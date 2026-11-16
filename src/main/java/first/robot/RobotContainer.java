@@ -11,6 +11,7 @@ import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.command2.sysid.SysIdRoutine.Direction;
+import org.wpilib.framework.RobotBase;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.tunable.Selectable;
 import org.wpilib.tunable.Tunables;
@@ -22,7 +23,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
 import first.robot.generated.TunerConstants;
+import first.robot.subsystems.Arm;
 import first.robot.subsystems.CommandSwerveDrivetrain;
+import first.robot.subsystems.Elevator;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -50,6 +53,9 @@ public class RobotContainer {
         Tunables.publish("Auto Mode", autoChooser);
 
         configureBindings();
+        if (RobotBase.isSimulation()) {
+            configurePreseasonMechanisms();
+        }
 
         // Warmup PathPlanner to avoid Java pauses
         CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
@@ -97,6 +103,19 @@ public class RobotContainer {
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+    }
+
+    private void configurePreseasonMechanisms() {
+        var elevator = new Elevator();
+        var arm = new Arm();
+
+        // Use the second controller so the existing drive controls keep their bindings.
+        var operator = new CommandXboxController(1);
+        var teleop = RobotModeTriggers.teleop();
+        teleop.and(operator.a()).onTrue(elevator.goToMeters(Elevator.LOW_METERS));
+        teleop.and(operator.y()).onTrue(elevator.goToMeters(Elevator.HIGH_METERS));
+        teleop.and(operator.x()).onTrue(arm.goToDegrees(Arm.LOW_DEGREES));
+        teleop.and(operator.b()).onTrue(arm.goToDegrees(Arm.HIGH_DEGREES));
     }
 
     public Command getAutonomousCommand() {
