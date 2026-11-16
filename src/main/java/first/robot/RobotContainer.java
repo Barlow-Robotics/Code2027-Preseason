@@ -109,7 +109,7 @@ public class RobotContainer {
         var elevator = new Elevator();
         var arm = new Arm();
 
-        // TODO 3: Bind your low and high goals to Xbox controller port 1 in Teleop.
+        // TODO 2: Bind your low and high goals to Xbox controller port 1 in Teleop.
     }
 
     public Command getAutonomousCommand() {

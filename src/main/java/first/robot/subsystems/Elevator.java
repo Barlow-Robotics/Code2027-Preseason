@@ -10,22 +10,20 @@ public final class Elevator extends SubsystemBase {
 
     private final ElevatorSim sim = new ElevatorSim();
 
-    // TODO 1: Add the TalonFX, configure it, and create a reusable position request.
-
-    public Command goToMeters(double goal) {
+    public Command setHeightGoalCommand(double goal) {
         return runOnce(() -> {
-            // TODO 1: Clamp and save the goal, convert it to mechanism turns, and send it.
+            // TODO 1: Add a target field and call a private method to clamp and save the goal.
         });
     }
 
     @Override
     public void periodic() {
-        // TODO 2: Publish the goal and TalonFX position in meters.
+        // TODO 3: Publish the goal in meters.
     }
 
     @Override
     public void simulationPeriodic() {
-        // TODO 1: Replace this zero-voltage preview with sim.step(motor.getSimState()).
+        // TODO 4: Connect the Talon FX simulation feedback after the target-only checkpoint.
         sim.update(0.0);
     }
 }
