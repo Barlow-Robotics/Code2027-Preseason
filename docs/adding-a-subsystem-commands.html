@@ -9,11 +9,11 @@
     <label><input type="radio" name="mechanism" value="arm"> Arm</label>
     <p id="selection-status" aria-live="polite">Showing the Elevator instructions below.</p>
   </fieldset>
-  <noscript><p>Enable JavaScript to switch mechanisms. The Elevator instructions are shown by default.</p></noscript></section><section id="files">  <h2>Find the files we will use</h2><p>Return to WPILib 2027 VS Code. We’ll first make a button change the goal and graph that goal, before adding motor control. The <strong>target</strong> is the position we ask for; the <strong>actual</strong> is where the mechanism is.</p>
+  <noscript><p>Enable JavaScript to switch mechanisms. The Elevator instructions are shown by default.</p></noscript></section><section id="files">  <h2>Find the files we will use</h2><p>A <strong>subsystem</strong> groups the code for one part of the robot, such as our elevator or arm. A <strong>command</strong> describes an action for it to perform.</p><p>Return to WPILib 2027 VS Code. We’ll first make a button change the goal and graph that goal, before adding motor control. The <strong>target</strong> is the position we ask for; the <strong>actual</strong> is where the mechanism is.</p>
   <ul>
     <li>Open <code><span data-elevator="src/main/java/first/robot/subsystems/Elevator.java" data-arm="src/main/java/first/robot/subsystems/Arm.java">src/main/java/first/robot/subsystems/Elevator.java</span></code>. This is the main file we will be editing.</li>
     <li>Open <code>src/main/java/first/robot/Constants.java</code>. Under <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code>, find <code>GEAR_RATIO</code>. This is the constant from the Mechanisms section: <strong><span data-elevator="12 motor turns per drum turn" data-arm="80 motor turns per arm turn">12 motor turns per drum turn</span></strong>. <span data-track="elevator">Also find <code>METERS_PER_DRUM_TURN</code>, our second conversion constant: the circumference that relates drum turns to elevator height. Notice how it is calculated from <code>DRUM_RADIUS_METERS</code>. </span>The file also contains the dimensions and allowed positions. The simulation uses these same values.</li>
-    <li>Open <code>src/main/java/first/robot/RobotContainer.java</code> and find <code>configureMechanisms()</code>. The starter creates both subsystems there during desktop simulation. You’ll add bindings for your track to this method.</li>
+    <li>Open <code>src/main/java/first/robot/RobotContainer.java</code> and find <code>configureMechanisms()</code>. The starter creates both subsystems there during desktop simulation. You’ll connect your mechanism’s commands to controller buttons in this method.</li>
   </ul>
   <h3>Run the starter once</h3>
   <ol>
@@ -48,10 +48,10 @@ private void setAngleGoal(double goal) {
 }</code></pre></div>
   <ul>
     <li><code>private double</code> declares a decimal number that only this class can change directly. It starts at the low preset, zero.</li>
-    <li><code>public Command</code> means other code can call this method and receive a command. Creating the command does not change the target yet.</li>
+    <li><code>public Command</code> means other code can call this method and receive a command. A method that creates and returns a command is called a <strong>command factory</strong>. Creating the command does not change the target yet.</li>
     <li><code>() -&gt;</code> describes work to do later. <code>runOnce</code> wraps that work in a command that calls the setter once when it starts, then finishes.</li>
     <li>The subsystem’s <code>runOnce</code> also makes this command require this subsystem. The scheduler—the code that runs commands—uses requirements to prevent two commands from controlling the same subsystem at once.</li>
-    <li>The private setter uses <code>Math.clamp</code> to keep the requested number between the minimum and maximum in <code>Constants.java</code>, then remembers it as the target.</li>
+    <li>The private setter uses <code>Math.clamp</code> to keep the requested number between the minimum and maximum in <code>Constants.java</code>, then remembers it as the target. <span data-track="elevator">The starter’s maximum height is 0.9 m; the earlier 1 m animation was an illustration of the conversion.</span></li>
   </ul>
   <p>For now, the setter only saves a number. We will add motor control after we can see that number change on a graph.</p>
 </section><section id="buttons">

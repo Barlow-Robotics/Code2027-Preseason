@@ -11,7 +11,9 @@
   </fieldset>
   <noscript><p>Enable JavaScript to switch mechanisms. The Elevator instructions are shown by default.</p></noscript></section><section id="motor">
   <h2>Make the mechanism follow the goal</h2>
+  <p>Your buttons now change the target on the graph. Next, we’ll send that target to the <strong>Talon FX motor controller</strong>, the device that drives the motor. We use CTRE’s <strong>Phoenix</strong> library to configure it and send requests.</p>
   <h3>Add a Motion Magic request</h3>
+  <p><strong>Motion Magic</strong> moves toward a position using a planned speed and acceleration. The Talon compares the measured position with that plan and adjusts the motor output.</p>
   <p>The starter already creates the <code>motor</code> field and connects it to the simulation. In your subsystem file, add these three imports alongside the existing imports near the top:</p>
   <pre data-snippet="motor-imports"><code>import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -90,15 +92,15 @@ telemetry.log("Actual_deg", measuredTurns * 360.0);</code></pre></div>
   <p class="check"><strong>Done when</strong> the same buttons pass both checkpoints. Point out where the target and actual differ most and explain why.</p>
   <details>
     <summary>The starter or your code fails to launch</summary>
-    <p>Check that you opened the top-level <code>Code2027-Preseason</code> folder in WPILib 2027 VS Code. Read the first error in the terminal. A Java compile error will point to a file and line. A Talon configuration exception names the subsystem and reports the Phoenix status. Recheck the CAN ID and bus against your track.</p>
+    <p>Check that you opened the top-level <code>Code2027-Preseason</code> folder in WPILib 2027 VS Code. Read the first error in the terminal. A Java compile error will point to a file and line. A Talon configuration exception names the subsystem and reports the Phoenix status. Recheck the CAN ID and bus against the example for your mechanism.</p>
   </details>
   <details>
     <summary>The drawing appears but the numeric fields are missing</summary>
-    <p>Check that you restarted the robot after editing and that the expected <code>telemetry.log</code> call is in the existing <code>periodic()</code> override. Check the case of <code>Preseason</code>, the track name, and the two keys.</p>
+    <p>Check that you restarted the robot after editing and that the expected <code>telemetry.log</code> call is in the existing <code>periodic()</code> override. Check the spelling and capital letters in <code>Preseason</code>, your mechanism’s name, and the field names.</p>
   </details>
   <details>
     <summary>The target stays flat when I press high</summary>
-    <p>Verify Teleop is enabled and the button indicator lights up under port 1. Check the track’s high button and put a breakpoint inside the <code>runOnce</code> body. If the breakpoint never hits, inspect the trigger in <code>configureMechanisms()</code>. If it hits, check where you assign and log the target.</p>
+    <p>Verify Teleop is enabled and the button indicator lights up under port 1. Check that the high button calls your command in <code>configureMechanisms()</code>, that <code>runOnce</code> calls the private setter, and that <code>periodic()</code> logs the target field.</p>
   </details>
   <details>
     <summary>The target moves but actual stays flat or moves the wrong distance</summary>
