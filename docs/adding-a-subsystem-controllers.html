@@ -39,14 +39,14 @@ private double targetDegrees = ArmConstants.LOW_DEGREES;
   <h3>Apply the configuration once</h3>
 <div class="code-edit" data-edit="config"><p>Find your subsystem’s constructor containing TODO 7:</p>
 <div data-track="elevator"><p class="code-caption">Before — red lines will change</p><pre data-existing="config-elevator"><code>public Elevator() {
-<span class="code-line code-removed">    // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.</span>
+<span class="code-line code-removed">    // TODO 7: Configure feedback, gains, and Motion Magic after the first graph checkpoint.</span>
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
     motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 }</code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">Before — red lines will change</p><pre data-existing="config-arm"><code>public Arm() {
-<span class="code-line code-removed">    // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.</span>
+<span class="code-line code-removed">    // TODO 7: Configure feedback, gains, and Motion Magic after the first graph checkpoint.</span>
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
@@ -121,35 +121,11 @@ private double targetDegrees = ArmConstants.LOW_DEGREES;
 <span class="code-line code-added">    motor.setControl(positionRequest.withPosition(goalTurns));</span>
 }</code></pre></div></div>
   <p><span data-elevator="Dividing meters by meters per drum turn converts our height into drum turns. A 0.65 m goal is about 4.14 drum turns." data-arm="Dividing degrees by 360 converts our angle into arm turns. A 65° goal is about 0.181 arm turns.">Dividing meters by meters per drum turn converts our height into drum turns. A 0.65 m goal is about 4.14 drum turns.</span> <code>withPosition</code> updates the request with that goal. <code>motor.setControl</code> sends it to the Talon, which continues running its position control after our one-shot command finishes.</p>
-  <h3>Log the actual position</h3>
-  <p>The supplied <code>simulationPeriodic()</code> method already connects the Talon to the physics model and updates the drawing. Leave that method as it is. Now we can read the Talon’s position and graph it.</p>
-<div class="code-edit" data-edit="actual"><p>Find <code>periodic()</code>, where you are already logging the target:</p>
-<div data-track="elevator"><p class="code-caption">Before — find this code</p><pre data-existing="actual-elevator"><code>@Override
-public void periodic() {
-    telemetry.log(&quot;Target_m&quot;, targetMeters);
-}</code></pre></div>
-<div data-track="arm" hidden><p class="code-caption">Before — find this code</p><pre data-existing="actual-arm"><code>@Override
-public void periodic() {
-    telemetry.log(&quot;Target_deg&quot;, targetDegrees);
-}</code></pre></div>
-<p>Keep the target log. Add the two green lines to read the Talon’s position, convert it back to the same units as the target, and log the actual position:</p>
-<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="actual-elevator"><code>@Override
-public void periodic() {
-    telemetry.log(&quot;Target_m&quot;, targetMeters);
-<span class="code-line code-added">    double measuredTurns = motor.getPosition().getValueAsDouble();</span>
-<span class="code-line code-added">    telemetry.log(&quot;Actual_m&quot;, measuredTurns * ElevatorConstants.METERS_PER_DRUM_TURN);</span>
-}</code></pre></div>
-<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="actual-arm"><code>@Override
-public void periodic() {
-    telemetry.log(&quot;Target_deg&quot;, targetDegrees);
-<span class="code-line code-added">    double measuredTurns = motor.getPosition().getValueAsDouble();</span>
-<span class="code-line code-added">    telemetry.log(&quot;Actual_deg&quot;, measuredTurns * 360.0);</span>
-}</code></pre></div></div>
-<p><code>getPosition()</code> gets the Talon’s position signal. <code>getValueAsDouble()</code> reads its numeric value in mechanism turns. We convert it back into <span data-elevator="meters" data-arm="degrees">meters</span> so target and actual use the same units on the graph.</p>
+  <p>Keep the target and actual logging you added earlier. The supplied <code>simulationPeriodic()</code> method updates the simulated mechanism and its motor sensor readings.</p>
 </section><section id="test">
   <h2>Checkpoint 2 · Compare target and actual</h2>
   <ol>
-    <li>Save and restart the simulator. Check port 1, reconnect AdvantageScope if needed, and add <code><span data-elevator="Actual_m" data-arm="Actual_deg">Actual_m</span></code> to the same axis as the target.</li>
+    <li>Save and restart the simulator. Check port 1, reconnect AdvantageScope if needed, and keep target and actual on the same axis as before.</li>
     <li>Enable Teleop with the buttons released. Press the same high button, wait about three seconds, then press low. Disable when both moves are done.</li>
     <li>The target steps first, then actual position moves toward it. Check that the actual settles near the goal and that the Mechanism drawing follows it.</li>
   </ol>

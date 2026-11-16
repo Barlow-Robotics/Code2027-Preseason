@@ -26,14 +26,14 @@ private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConsta
 <h3>Recognize the constructor</h3>
 <p><strong>Existing code—leave it as it is for now.</strong> Immediately below the fields, find the constructor. It has the same name as the class and runs when we create an instance:</p>
 <div data-track="elevator"><pre data-existing="constructor-elevator"><code>public Elevator() {
-    // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
+    // TODO 7: Configure feedback, gains, and Motion Magic after the first graph checkpoint.
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
     motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 }</code></pre></div>
 <div data-track="arm" hidden><pre data-existing="constructor-arm"><code>public Arm() {
-    // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
+    // TODO 7: Configure feedback, gains, and Motion Magic after the first graph checkpoint.
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.

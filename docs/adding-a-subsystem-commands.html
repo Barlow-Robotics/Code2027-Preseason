@@ -119,57 +119,67 @@ private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConsta
 <p><code>operator.<span data-elevator="a" data-arm="x">a</span>()</code> represents the low button. <code>onTrue</code> starts its command when the button changes from released to pressed. The second line does the same for the high button.</p>
   <p>The expression inside <code>onTrue(...)</code> calls your subsystem’s command factory. When you press the button, the scheduler runs that command, which calls your private setter and saves the goal. These commands do not run while the robot is disabled; we will test with Teleop enabled.</p>
 </section><section id="telemetry">
-  <h2>Graph the target</h2>
-<div class="code-edit" data-edit="telemetry-imports"><p>Return to your subsystem file. Find these imports near the top:</p>
+  <h2>Graph target and actual position</h2>
+<div class="code-edit" data-edit="telemetry-imports"><p>Return to your subsystem file. Find TODO 6a below the imports near the top:</p>
 <p class="code-caption">Before — find this code</p><pre data-existing="telemetry-imports"><code>import org.wpilib.command2.Command;
-import org.wpilib.command2.SubsystemBase;</code></pre>
-<p>Add the two telemetry imports below them. Imports let Java find the classes used in our code:</p>
+import org.wpilib.command2.SubsystemBase;
+<span class="code-line code-removed">// TODO 6a: Add the telemetry imports.</span></code></pre>
+<p>Replace TODO 6a with the two telemetry imports. Imports let Java find the classes used in our code:</p>
 <p class="code-caption">After — green lines are new or changed</p><pre data-snippet="telemetry-imports"><code>import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 <span class="code-line code-added">import org.wpilib.telemetry.Telemetry;</span>
 <span class="code-line code-added">import org.wpilib.telemetry.TelemetryTable;</span></code></pre></div>
-<div class="code-edit" data-edit="telemetry-field"><p>Inside the class, find the target field you added earlier:</p>
-<div data-track="elevator"><p class="code-caption">Before — find this code</p><pre data-existing="telemetry-field-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;</code></pre></div>
-<div data-track="arm" hidden><p class="code-caption">Before — find this code</p><pre data-existing="telemetry-field-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;</code></pre></div>
-<p>Add the telemetry table field immediately below it. This table will hold the values we graph:</p>
+<div class="code-edit" data-edit="telemetry-field"><p>Inside the class, find TODO 6b below the target field you added earlier:</p>
+<div data-track="elevator"><p class="code-caption">Before — find this code</p><pre data-existing="telemetry-field-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;
+<span class="code-line code-removed">// TODO 6b: Add a telemetry table field.</span></code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">Before — find this code</p><pre data-existing="telemetry-field-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;
+<span class="code-line code-removed">// TODO 6b: Add a telemetry table field.</span></code></pre></div>
+<p>Replace TODO 6b with the telemetry table field. This table will hold the values we graph:</p>
 <div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="telemetry-field-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;
 <span class="code-line code-added">private final TelemetryTable telemetry =</span>
 <span class="code-line code-added">    Telemetry.getTable(&quot;Elevator&quot;);</span></code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="telemetry-field-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;
 <span class="code-line code-added">private final TelemetryTable telemetry =</span>
 <span class="code-line code-added">    Telemetry.getTable(&quot;Arm&quot;);</span></code></pre></div></div>
-<div class="code-edit" data-edit="target"><p>Find <code>periodic()</code>, which still contains TODO 6:</p>
+<div class="code-edit" data-edit="target"><p>Find <code>periodic()</code>, which still contains TODO 6c:</p>
 <div data-track="elevator"><p class="code-caption">Before — red lines will change</p><pre data-existing="target-elevator"><code>@Override
 public void periodic() {
-<span class="code-line code-removed">    // TODO 6: Publish the goal in meters.</span>
+<span class="code-line code-removed">    // TODO 6c: Publish target and actual position in meters.</span>
 }</code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">Before — red lines will change</p><pre data-existing="target-arm"><code>@Override
 public void periodic() {
-<span class="code-line code-removed">    // TODO 6: Publish the goal in degrees.</span>
+<span class="code-line code-removed">    // TODO 6c: Publish target and actual position in degrees.</span>
 }</code></pre></div>
-<p>Replace the TODO with the target log call. The scheduler calls this method repeatedly, so the graph will keep receiving the current goal:</p>
+<p>Replace TODO 6c with the following code. It logs the goal and the measured position each time the scheduler calls this method:</p>
 <div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="target-elevator"><code>@Override
 public void periodic() {
 <span class="code-line code-added">    telemetry.log(&quot;Target_m&quot;, targetMeters);</span>
+<span class="code-line code-added">    double motorTurns = motor.getRotorPosition().getValueAsDouble();</span>
+<span class="code-line code-added">    double mechanismTurns = motorTurns / ElevatorConstants.GEAR_RATIO;</span>
+<span class="code-line code-added">    telemetry.log(&quot;Actual_m&quot;, mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);</span>
 }</code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="target-arm"><code>@Override
 public void periodic() {
 <span class="code-line code-added">    telemetry.log(&quot;Target_deg&quot;, targetDegrees);</span>
+<span class="code-line code-added">    double motorTurns = motor.getRotorPosition().getValueAsDouble();</span>
+<span class="code-line code-added">    double mechanismTurns = motorTurns / ArmConstants.GEAR_RATIO;</span>
+<span class="code-line code-added">    telemetry.log(&quot;Actual_deg&quot;, mechanismTurns * 360.0);</span>
 }</code></pre></div></div>
+  <p><code>getRotorPosition()</code> reads motor rotations; <code>getValueAsDouble()</code> gives us the number. Divide by <code>GEAR_RATIO</code> to get mechanism turns, then multiply by <span data-elevator="meters per drum turn to get height" data-arm="360 to get degrees">meters per drum turn to get height</span>. This uses the ratio we determined earlier and works before we configure motor control.</p>
   <ul>
     <li><code>private final TelemetryTable telemetry</code> remembers the table we write to. <code>final</code> means this field keeps referring to the same table.</li>
     <li>The <code>getTable</code> call creates a table named <code><span data-elevator="Elevator" data-arm="Arm">Elevator</span></code>.</li>
     <li><code>@Override</code> marks a method supplied by the subsystem framework that we are filling in. The scheduler calls <code>periodic()</code> repeatedly, normally every 20 milliseconds.</li>
-    <li><code>telemetry.log</code> publishes the target under the name in quotes. The suffix <code><span data-elevator="_m" data-arm="_deg">_m</span></code> tells us the unit. This project’s WPILib telemetry sends these values to NetworkTables, where AdvantageScope can read them.</li>
+    <li><code>telemetry.log</code> publishes each value under the name in quotes. The suffix <code><span data-elevator="_m" data-arm="_deg">_m</span></code> tells us the unit. This project’s WPILib telemetry sends these values to NetworkTables, where AdvantageScope can read them.</li>
   </ul>
-  <h3>Checkpoint 1 · Press the buttons and watch the target</h3>
+  <h3>Checkpoint 1 · Press the buttons and compare the lines</h3>
   <ol>
     <li>Save and restart <strong>WPILib: Simulate Robot Code</strong>. While disabled, drag your Xbox controller from <strong>System Joysticks</strong> to port <strong>1</strong> in <strong>Joysticks</strong>. Check that the face-button indicators change. For keyboard input, assign a Keyboard entry to port 1 and check its mappings in the simulator’s <strong>DS</strong> menu.</li>
-    <li>In AdvantageScope, connect to the simulator. Open a <strong>Line Graph</strong> tab and drag <code><span data-elevator="Target_m" data-arm="Target_deg">Target_m</span></code> from <code>Telemetry → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code> to the graph.</li>
+    <li>In AdvantageScope, connect to the simulator. Open a <strong>Line Graph</strong> tab and drag <code><span data-elevator="Target_m" data-arm="Target_deg">Target_m</span></code> from <code>Telemetry → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code> to the same axis on the graph.</li>
     <li>Release the buttons, enable simulated <strong>Teleop</strong>, then press high and low a few seconds apart. Use <strong><span data-elevator="Y then A" data-arm="B then X">Y then A</span></strong>.</li>
   </ol>
-<figure class="screenshot-placeholder" id="shot-controller"><strong>Screenshot to add · Put the controller on port 1</strong><figcaption>Show the Sim GUI with the operator controller assigned to port 1 and the matching face-button indicators visible.</figcaption></figure><figure class="screenshot-placeholder" id="shot-target"><strong>Screenshot to add · Checkpoint 1 in AdvantageScope</strong><figcaption>Show a target-only Line Graph with the high and low button presses visible as steps. Show the field name and units.</figcaption></figure>
-  <p class="check"><strong>Expected.</strong> The target jumps from 0 to <span data-elevator="0.65 m" data-arm="65°">0.65 m</span> and back to 0. The simulation is already connected to the Talon, but we have not sent a motor-control request, so its output is still zero volts. The unpowered mechanism may move under gravity. If the target stays flat, check Teleop, the port 1 button indicator, and whether the command calls the setter. Stop the simulator before the next step.</p>
+<figure class="screenshot-placeholder" id="shot-controller"><strong>Screenshot to add · Put the controller on port 1</strong><figcaption>Show the Sim GUI with the operator controller assigned to port 1 and the matching face-button indicators visible.</figcaption></figure><figure class="screenshot-placeholder" id="shot-target"><strong>Screenshot to add · Checkpoint 1 in AdvantageScope</strong><figcaption>Show target and actual on the same axis before motor control is added. Target steps with button presses while actual does not follow it. Show both field names and units.</figcaption></figure>
+  <p class="check"><strong>Expected.</strong> The target jumps from 0 to <span data-elevator="0.65 m" data-arm="65°">0.65 m</span> and back to 0. The simulation is already connected to the Talon, but we have not sent a motor-control request, so its output is still zero volts. Actual position does not follow the target. The unpowered mechanism may move under gravity, so its line may move on its own before settling at a limit. If the target stays flat, check Teleop, the port 1 button indicator, and whether the command calls the setter. Stop the simulator before the next step.</p>
 </section><div class="lesson-next"><a data-lesson-link href="adding-a-subsystem-subsystem.html">← Adding your subsystem</a><a data-lesson-link href="adding-a-subsystem-controllers.html">Next section: Controllers →</a></div></main>
 <footer class="wrap">
   <a href="https://docs.github.com/en/desktop/making-changes-in-a-branch/managing-branches-in-github-desktop">GitHub Desktop branches</a> ·
