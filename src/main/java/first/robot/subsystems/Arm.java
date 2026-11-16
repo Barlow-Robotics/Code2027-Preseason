@@ -16,14 +16,11 @@ import first.robot.generated.TunerConstants;
 
 /** Simulated arm used in the preseason controls lesson. */
 public final class Arm extends SubsystemBase {
-    public static final double LOW_DEGREES = 0.0;
-    public static final double HIGH_DEGREES = 65.0;
-
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(21, TunerConstants.kCANBus);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
     private final TelemetryTable telemetry = Telemetry.getTable("Arm");
-    private double targetDegrees = LOW_DEGREES;
+    private double targetDegrees = ArmConstants.LOW_DEGREES;
 
     public Arm() {
         var config = new TalonFXConfiguration();

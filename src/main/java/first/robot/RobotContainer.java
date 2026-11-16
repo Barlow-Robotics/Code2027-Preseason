@@ -21,6 +21,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
+import first.robot.Constants.ArmConstants;
+import first.robot.Constants.ElevatorConstants;
 import first.robot.generated.TunerConstants;
 import first.robot.subsystems.Arm;
 import first.robot.subsystems.CommandSwerveDrivetrain;
@@ -111,13 +113,13 @@ public class RobotContainer {
     }
 
     private void configureElevatorBindings() {
-        operator.a().onTrue(elevator.setHeightGoalCommand(Elevator.LOW_METERS));
-        operator.y().onTrue(elevator.setHeightGoalCommand(Elevator.HIGH_METERS));
+        operator.a().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));
+        operator.y().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));
     }
 
     private void configureArmBindings() {
-        operator.x().onTrue(arm.setAngleGoalCommand(Arm.LOW_DEGREES));
-        operator.b().onTrue(arm.setAngleGoalCommand(Arm.HIGH_DEGREES));
+        operator.x().onTrue(arm.setAngleGoalCommand(ArmConstants.LOW_DEGREES));
+        operator.b().onTrue(arm.setAngleGoalCommand(ArmConstants.HIGH_DEGREES));
     }
 
     public Command getAutonomousCommand() {
