@@ -15,8 +15,11 @@ import first.robot.Constants.ElevatorConstants;
 
 /** Physics and Mechanism2d drawing for the desktop elevator. */
 final class ElevatorSim {
+    // Physical gearbox in this model, independent of the student's controller configuration.
+    private static final double MODEL_GEAR_RATIO = 12.0;
+
     private final org.wpilib.simulation.ElevatorSim physics = new org.wpilib.simulation.ElevatorSim(
-        DCMotor.getKrakenX60(1), ElevatorConstants.GEAR_RATIO, 5.0, ElevatorConstants.DRUM_RADIUS_METERS,
+        DCMotor.getKrakenX60(1), MODEL_GEAR_RATIO, 5.0, ElevatorConstants.DRUM_RADIUS_METERS,
         ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS, true, 0.0);
 
     private final TelemetryTable telemetry = Telemetry.getTable("Elevator");
@@ -29,8 +32,8 @@ final class ElevatorSim {
         motor.setSupplyVoltage(RobotController.getBatteryVoltage());
         update(motor.getMotorVoltage());
         // Phoenix simulation needs raw motor rotations, before SensorToMechanismRatio is applied.
-        motor.setRawRotorPosition(physics.getPosition() / ElevatorConstants.METERS_PER_DRUM_TURN * ElevatorConstants.GEAR_RATIO);
-        motor.setRotorVelocity(physics.getVelocity() / ElevatorConstants.METERS_PER_DRUM_TURN * ElevatorConstants.GEAR_RATIO);
+        motor.setRawRotorPosition(physics.getPosition() / ElevatorConstants.METERS_PER_DRUM_TURN * MODEL_GEAR_RATIO);
+        motor.setRotorVelocity(physics.getVelocity() / ElevatorConstants.METERS_PER_DRUM_TURN * MODEL_GEAR_RATIO);
     }
 
     void update(double motorVolts) {
