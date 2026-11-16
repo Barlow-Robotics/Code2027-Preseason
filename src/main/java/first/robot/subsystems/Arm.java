@@ -15,7 +15,7 @@ public final class Arm extends SubsystemBase {
     private final TalonFX motor = new TalonFX(21, TunerConstants.kCANBus);
 
     public Arm() {
-        // TODO 5: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
+        // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
 
         // Setup Simulation
         // Sets the simulated motor model. This setup is prepared for you; leave it in place.
@@ -24,13 +24,13 @@ public final class Arm extends SubsystemBase {
 
     public Command setAngleGoalCommand(double goal) {
         return runOnce(() -> {
-            // TODO 2: Add a target field and call a private method to clamp and save the goal.
+            // TODO 3: Add a target field and call a private method to clamp and save the goal.
         });
     }
 
     @Override
     public void periodic() {
-        // TODO 4: Publish the goal in degrees.
+        // TODO 6: Publish the goal in degrees.
     }
 
     @Override

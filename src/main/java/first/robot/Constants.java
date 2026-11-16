@@ -11,7 +11,7 @@ public final class Constants {
         public static final double LOW_METERS = 0.0;
         public static final double HIGH_METERS = 0.65;
 
-        // TODO 1a: Set the gear ratio using the Mechanisms walkthrough.
+        // TODO 1: Set the gear ratio using the Mechanisms walkthrough.
         public static final double GEAR_RATIO = 1.0; // motor turns per drum turn
         public static final double MIN_METERS = 0.0;
         public static final double MAX_METERS = 0.9;
@@ -26,7 +26,7 @@ public final class Constants {
         public static final double LOW_DEGREES = 0.0;
         public static final double HIGH_DEGREES = 65.0;
 
-        // TODO 1a: Set the gear ratio using the Mechanisms walkthrough.
+        // TODO 1: Set the gear ratio using the Mechanisms walkthrough.
         public static final double GEAR_RATIO = 1.0; // motor turns per arm turn
         public static final double MIN_DEGREES = -20.0;
         public static final double MAX_DEGREES = 95.0;
