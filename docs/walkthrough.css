@@ -31,7 +31,7 @@ section + section { border-top:1px solid var(--line); }
 section > :is(p,ol,ul,details) { max-width:74ch; }
 p { margin:.5rem 0 1rem; }
 ul,ol { padding-inline-start:1.4rem; }
-li + li { margin-top:.5rem; }
+section li + li { margin-top:.5rem; }
 code,pre { font-family:Consolas,"Courier New",monospace; font-size:.9em; }
 p code,li code { background:#eff3f0; padding:.12em .3em; border-radius:3px; overflow-wrap:anywhere; }
 pre { max-width:100%; overflow:auto; margin:1rem 0; padding:1rem 1.2rem; border:1px solid var(--line); border-radius:6px; background:var(--surface); color:var(--ink); line-height:1.6; tab-size:4; }
