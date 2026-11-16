@@ -13,7 +13,7 @@ import first.robot.Constants.ElevatorConstants;
 public final class Elevator extends SubsystemBase {
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-    // TODO 3: Add a field to store the target position.
+    // TODO 3a: Add a field to store the target position.
 
     public Elevator() {
         // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
@@ -25,11 +25,11 @@ public final class Elevator extends SubsystemBase {
 
     public Command setHeightGoalCommand(double goal) {
         return runOnce(() -> {
-            // TODO 3: Call the private function that saves the goal.
+            // TODO 3c: Call the private function that saves the goal.
         });
     }
 
-    // TODO 3: Add the private setHeightGoal(double goal) function here.
+    // TODO 3b: Add the private setHeightGoal(double goal) function here.
 
     @Override
     public void periodic() {

@@ -14,13 +14,13 @@
   <p>Your subsystem now exists and its simulation drawing is running. A <strong>command</strong> describes an action for it to perform. We’ll make one that changes the <strong>target</strong>—the position we ask for—and graph that target before adding motor control.</p>
   <p>We’ll use the constants you found in the previous section to keep the goal within the mechanism’s allowed positions.</p>
   <h3>Add a private function to save the goal</h3>
-  <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Find TODO 3 just below the existing <code>sim</code> and <code>motor</code> fields:</p>
+  <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Find TODO 3a just below the existing <code>sim</code> and <code>motor</code> fields:</p>
 <div data-track="elevator"><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="target-field-location-elevator"><code>private final ElevatorSim sim = new ElevatorSim();
 private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-<span class="code-line code-removed">// TODO 3: Add a field to store the target position.</span></code></pre></div>
+<span class="code-line code-removed">// TODO 3a: Add a field to store the target position.</span></code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="target-field-location-arm"><code>private final ArmSim sim = new ArmSim();
 private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-<span class="code-line code-removed">// TODO 3: Add a field to store the target position.</span></code></pre></div>
+<span class="code-line code-removed">// TODO 3a: Add a field to store the target position.</span></code></pre></div>
 <p>Modify this part of the file to match the following. Keep the existing <code>sim</code> and <code>motor</code> fields; replace only the TODO line:</p>
 <div data-track="elevator"><p class="code-caption">After — the new field is green</p><pre data-snippet="goal-field-elevator"><code>private final ElevatorSim sim = new ElevatorSim();
 private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
@@ -29,25 +29,25 @@ private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerC
 private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
 <span class="code-line code-added">private double targetDegrees = ArmConstants.LOW_DEGREES;</span></code></pre></div>
   <p>A <strong>field</strong> is a value the subsystem remembers between calls. <code>private double</code> declares a decimal number that only this class can change directly. It starts at the low preset, zero.</p>
-<div class="code-edit" data-edit="goal-setter"><p>In your subsystem file, find the TODO 3 placeholder immediately below the command factory:</p>
+<div class="code-edit" data-edit="goal-setter"><p>In your subsystem file, find the TODO 3b placeholder immediately below the command factory:</p>
 <div data-track="elevator"><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="goal-setter-elevator"><code>public Command setHeightGoalCommand(double goal) {
     return runOnce(() -&gt; {
-        // TODO 3: Call the private function that saves the goal.
+        // TODO 3c: Call the private function that saves the goal.
     });
 }
 
-<span class="code-line code-removed">// TODO 3: Add the private setHeightGoal(double goal) function here.</span></code></pre></div>
+<span class="code-line code-removed">// TODO 3b: Add the private setHeightGoal(double goal) function here.</span></code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="goal-setter-arm"><code>public Command setAngleGoalCommand(double goal) {
     return runOnce(() -&gt; {
-        // TODO 3: Call the private function that saves the goal.
+        // TODO 3c: Call the private function that saves the goal.
     });
 }
 
-<span class="code-line code-removed">// TODO 3: Add the private setAngleGoal(double goal) function here.</span></code></pre></div>
+<span class="code-line code-removed">// TODO 3b: Add the private setAngleGoal(double goal) function here.</span></code></pre></div>
 <p>Replace the placeholder with the private function shown in green. Keep the command factory above it unchanged for this edit:</p>
 <div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-setter-elevator"><code>public Command setHeightGoalCommand(double goal) {
     return runOnce(() -&gt; {
-        // TODO 3: Call the private function that saves the goal.
+        // TODO 3c: Call the private function that saves the goal.
     });
 }
 
@@ -56,7 +56,7 @@ private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConsta
 <span class="code-line code-added">}</span></code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-setter-arm"><code>public Command setAngleGoalCommand(double goal) {
     return runOnce(() -&gt; {
-        // TODO 3: Call the private function that saves the goal.
+        // TODO 3c: Call the private function that saves the goal.
     });
 }
 
@@ -66,15 +66,15 @@ private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConsta
   <p><code>goal</code> is the requested position. <code>Math.clamp</code> keeps it between the minimum and maximum in <code>Constants.java</code>, then the function saves it in the target field. <span data-track="elevator">The elevator’s configured maximum height is 0.9 m; the earlier 1 m animation was an illustration of the conversion.</span></p>
   <p>This function is <code>private</code>, so only this subsystem can call it. It saves a number for now; we’ll add motor control later.</p>
   <h3>Have the command factory call the function</h3>
-<div class="code-edit" data-edit="goal-command"><p>Find the command factory containing TODO 3:</p>
+<div class="code-edit" data-edit="goal-command"><p>Find the command factory containing TODO 3c:</p>
 <div data-track="elevator"><p class="code-caption">Before — red lines will change</p><pre data-existing="goal-command-elevator"><code>public Command setHeightGoalCommand(double goal) {
 <span class="code-line code-removed">    return runOnce(() -&gt; {</span>
-<span class="code-line code-removed">        // TODO 3: Call the private function that saves the goal.</span>
+<span class="code-line code-removed">        // TODO 3c: Call the private function that saves the goal.</span>
 <span class="code-line code-removed">    });</span>
 }</code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">Before — red lines will change</p><pre data-existing="goal-command-arm"><code>public Command setAngleGoalCommand(double goal) {
 <span class="code-line code-removed">    return runOnce(() -&gt; {</span>
-<span class="code-line code-removed">        // TODO 3: Call the private function that saves the goal.</span>
+<span class="code-line code-removed">        // TODO 3c: Call the private function that saves the goal.</span>
 <span class="code-line code-removed">    });</span>
 }</code></pre></div>
 <p>Change the <code>runOnce</code> body so it calls the private function you just added. Keep the method name and parameter:</p>
