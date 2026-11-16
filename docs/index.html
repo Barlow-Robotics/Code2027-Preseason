@@ -74,11 +74,11 @@ footer { padding-bottom:2rem; color:var(--muted); }
 <section id="start">
   <h2>Set up and pick a mechanism</h2>
   <ol>
-    <li>Open the <code>Code2027-Preseason</code> folder in the team's WPILib VS Code. Open it at the level containing <code>build.gradle</code>. Use the project’s 2027 alpha toolchain and Java 25.</li>
-    <li>In the VS Code terminal, start from the lesson’s <code>main</code> and create your pair’s branch. Replace <code>pair-name</code> with a unique name.</li>
+    <li>In <strong>GitHub Desktop</strong>, select <code>Code2027-Preseason</code> under <strong>Current Repository</strong>. If the folder is already on your computer but missing from the list, choose <strong>File → Add Local Repository</strong> and select that folder.</li>
+    <li>Choose <strong>Current Branch → main</strong>. If you are getting the lesson starter from GitHub, click <strong>Fetch origin</strong> and then <strong>Pull origin</strong> if it appears.</li>
+    <li>Choose <strong>Current Branch → New Branch</strong>. Enter <code>lab/pair-name</code> with a unique name for your pair, select <code>main</code> as the base if prompted, then click <strong>Create Branch</strong>. Confirm your new branch is shown under <strong>Current Branch</strong>.</li>
+    <li>Open the same <code>Code2027-Preseason</code> folder in the team's <strong>WPILib VS Code</strong>. Open the folder that contains <code>build.gradle</code>. Use the project's WPILib 2027 alpha toolchain and Java 25.</li>
   </ol>
-  <pre><code>git switch main
-git switch -c lab/pair-name</code></pre>
   <div class="tracks" aria-label="Choose one mechanism">
     <div class="track">
       <h3>Elevator</h3>
@@ -301,6 +301,7 @@ telemetry.log("Actual_deg", measuredTurns * 360.0);</code></pre>
 </section>
 </main>
 <footer class="wrap">
+  <a href="https://docs.github.com/en/desktop/making-changes-in-a-branch/managing-branches-in-github-desktop">GitHub Desktop branches</a> ·
   <a href="https://docs.wpilib.org/en/latest/docs/software/wpilib-tools/robot-simulation/simulation-gui.html">WPILib Simulation GUI</a> · <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html">Phoenix position control</a> ·
   <a href="https://github.com/wpilibsuite/allwpilib/blob/main/telemetry/doc/telemetry.md">WPILib telemetry</a> ·
   <a href="https://docs.advantagescope.org/tab-reference/line-graph/">AdvantageScope Line Graph</a>
