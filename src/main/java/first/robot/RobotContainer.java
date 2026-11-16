@@ -41,7 +41,7 @@ public class RobotContainer {
     private final SwerveTelemetry logger = new SwerveTelemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
-    private final CommandXboxController operator = new CommandXboxController(1);
+    // TODO 3a: Add an operator CommandXboxController field on port 1.
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     // TODO 1: Add your Elevator or Arm subsystem field here.
@@ -110,11 +110,11 @@ public class RobotContainer {
     }
 
     private void configureElevatorBindings() {
-        // TODO 3: Bind A and Y on the operator controller to the low and high elevator goals.
+        // TODO 3b: Bind A and Y on the operator controller to the low and high elevator goals.
     }
 
     private void configureArmBindings() {
-        // TODO 3: Bind X and B on the operator controller to the low and high arm goals.
+        // TODO 3b: Bind X and B on the operator controller to the low and high arm goals.
     }
 
     public Command getAutonomousCommand() {

@@ -62,11 +62,11 @@ private void setAngleGoal(double goal) {
   <p>For now, the setter only saves a number. We will add motor control after we can see that number change on a graph.</p>
 </section><section id="buttons">
   <h2>Bind your two buttons</h2>
-  <p>Open <code>RobotContainer.java</code>. The starter already creates an <code>operator</code> controller near the top of the class:</p>
+  <p>Open <code>RobotContainer.java</code>. Near the top of the class, find the existing <code>joystick</code> field for port 0. Replace TODO 3a immediately below it with this new field:</p>
   <pre data-snippet="operator"><code>private final CommandXboxController operator = new CommandXboxController(1);</code></pre>
-  <p><code>new CommandXboxController(1)</code> reads the controller assigned to port 1. The field named <code>operator</code> lets the elevator and arm bindings share that controller. Port 0 continues to drive the swerve. This line is already supplied; you do not need to add it.</p>
+  <p><code>new CommandXboxController(1)</code> reads the controller assigned to port 1. The field named <code>operator</code> lets the elevator and arm bindings share that controller. Port 0 continues to drive the swerve. Keep both controller fields: <code>joystick</code> for driving and <code>operator</code> for your mechanism.</p>
   <p><code>configureBindings()</code> organizes the controls by calling <code>configureDriveBindings()</code>, <code>configureElevatorBindings()</code>, and <code>configureArmBindings()</code>.</p>
-  <p>Find <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>. Your subsystem already exists as a field in this class. Replace the TODO 3 comment with these two button bindings:</p>
+  <p>Find <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>. Your subsystem already exists as a field in this class. Replace the TODO 3b comment with these two button bindings:</p>
   <div data-track="elevator"><pre data-snippet="bind-elevator"><code>operator.a().onTrue(elevator.setHeightGoalCommand(Elevator.LOW_METERS));
 operator.y().onTrue(elevator.setHeightGoalCommand(Elevator.HIGH_METERS));</code></pre></div>
   <div data-track="arm" hidden><pre data-snippet="bind-arm"><code>operator.x().onTrue(arm.setAngleGoalCommand(Arm.LOW_DEGREES));
