@@ -13,6 +13,7 @@ import first.robot.Constants.ArmConstants;
 public final class Arm extends SubsystemBase {
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+    // TODO 3: Add a field to store the target position.
 
     public Arm() {
         // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.

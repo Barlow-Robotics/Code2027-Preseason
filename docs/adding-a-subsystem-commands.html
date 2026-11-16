@@ -14,7 +14,14 @@
   <p>Your subsystem now exists and its simulation drawing is running. A <strong>command</strong> describes an action for it to perform. We’ll make one that changes the <strong>target</strong>—the position we ask for—and graph that target before adding motor control.</p>
   <p>We’ll use the constants you found in the previous section to keep the goal within the mechanism’s allowed positions.</p>
   <h3>Add a private function to save the goal</h3>
-  <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. First add this field alongside the existing <code>sim</code> and <code>motor</code> fields, inside the class:</p>
+  <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Find TODO 3 just below the existing <code>sim</code> and <code>motor</code> fields:</p>
+<div data-track="elevator"><pre data-existing="target-field-location-elevator"><code>private final ElevatorSim sim = new ElevatorSim();
+private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+// TODO 3: Add a field to store the target position.</code></pre></div>
+<div data-track="arm" hidden><pre data-existing="target-field-location-arm"><code>private final ArmSim sim = new ArmSim();
+private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+// TODO 3: Add a field to store the target position.</code></pre></div>
+<p>Replace that TODO comment with this target field:</p>
 <div data-track="elevator"><pre data-snippet="goal-field-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;</code></pre></div>
 <div data-track="arm" hidden><pre data-snippet="goal-field-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;</code></pre></div>
   <p>A <strong>field</strong> is a value the subsystem remembers between calls. <code>private double</code> declares a decimal number that only this class can change directly. It starts at the low preset, zero.</p>

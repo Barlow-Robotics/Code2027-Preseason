@@ -13,6 +13,7 @@ import first.robot.Constants.ElevatorConstants;
 public final class Elevator extends SubsystemBase {
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+    // TODO 3: Add a field to store the target position.
 
     public Elevator() {
         // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
