@@ -40,11 +40,13 @@ public final class Elevator extends SubsystemBase {
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
-    public Command goToMeters(double meters) {
-        return runOnce(() -> {
-            targetMeters = Math.clamp(meters, ElevatorSim.MIN_METERS, ElevatorSim.MAX_METERS);
-            motor.setControl(positionRequest.withPosition(targetMeters / ElevatorSim.METERS_PER_DRUM_TURN));
-        });
+    public Command setHeightGoalCommand(double meters) {
+        return runOnce(() -> setHeightGoal(meters));
+    }
+
+    private void setHeightGoal(double meters) {
+        targetMeters = Math.clamp(meters, ElevatorSim.MIN_METERS, ElevatorSim.MAX_METERS);
+        motor.setControl(positionRequest.withPosition(targetMeters / ElevatorSim.METERS_PER_DRUM_TURN));
     }
 
     @Override

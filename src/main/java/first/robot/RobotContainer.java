@@ -112,10 +112,10 @@ public class RobotContainer {
         // Use the second controller so the existing drive controls keep their bindings.
         var operator = new CommandXboxController(1);
         var teleop = RobotModeTriggers.teleop();
-        teleop.and(operator.a()).onTrue(elevator.goToMeters(Elevator.LOW_METERS));
-        teleop.and(operator.y()).onTrue(elevator.goToMeters(Elevator.HIGH_METERS));
-        teleop.and(operator.x()).onTrue(arm.goToDegrees(Arm.LOW_DEGREES));
-        teleop.and(operator.b()).onTrue(arm.goToDegrees(Arm.HIGH_DEGREES));
+        teleop.and(operator.a()).onTrue(elevator.setHeightGoalCommand(Elevator.LOW_METERS));
+        teleop.and(operator.y()).onTrue(elevator.setHeightGoalCommand(Elevator.HIGH_METERS));
+        teleop.and(operator.x()).onTrue(arm.setAngleGoalCommand(Arm.LOW_DEGREES));
+        teleop.and(operator.b()).onTrue(arm.setAngleGoalCommand(Arm.HIGH_DEGREES));
     }
 
     public Command getAutonomousCommand() {

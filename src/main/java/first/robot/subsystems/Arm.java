@@ -40,11 +40,13 @@ public final class Arm extends SubsystemBase {
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
-    public Command goToDegrees(double degrees) {
-        return runOnce(() -> {
-            targetDegrees = Math.clamp(degrees, ArmSim.MIN_DEGREES, ArmSim.MAX_DEGREES);
-            motor.setControl(positionRequest.withPosition(targetDegrees / 360.0));
-        });
+    public Command setAngleGoalCommand(double degrees) {
+        return runOnce(() -> setAngleGoal(degrees));
+    }
+
+    private void setAngleGoal(double degrees) {
+        targetDegrees = Math.clamp(degrees, ArmSim.MIN_DEGREES, ArmSim.MAX_DEGREES);
+        motor.setControl(positionRequest.withPosition(targetDegrees / 360.0));
     }
 
     @Override
