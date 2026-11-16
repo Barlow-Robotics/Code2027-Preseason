@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A Code2027-Preseason lab on adding a command-based arm or elevator subsystem and graphing its response.">
+<title>Add a subsystem · Code2027-Preseason</title>
+<style>
+:root { color-scheme: light; --ink:#142623; --muted:#45605a; --paper:#f8f7ef; --line:#b8c8be; --link:#155747; --dark:#17352f; --accent:#e8f2b9; }
+* { box-sizing:border-box; }
+html { scroll-padding-top:1.5rem; }
+body { margin:0; font:1rem/1.65 "Inter","Segoe UI",sans-serif; color:var(--ink); background:var(--paper); }
+::selection { background:#d9ed97; color:var(--ink); }
+a { color:var(--link); text-underline-offset:.18em; }
+a:hover { text-decoration-thickness:.15em; }
+:focus-visible { outline:2px solid #87662d; outline-offset:4px; }
+.wrap { width:min(100% - 2.5rem,67rem); margin-inline:auto; }
+.mast { padding:1rem 0; border-bottom:1px solid #416157; }
+.mast a { color:#f5fae5; font-size:.9rem; font-weight:650; }
+header { color:#f5fae5; background:var(--dark); }
+.intro { padding:clamp(2.6rem,8vw,5.7rem) 0 clamp(2.4rem,6vw,4rem); }
+h1,h2 { line-height:1.10; letter-spacing:-.035em; text-wrap:balance; }
+h1 { font-family:"Instrument Sans","Segoe UI",sans-serif; font-size:clamp(2.6rem,8vw,5.4rem); margin:0 0 .33em; }
+.intro p { max-width:53ch; margin:0; color:#dce9cf; font-size:clamp(1rem,2.3vw,1.25rem); }
+nav { border-bottom:1px solid var(--line); }
+nav ul { display:flex; gap:.3rem 1.4rem; flex-wrap:wrap; list-style:none; padding:.75rem 0; margin:0; }
+nav a { display:inline-block; padding:.28rem 0; font-weight:650; font-size:.9rem; }
+main { padding-block:1rem 4rem; }
+section { padding:clamp(1.8rem,5vw,3rem) 0; border-bottom:1px solid var(--line); }
+section > :is(p,ol,ul,details) { max-width:70ch; }
+h2 { font-size:clamp(1.65rem,4vw,2.65rem); margin:0 0 1rem; }
+h3 { font-size:1.15rem; margin:1.4rem 0 .4rem; }
+p { margin:.6rem 0 .9rem; }
+ol,ul { padding-inline-start:1.5em; }
+li + li { margin-top:.45rem; }
+nav li + li { margin:0; }
+code, pre { font-family:"IBM Plex Mono",Consolas,monospace; font-size:.92em; }
+p code, li code, td code, dd code { overflow-wrap:anywhere; background:#e8ede3; padding:.1em .25em; }
+pre { max-width:70ch; overflow:auto; padding:1rem 1.2rem; background:var(--dark); color:#f5fae5; line-height:1.55; }
+pre code { font-size:1em; }
+.tracks { display:grid; grid-template-columns:1fr 1fr; gap:1px; border:1px solid var(--line); background:var(--line); margin:1.35rem 0; max-width:51rem; }
+.track { background:#eff2e7; padding:1rem clamp(.9rem,3vw,1.5rem); min-width:0; }
+.track h3 { margin:0 0 .75rem; }
+dl { margin:0; }
+dt { color:var(--muted); font-size:.85rem; font-weight:650; }
+dd { margin:0 0 .55rem; font-variant-numeric:tabular-nums; }
+dd:last-child { margin:0; }
+.check { padding:.8rem 1rem; background:var(--accent); max-width:70ch; }
+summary { cursor:pointer; font-weight:700; padding:.55rem 0; }
+details { border-top:1px solid var(--line); }
+footer { padding-bottom:2rem; color:var(--muted); }
+@media(max-width:36rem) { .wrap { width:calc(100% - 1.7rem); } .tracks { grid-template-columns:1fr; } }
+@media print { header, pre { color:#000; background:#fff; } .intro p, .mast a { color:#000; } nav { display:none; } section { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="mast"><div class="wrap"><a href="https://github.com/Barlow-Robotics/Code2027-Preseason">Code2027-Preseason</a></div></div>
+  <div class="wrap intro">
+    <h1>Add a subsystem</h1>
+    <p>Make an arm or elevator move to two positions. Drive it from the operator controller and graph the Talon FX response in AdvantageScope.</p>
+  </div>
+</header>
+<nav aria-label="Walkthrough"><div class="wrap">
+  <ul><li><a href="#start">Choose a mechanism</a></li><li><a href="#motor">Configure</a></li><li><a href="#telemetry">Log</a></li><li><a href="#buttons">Bind</a></li><li><a href="#test">Test</a></li></ul>
+</div></nav>
+<main class="wrap">
+<section id="start">
+  <h2>Start in simulation</h2>
+  <p>Open the repo on <code>main</code> in WPILib VS Code, create a branch for your pair, and run <strong>WPILib: Simulate Robot Code</strong>. Use this project’s WPILib 2027 alpha setup and JDK 25. This exercise runs on your computer.</p>
+  <div class="tracks" aria-label="Choose one mechanism">
+    <div class="track">
+      <h3>Elevator</h3>
+      <dl><dt>Subsystem</dt><dd><code>Elevator.java</code></dd><dt>Goals in meters</dt><dd>0.00 <strong>→</strong> 0.65</dd><dt>Operator controller</dt><dd>A lowers, Y raises</dd><dt>Graph fields</dt><dd><code>Target_m</code> and <code>Actual_m</code></dd></dl>
+    </div>
+    <div class="track">
+      <h3>Arm</h3>
+      <dl><dt>Subsystem</dt><dd><code>Arm.java</code></dd><dt>Goals in degrees</dt><dd>0 <strong>→</strong> 65</dd><dt>Operator controller</dt><dd>X lowers, B raises</dd><dt>Graph fields</dt><dd><code>Target_deg</code> and <code>Actual_deg</code></dd></dl>
+    </div>
+  </div>
+  <p>Find the files in <code>src/main/java/first/robot/subsystems</code>. The starter already runs the physics and publishes the drawings. In desktop AdvantageScope 2027, choose <strong>File → Connect to Simulator</strong> and select <strong>NetworkTables</strong> if prompted. Open a <strong>Mechanism</strong> tab and drag in <code>Telemetry/Preseason/&lt;mechanism&gt;/Mechanism</code>. With the motor work ahead of you, gravity can settle the arm against its lower stop.</p>
+</section>
+<section id="motor">
+  <h2>1. Configure the Talon FX</h2>
+  <ol>
+    <li>Declare a <code>TalonFX</code> on <code>TunerConstants.kCANBus</code> and one reusable <code>MotionMagicVoltage</code> request. Use CAN ID <strong>20</strong> for the elevator and <strong>21</strong> for the arm.</li>
+    <li>In a constructor, build and apply a <code>TalonFXConfiguration</code>. Set <code>Feedback.SensorToMechanismRatio</code> to the provided <code>GEAR_RATIO</code>. Use the starting gains below. Check the returned status with <code>isOK()</code> so a failed configuration is visible. Set the motor’s sim type to <code>TalonFXSimState.MotorType.KrakenX60</code>.</li>
+    <li>Inside the existing <code>runOnce</code>, clamp the goal to the sim’s min and max, save that goal for logging, then pass it to <code>positionRequest.withPosition(...)</code> in <strong>mechanism turns</strong>. Send the request with <code>motor.setControl(...)</code>.</li>
+    <li>In <code>simulationPeriodic()</code>, call <code>sim.step(motor.getSimState())</code> in place of <code>sim.update(0.0)</code>. The helper feeds applied voltage into the model and gives Phoenix back rotor position and velocity.</li>
+  </ol>
+  <details open>
+    <summary>Starting gains for the simulator</summary>
+    <p>In <code>config.Slot0</code>, try these values for <code>kP</code>, <code>kV</code>, <code>kG</code>, and <code>GravityType</code>. In <code>config.MotionMagic</code>, set <code>MotionMagicCruiseVelocity</code> in turns/s and <code>MotionMagicAcceleration</code> in turns/s².</p>
+    <ul>
+      <li><strong>Elevator</strong> · 5.0, 2.4, 0.28, <code>Elevator_Static</code> · 2.0 turns/s, 6.0 turns/s²</li>
+      <li><strong>Arm</strong> · 45.0, 15.0, 0.23, <code>Arm_Cosine</code> · 0.45 turns/s, 1.5 turns/s²</li>
+    </ul>
+  </details>
+  <p class="check"><strong>Units check.</strong> Divide elevator meters by <code>ElevatorSim.METERS_PER_DRUM_TURN</code>. Divide arm degrees by 360. Phoenix applies the gear ratio when it reports mechanism turns.</p>
+</section>
+<section id="telemetry">
+  <h2>2. Log the target and actual position</h2>
+  <p>Use <code>org.wpilib.telemetry.Telemetry</code>, the same WPILib API used for swerve. Keep the table in a field so both values go to the same place every loop.</p>
+  <pre><code>Telemetry.getTable("Preseason").getTable("Elevator")</code></pre>
+  <p>Use <code>"Arm"</code> for the arm. In <code>periodic()</code>, log your saved goal and read the Talon FX’s position with <code>motor.getPosition().getValueAsDouble()</code>. Convert the reading back to meters or degrees by multiplying by the same factor you divided by when sending the goal. Publish the two values with <code>telemetry.log(key, value)</code> using your mechanism’s graph fields above.</p>
+</section>
+<section id="buttons">
+  <h2>3. Bind two controller buttons</h2>
+  <p>In <code>RobotContainer.configurePreseasonMechanisms()</code>, create a <code>CommandXboxController(1)</code>. Port 0 is the driver. Combine your button with <code>RobotModeTriggers.teleop()</code> using <code>.and(...)</code>, then call <code>.onTrue(...)</code> with your subsystem’s <code>goToMeters(...)</code> or <code>goToDegrees(...)</code> command. Use the supplied <code>LOW_*</code> and <code>HIGH_*</code> constants.</p>
+  <p>Use <code>onTrue</code> because a press selects a new goal once. The Talon FX keeps running its onboard position loop between presses.</p>
+</section>
+<section id="test">
+  <h2>Test the response</h2>
+  <ol>
+    <li>Restart the simulator. Assign an Xbox controller to joystick port 1. If you are using an emulated controller, check its button mapping in the sim UI. Release the buttons before enabling Teleop.</li>
+    <li>In AdvantageScope, open a <strong>Line Graph</strong> tab. Drag both values from <code>Telemetry/Preseason/&lt;mechanism&gt;</code> onto the same axis so they share a scale.</li>
+    <li>Press high, wait for the motion to settle, then press low. The target should jump on each press, the actual should travel toward it, and the Mechanism drawing should move with it.</li>
+  </ol>
+  <details>
+    <summary>The target stays flat</summary>
+    <p>Check that the simulator is enabled in Teleop, the operator is on port 1, and you pressed the matching button. Put a breakpoint inside the <code>runOnce</code> body to see whether the binding fired.</p>
+  </details>
+  <details>
+    <summary>The target moves but actual stays flat</summary>
+    <p>Check the Talon configuration status and confirm <code>simulationPeriodic()</code> calls <code>sim.step(...)</code>. Recheck the conversion to mechanism turns and the feedback ratio.</p>
+  </details>
+  <details>
+    <summary>AdvantageScope shows no data</summary>
+    <p>Use desktop AdvantageScope 2027 alpha with ordinary NetworkTables. Connect to the simulator on the same computer. First look for <code>Telemetry</code> and the existing <code>Swerve</code> table to confirm the connection.</p>
+  </details>
+</section>
+</main>
+<footer class="wrap">
+  <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html">Phoenix position control</a> ·
+  <a href="https://github.com/wpilibsuite/allwpilib/blob/main/telemetry/doc/telemetry.md">WPILib telemetry</a> ·
+  <a href="https://docs.advantagescope.org/tab-reference/line-graph/">AdvantageScope Line Graph</a>
+</footer>
+</body>
+</html>
