@@ -38,7 +38,7 @@ public final class Arm extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        // Prepared simulation connection: no motor output until we send a control request.
+        // Updates the simulated mechanism and sends its position back to the Talon.
         sim.step(motor.getSimState());
     }
 }
