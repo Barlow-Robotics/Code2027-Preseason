@@ -15,7 +15,7 @@
     <li>Open <code>src/main/java/first/robot/Constants.java</code>. Under <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code>, find <code>GEAR_RATIO</code>. This is the constant from the Mechanisms section: <strong><span data-elevator="12 motor turns per drum turn" data-arm="80 motor turns per arm turn">12 motor turns per drum turn</span></strong>. <span data-track="elevator">Also find <code>METERS_PER_DRUM_TURN</code>, our second conversion constant: the circumference that relates drum turns to elevator height. Notice how it is calculated from <code>DRUM_RADIUS_METERS</code>. </span>The file also contains the dimensions and allowed positions. The simulation uses these same values.</li>
     <li>Open <code>src/main/java/first/robot/RobotContainer.java</code> and find <code>configureMechanisms()</code>. The starter creates both subsystems there during desktop simulation. You’ll connect your mechanism’s commands to controller buttons in this method.</li>
   </ul>
-  <h3>Run the starter once</h3>
+  <h3>See what the system does before we add any code</h3>
   <ol>
     <li>Open the Command Palette with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Choose <strong>WPILib: Simulate Robot Code</strong>, select <strong>Sim GUI</strong> if prompted, and wait for robot startup. Leave the simulated robot disabled.</li>
     <li>Open the desktop <strong>AdvantageScope (WPILib)</strong> installed with the 2027 tools. Choose <strong>File → Connect to Simulator</strong> and select <strong>NetworkTables</strong> if prompted.</li>
