@@ -1,5 +1,8 @@
 # Code2027-Preseason
 
-Open the [arm and elevator walkthrough](docs/index.html) in a browser. Start on
-`main`, make a branch for your pair, and choose either mechanism. Use
-**WPILib: Simulate Robot Code** in VS Code to run the exercise.
+Building an arm or elevator in today's tutorial? Start here.
+
+## [Open the walkthrough](https://barlow-robotics.github.io/Code2027-Preseason/)
+
+The walkthrough opens in your browser. It shows you how to get the new code
+with GitHub Desktop, open the project in WPILib VS Code, and work through the lesson.
