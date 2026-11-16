@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import first.robot.Constants.ElevatorConstants;
 import first.robot.generated.TunerConstants;
 
 /** Simulated elevator used in the preseason controls lesson. */
@@ -26,7 +27,7 @@ public final class Elevator extends SubsystemBase {
 
     public Elevator() {
         var config = new TalonFXConfiguration();
-        config.Feedback.SensorToMechanismRatio = ElevatorSim.GEAR_RATIO;
+        config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;
         config.Slot0.kP = 5.0;
         config.Slot0.kV = 2.4;
         config.Slot0.kG = 0.28;
@@ -45,15 +46,15 @@ public final class Elevator extends SubsystemBase {
     }
 
     private void setHeightGoal(double meters) {
-        targetMeters = Math.clamp(meters, ElevatorSim.MIN_METERS, ElevatorSim.MAX_METERS);
-        motor.setControl(positionRequest.withPosition(targetMeters / ElevatorSim.METERS_PER_DRUM_TURN));
+        targetMeters = Math.clamp(meters, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
+        motor.setControl(positionRequest.withPosition(targetMeters / ElevatorConstants.METERS_PER_DRUM_TURN));
     }
 
     @Override
     public void periodic() {
         double measuredTurns = motor.getPosition().getValueAsDouble();
         telemetry.log("Target_m", targetMeters);
-        telemetry.log("Actual_m", measuredTurns * ElevatorSim.METERS_PER_DRUM_TURN);
+        telemetry.log("Actual_m", measuredTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
     }
 
     @Override

@@ -13,29 +13,27 @@ import org.wpilib.util.Color8Bit;
 
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import first.robot.Constants.ArmConstants;
+
 /** Physics and Mechanism2d drawing for the desktop arm. */
 final class ArmSim {
-    static final double GEAR_RATIO = 80.0; // motor turns per mechanism turn
-    static final double MIN_DEGREES = -20.0;
-    static final double MAX_DEGREES = 95.0;
-    private static final double ARM_LENGTH_METERS = 0.55;
     private final SingleJointedArmSim physics = new SingleJointedArmSim(
-        DCMotor.getKrakenX60(1), GEAR_RATIO,
-        SingleJointedArmSim.estimateMOI(ARM_LENGTH_METERS, 3.0), ARM_LENGTH_METERS,
-        Units.degreesToRadians(MIN_DEGREES), Units.degreesToRadians(MAX_DEGREES), true, 0.0);
+        DCMotor.getKrakenX60(1), ArmConstants.GEAR_RATIO,
+        SingleJointedArmSim.estimateMOI(ArmConstants.ARM_LENGTH_METERS, 3.0), ArmConstants.ARM_LENGTH_METERS,
+        Units.degreesToRadians(ArmConstants.MIN_DEGREES), Units.degreesToRadians(ArmConstants.MAX_DEGREES), true, 0.0);
 
     private final TelemetryTable telemetry = Telemetry.getTable("Preseason").getTable("Arm");
     private final Mechanism2d drawing = new Mechanism2d(1.2, 1.2);
     private final MechanismLigament2d link = drawing.getRoot("Pivot", 0.45, 0.40)
-        .append(new MechanismLigament2d("Arm", ARM_LENGTH_METERS, 0.0, 6.0,
+        .append(new MechanismLigament2d("Arm", ArmConstants.ARM_LENGTH_METERS, 0.0, 6.0,
             new Color8Bit(Color.ORANGE)));
 
     void step(TalonFXSimState motor) {
         motor.setSupplyVoltage(RobotController.getBatteryVoltage());
         update(motor.getMotorVoltage());
         // Phoenix simulation needs raw motor rotations, before SensorToMechanismRatio is applied.
-        motor.setRawRotorPosition(Units.radiansToRotations(physics.getAngle()) * GEAR_RATIO);
-        motor.setRotorVelocity(Units.radiansToRotations(physics.getVelocity()) * GEAR_RATIO);
+        motor.setRawRotorPosition(Units.radiansToRotations(physics.getAngle()) * ArmConstants.GEAR_RATIO);
+        motor.setRotorVelocity(Units.radiansToRotations(physics.getVelocity()) * ArmConstants.GEAR_RATIO);
     }
 
     void update(double motorVolts) {

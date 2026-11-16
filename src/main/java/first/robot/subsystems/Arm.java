@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import first.robot.Constants.ArmConstants;
 import first.robot.generated.TunerConstants;
 
 /** Simulated arm used in the preseason controls lesson. */
@@ -26,7 +27,7 @@ public final class Arm extends SubsystemBase {
 
     public Arm() {
         var config = new TalonFXConfiguration();
-        config.Feedback.SensorToMechanismRatio = ArmSim.GEAR_RATIO;
+        config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;
         config.Slot0.kP = 45.0;
         config.Slot0.kV = 15.0;
         config.Slot0.kG = 0.23;
@@ -45,7 +46,7 @@ public final class Arm extends SubsystemBase {
     }
 
     private void setAngleGoal(double degrees) {
-        targetDegrees = Math.clamp(degrees, ArmSim.MIN_DEGREES, ArmSim.MAX_DEGREES);
+        targetDegrees = Math.clamp(degrees, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
         motor.setControl(positionRequest.withPosition(targetDegrees / 360.0));
     }
 

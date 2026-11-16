@@ -11,16 +11,13 @@ import org.wpilib.util.Color8Bit;
 
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
+import first.robot.Constants.ElevatorConstants;
+
 /** Physics and Mechanism2d drawing for the desktop elevator. */
 final class ElevatorSim {
-    static final double GEAR_RATIO = 12.0; // motor turns per mechanism turn
-    static final double MIN_METERS = 0.0;
-    static final double MAX_METERS = 0.9;
-    private static final double DRUM_RADIUS_METERS = 0.025;
-    static final double METERS_PER_DRUM_TURN = 2.0 * Math.PI * DRUM_RADIUS_METERS;
     private final org.wpilib.simulation.ElevatorSim physics = new org.wpilib.simulation.ElevatorSim(
-        DCMotor.getKrakenX60(1), GEAR_RATIO, 5.0, DRUM_RADIUS_METERS,
-        MIN_METERS, MAX_METERS, true, 0.0);
+        DCMotor.getKrakenX60(1), ElevatorConstants.GEAR_RATIO, 5.0, ElevatorConstants.DRUM_RADIUS_METERS,
+        ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS, true, 0.0);
 
     private final TelemetryTable telemetry = Telemetry.getTable("Preseason").getTable("Elevator");
     private final Mechanism2d drawing = new Mechanism2d(1.2, 1.2);
@@ -32,8 +29,8 @@ final class ElevatorSim {
         motor.setSupplyVoltage(RobotController.getBatteryVoltage());
         update(motor.getMotorVoltage());
         // Phoenix simulation needs raw motor rotations, before SensorToMechanismRatio is applied.
-        motor.setRawRotorPosition(physics.getPosition() / METERS_PER_DRUM_TURN * GEAR_RATIO);
-        motor.setRotorVelocity(physics.getVelocity() / METERS_PER_DRUM_TURN * GEAR_RATIO);
+        motor.setRawRotorPosition(physics.getPosition() / ElevatorConstants.METERS_PER_DRUM_TURN * ElevatorConstants.GEAR_RATIO);
+        motor.setRotorVelocity(physics.getVelocity() / ElevatorConstants.METERS_PER_DRUM_TURN * ElevatorConstants.GEAR_RATIO);
     }
 
     void update(double motorVolts) {
