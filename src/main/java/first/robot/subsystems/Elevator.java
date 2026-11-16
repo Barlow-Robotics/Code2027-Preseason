@@ -18,19 +18,19 @@ public final class Elevator extends SubsystemBase {
     private final TalonFX motor = new TalonFX(20, TunerConstants.kCANBus);
 
     public Elevator() {
-        // TODO 4: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
+        // TODO 5: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
     public Command setHeightGoalCommand(double goal) {
         return runOnce(() -> {
-            // TODO 1: Add a target field and call a private method to clamp and save the goal.
+            // TODO 2: Add a target field and call a private method to clamp and save the goal.
         });
     }
 
     @Override
     public void periodic() {
-        // TODO 3: Publish the goal in meters.
+        // TODO 4: Publish the goal in meters.
     }
 
     @Override

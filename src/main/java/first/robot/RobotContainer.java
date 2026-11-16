@@ -11,7 +11,6 @@ import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.command2.sysid.SysIdRoutine.Direction;
-import org.wpilib.framework.RobotBase;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.tunable.Selectable;
 import org.wpilib.tunable.Tunables;
@@ -45,6 +44,7 @@ public class RobotContainer {
     private final CommandXboxController operator = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    // TODO 1: Add your Elevator or Arm subsystem field here.
 
     /* Path follower */
     private final Selectable<Command> autoChooser;
@@ -61,11 +61,8 @@ public class RobotContainer {
 
     private void configureBindings() {
         configureDriveBindings();
-        // These tutorial mechanisms are only created in desktop simulation.
-        if (RobotBase.isSimulation()) {
-            configureElevatorBindings();
-            configureArmBindings();
-        }
+        configureElevatorBindings();
+        configureArmBindings();
     }
 
     private void configureDriveBindings() {
@@ -113,13 +110,11 @@ public class RobotContainer {
     }
 
     private void configureElevatorBindings() {
-        var elevator = new Elevator();
-        // TODO 2: Bind A and Y on the operator controller to the low and high elevator goals.
+        // TODO 3: Bind A and Y on the operator controller to the low and high elevator goals.
     }
 
     private void configureArmBindings() {
-        var arm = new Arm();
-        // TODO 2: Bind X and B on the operator controller to the low and high arm goals.
+        // TODO 3: Bind X and B on the operator controller to the low and high arm goals.
     }
 
     public Command getAutonomousCommand() {
