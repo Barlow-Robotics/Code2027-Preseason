@@ -11,9 +11,6 @@ import first.robot.Constants.ElevatorConstants;
 
 /** Desktop elevator for the preseason controls lesson. */
 public final class Elevator extends SubsystemBase {
-    public static final double LOW_METERS = 0.0;
-    public static final double HIGH_METERS = 0.65;
-
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(20, TunerConstants.kCANBus);
 

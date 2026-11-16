@@ -11,9 +11,6 @@ import first.robot.Constants.ArmConstants;
 
 /** Desktop arm for the preseason controls lesson. */
 public final class Arm extends SubsystemBase {
-    public static final double LOW_DEGREES = 0.0;
-    public static final double HIGH_DEGREES = 65.0;
-
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(21, TunerConstants.kCANBus);
 

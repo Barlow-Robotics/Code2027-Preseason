@@ -21,6 +21,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
+import first.robot.Constants.ArmConstants;
+import first.robot.Constants.ElevatorConstants;
 import first.robot.generated.TunerConstants;
 import first.robot.subsystems.Arm;
 import first.robot.subsystems.CommandSwerveDrivetrain;

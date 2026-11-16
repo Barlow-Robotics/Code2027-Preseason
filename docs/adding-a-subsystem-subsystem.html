@@ -27,6 +27,7 @@
 <li><code>GEAR_RATIO</code>: <span data-elevator="12 motor turns per drum turn" data-arm="80 motor turns per arm turn">12 motor turns per drum turn</span>.</li>
 <li data-track="elevator"><code>METERS_PER_DRUM_TURN</code>: the drum circumference that converts drum turns to elevator height, calculated from <code>DRUM_RADIUS_METERS</code>.</li>
 <li><code><span data-elevator="MIN_METERS" data-arm="MIN_DEGREES">MIN_METERS</span></code> and <code><span data-elevator="MAX_METERS" data-arm="MAX_DEGREES">MAX_METERS</span></code>: the allowed positions.</li>
+<li><code><span data-elevator="LOW_METERS" data-arm="LOW_DEGREES">LOW_METERS</span></code> and <code><span data-elevator="HIGH_METERS" data-arm="HIGH_DEGREES">HIGH_METERS</span></code>: the two goal presets our buttons will request. LOW is zero; HIGH is <span data-elevator="0.65 meters" data-arm="65 degrees">0.65 meters</span>. These are positions we choose to move to; MIN and MAX define the allowed range.</li>
 </ul>
 <p>Return to your subsystem file. This import is already present above the class declaration:</p>
 <div data-track="elevator"><pre data-snippet="constants-import-elevator"><code>import first.robot.Constants.ElevatorConstants;</code></pre></div>

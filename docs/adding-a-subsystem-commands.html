@@ -15,7 +15,7 @@
   <p>We’ll use the constants you found in the previous section to keep the goal within the mechanism’s allowed positions.</p>
   <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Inside the class, immediately below the existing <code>sim</code> field, add the first line below. A <strong>field</strong> is a value the subsystem remembers between calls.</p>
   <p>Find the existing <code><span data-elevator="setHeightGoalCommand" data-arm="setAngleGoalCommand">setHeightGoalCommand</span></code> method containing TODO 2. Replace that whole method, including its closing brace, with the two methods below. Keep the class’s final closing brace and the existing <code>periodic()</code> and <code>simulationPeriodic()</code> methods.</p>
-  <div data-track="elevator"><pre data-snippet="goal-elevator"><code>private double targetMeters = LOW_METERS;
+  <div data-track="elevator"><pre data-snippet="goal-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;
 
 public Command setHeightGoalCommand(double goal) {
     return runOnce(() -&gt; setHeightGoal(goal));
@@ -24,7 +24,7 @@ public Command setHeightGoalCommand(double goal) {
 private void setHeightGoal(double goal) {
     targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
 }</code></pre></div>
-  <div data-track="arm" hidden><pre data-snippet="goal-arm"><code>private double targetDegrees = LOW_DEGREES;
+  <div data-track="arm" hidden><pre data-snippet="goal-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;
 
 public Command setAngleGoalCommand(double goal) {
     return runOnce(() -&gt; setAngleGoal(goal));
@@ -47,11 +47,11 @@ private void setAngleGoal(double goal) {
   <pre data-snippet="operator"><code>private final CommandXboxController operator = new CommandXboxController(1);</code></pre>
   <p><code>new CommandXboxController(1)</code> reads the controller assigned to port 1. The field named <code>operator</code> lets the elevator and arm bindings share that controller. Port 0 continues to drive the swerve. Keep both controller fields: <code>joystick</code> for driving and <code>operator</code> for your mechanism.</p>
   <p><code>configureBindings()</code> organizes the controls by calling <code>configureDriveBindings()</code>, <code>configureElevatorBindings()</code>, and <code>configureArmBindings()</code>.</p>
-  <p>Find <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>. Your subsystem already exists as a field in this class. Replace the TODO 3b comment with these two button bindings:</p>
-  <div data-track="elevator"><pre data-snippet="bind-elevator"><code>operator.a().onTrue(elevator.setHeightGoalCommand(Elevator.LOW_METERS));
-operator.y().onTrue(elevator.setHeightGoalCommand(Elevator.HIGH_METERS));</code></pre></div>
-  <div data-track="arm" hidden><pre data-snippet="bind-arm"><code>operator.x().onTrue(arm.setAngleGoalCommand(Arm.LOW_DEGREES));
-operator.b().onTrue(arm.setAngleGoalCommand(Arm.HIGH_DEGREES));</code></pre></div>
+  <p>Find <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>. Your subsystem already exists as a field in this class. The starter also imports <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code> here so the bindings can use its LOW and HIGH presets. Replace the TODO 3b comment with these two button bindings:</p>
+  <div data-track="elevator"><pre data-snippet="bind-elevator"><code>operator.a().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));
+operator.y().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));</code></pre></div>
+  <div data-track="arm" hidden><pre data-snippet="bind-arm"><code>operator.x().onTrue(arm.setAngleGoalCommand(ArmConstants.LOW_DEGREES));
+operator.b().onTrue(arm.setAngleGoalCommand(ArmConstants.HIGH_DEGREES));</code></pre></div>
 <p><code>operator.<span data-elevator="a" data-arm="x">a</span>()</code> represents the low button. <code>onTrue</code> starts its command when the button changes from released to pressed. The second line does the same for the high button.</p>
   <p>The expression inside <code>onTrue(...)</code> calls your subsystem’s command factory. When you press the button, the scheduler runs that command, which calls your private setter and saves the goal. These commands do not run while the robot is disabled; we will test with Teleop enabled.</p>
 </section><section id="telemetry">
