@@ -11,7 +11,6 @@ import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.command2.sysid.SysIdRoutine.Direction;
-import org.wpilib.framework.RobotBase;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.tunable.Selectable;
 import org.wpilib.tunable.Tunables;
@@ -45,6 +44,8 @@ public class RobotContainer {
     private final CommandXboxController operator = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private final Elevator elevator = new Elevator();
+    private final Arm arm = new Arm();
 
     /* Path follower */
     private final Selectable<Command> autoChooser;
@@ -61,11 +62,8 @@ public class RobotContainer {
 
     private void configureBindings() {
         configureDriveBindings();
-        // These tutorial mechanisms are only created in desktop simulation.
-        if (RobotBase.isSimulation()) {
-            configureElevatorBindings();
-            configureArmBindings();
-        }
+        configureElevatorBindings();
+        configureArmBindings();
     }
 
     private void configureDriveBindings() {
@@ -113,13 +111,11 @@ public class RobotContainer {
     }
 
     private void configureElevatorBindings() {
-        var elevator = new Elevator();
         operator.a().onTrue(elevator.setHeightGoalCommand(Elevator.LOW_METERS));
         operator.y().onTrue(elevator.setHeightGoalCommand(Elevator.HIGH_METERS));
     }
 
     private void configureArmBindings() {
-        var arm = new Arm();
         operator.x().onTrue(arm.setAngleGoalCommand(Arm.LOW_DEGREES));
         operator.b().onTrue(arm.setAngleGoalCommand(Arm.HIGH_DEGREES));
     }
