@@ -141,7 +141,7 @@ private double targetDegrees = ArmConstants.LOW_DEGREES;
   </details>
   <details>
     <summary>The target stays flat when I press high</summary>
-    <p>Verify Teleop is enabled and the button indicator lights up under port 1. Check that the high button calls your command in <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>, that <code>runOnce</code> calls the private setter, and that <code>periodic()</code> logs the target field.</p>
+    <p>Verify Teleop is enabled and your controller is assigned to port 1. Release the button, then press it again while watching the target line in AdvantageScope. Check that the high button calls your command in <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>, that <code>runOnce</code> calls the private setter, and that <code>periodic()</code> logs the target field.</p>
   </details>
   <details>
     <summary>The target moves but actual stays flat or moves the wrong distance</summary>
