@@ -54,7 +54,7 @@ public class RobotContainer {
 
         configureBindings();
         if (RobotBase.isSimulation()) {
-            configurePreseasonMechanisms();
+            configureMechanisms();
         }
 
         // Warmup PathPlanner to avoid Java pauses
@@ -105,7 +105,7 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-    private void configurePreseasonMechanisms() {
+    private void configureMechanisms() {
         var elevator = new Elevator();
         var arm = new Arm();
 
