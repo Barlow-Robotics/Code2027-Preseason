@@ -90,11 +90,11 @@ footer { padding-bottom:2rem; color:var(--muted); }
   <figure class="screenshot-placeholder" id="shot-pull"><strong>Screenshot to add · Download the new code</strong><figcaption>Show the student clone after fetching, still on the older main, with Pull origin visible and highlighted. Capture before clicking Pull origin.</figcaption></figure>
   <p>When the download finishes, the button returns to <strong>Fetch origin</strong>. If it already says Fetch origin after checking for updates, your copy is up to date.</p>
   <figure class="screenshot-placeholder" id="shot-updated"><strong>Screenshot to add · The update is complete</strong><figcaption>Show the student clone after pulling, with Current Branch set to main, Fetch origin visible, and no local changes.</figcaption></figure>
-  <h3>Make a branch for your pair</h3>
-  <p>Click <strong>Current Branch</strong>, then <strong>New Branch</strong>. Type a name such as <code>lab/ada-sam</code>, using your own names. If the dialog asks which branch to start from, choose <code>main</code>. Click <strong>Create Branch</strong>.</p>
-  <figure class="screenshot-placeholder" id="shot-new-branch"><strong>Screenshot to add · Create your pair's branch</strong><figcaption>Show the Create a Branch dialog with lab/ada-sam entered and main selected if a base choice is shown. Highlight Create Branch.</figcaption></figure>
-  <p>Check that <strong>Current Branch</strong> shows your pair’s branch name. Your edits will now belong to that branch. Return to VS Code to begin the exercise.</p>
-  <figure class="screenshot-placeholder" id="shot-pair-branch"><strong>Screenshot to add · Check your branch name</strong><figcaption>Show the student clone after creating lab/ada-sam, with the new name highlighted under Current Branch.</figcaption></figure>
+  <h3>Make your own branch</h3>
+  <p>Click <strong>Current Branch</strong>, then <strong>New Branch</strong>. Type a name such as <code>lab/ada</code>, using your own name. If the dialog asks which branch to start from, choose <code>main</code>. Click <strong>Create Branch</strong>.</p>
+  <figure class="screenshot-placeholder" id="shot-new-branch"><strong>Screenshot to add · Create your branch</strong><figcaption>Show the Create a Branch dialog with lab/ada entered and main selected if a base choice is shown. Highlight Create Branch.</figcaption></figure>
+  <p>Check that <strong>Current Branch</strong> shows your branch name. Your edits will now belong to that branch. Return to VS Code to begin the exercise.</p>
+  <figure class="screenshot-placeholder" id="shot-student-branch"><strong>Screenshot to add · Check your branch name</strong><figcaption>Show the student clone after creating lab/ada, with the new name highlighted under Current Branch.</figcaption></figure>
   <p>Choose the elevator or the arm. You’ll graph two numbers during the lab. The <strong>target</strong> is the position you ask for. The <strong>actual</strong> is where the mechanism is.</p>
   <div class="tracks" aria-label="Choose one mechanism">
     <div class="track">
@@ -106,7 +106,7 @@ footer { padding-bottom:2rem; color:var(--muted); }
       <dl><dt>File to edit</dt><dd><code>Arm.java</code></dd><dt>Goals in degrees</dt><dd>X: 0° · B: 65°</dd><dt>Graph fields</dt><dd><code>Target_deg</code> and <code>Actual_deg</code></dd></dl>
     </div>
   </div>
-  <p>One partner can write the code while the other checks the numbers and runs the simulator. Swap when you get to the graph.</p>
+  <p>Work through the steps below and check your results in the simulator as you go.</p>
   <ul>
     <li>Edit <code>src/main/java/first/robot/subsystems/Elevator.java</code> or <code>src/main/java/first/robot/subsystems/Arm.java</code>. Start with the numbered TODOs.</li>
     <li>Read the matching <code>ElevatorSim.java</code> or <code>ArmSim.java</code> to find the model’s limits and conversion constants. That file runs the physics and publishes the drawing.</li>
