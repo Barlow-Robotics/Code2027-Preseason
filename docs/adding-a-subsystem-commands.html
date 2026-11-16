@@ -13,34 +13,34 @@
   <h2>Create the goal command</h2>
   <p>Your subsystem now exists and its simulation drawing is running. A <strong>command</strong> describes an action for it to perform. We’ll make one that changes the <strong>target</strong>—the position we ask for—and graph that target before adding motor control.</p>
   <p>We’ll use the constants you found in the previous section to keep the goal within the mechanism’s allowed positions.</p>
-  <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Inside the class, immediately below the existing <code>sim</code> field, add the first line below. A <strong>field</strong> is a value the subsystem remembers between calls.</p>
-  <p>Find the existing <code><span data-elevator="setHeightGoalCommand" data-arm="setAngleGoalCommand">setHeightGoalCommand</span></code> method containing TODO 3. Modify the code to match the following. Keep the class’s final closing brace and the existing <code>periodic()</code> and <code>simulationPeriodic()</code> methods.</p>
-  <div data-track="elevator"><pre data-snippet="goal-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;
-
-public Command setHeightGoalCommand(double goal) {
-    return runOnce(() -&gt; setHeightGoal(goal));
-}
-
-private void setHeightGoal(double goal) {
+  <h3>Add a private function to save the goal</h3>
+  <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. First add this field alongside the existing <code>sim</code> and <code>motor</code> fields, inside the class:</p>
+<div data-track="elevator"><pre data-snippet="goal-field-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;</code></pre></div>
+<div data-track="arm" hidden><pre data-snippet="goal-field-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;</code></pre></div>
+  <p>A <strong>field</strong> is a value the subsystem remembers between calls. <code>private double</code> declares a decimal number that only this class can change directly. It starts at the low preset, zero.</p>
+  <p>Now add this private function below the existing <code><span data-elevator="setHeightGoalCommand" data-arm="setAngleGoalCommand">setHeightGoalCommand</span></code> method and above <code>periodic()</code>. Keep it inside the class, outside the other methods:</p>
+<div data-track="elevator"><pre data-snippet="goal-setter-elevator"><code>private void setHeightGoal(double goal) {
     targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
 }</code></pre></div>
-  <div data-track="arm" hidden><pre data-snippet="goal-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;
-
-public Command setAngleGoalCommand(double goal) {
-    return runOnce(() -&gt; setAngleGoal(goal));
-}
-
-private void setAngleGoal(double goal) {
+<div data-track="arm" hidden><pre data-snippet="goal-setter-arm"><code>private void setAngleGoal(double goal) {
     targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
 }</code></pre></div>
+  <p><code>goal</code> is the requested position. <code>Math.clamp</code> keeps it between the minimum and maximum in <code>Constants.java</code>, then the function saves it in the target field. <span data-track="elevator">The elevator’s configured maximum height is 0.9 m; the earlier 1 m animation was an illustration of the conversion.</span></p>
+  <p>This function is <code>private</code>, so only this subsystem can call it. It saves a number for now; we’ll add motor control later.</p>
+  <h3>Have the command factory call the function</h3>
+  <p>Find the existing <code><span data-elevator="setHeightGoalCommand" data-arm="setAngleGoalCommand">setHeightGoalCommand</span></code> method containing TODO 3. Modify it to match the following:</p>
+<div data-track="elevator"><pre data-snippet="goal-command-elevator"><code>public Command setHeightGoalCommand(double goal) {
+    return runOnce(() -&gt; setHeightGoal(goal));
+}</code></pre></div>
+<div data-track="arm" hidden><pre data-snippet="goal-command-arm"><code>public Command setAngleGoalCommand(double goal) {
+    return runOnce(() -&gt; setAngleGoal(goal));
+}</code></pre></div>
   <ul>
-    <li><code>private double</code> declares a decimal number that only this class can change directly. It starts at the low preset, zero.</li>
-    <li><code>public Command</code> means other code can call this method and receive a command. A method that creates and returns a command is called a <strong>command factory</strong>. Creating the command does not change the target yet.</li>
-    <li><code>() -&gt;</code> describes work to do later. <code>runOnce</code> wraps that work in a command that calls the setter once when it starts, then finishes.</li>
+    <li><code>public Command</code> means other code can call this method and receive a command. A method that creates and returns a command is called a <strong>command factory</strong>.</li>
+    <li><code>() -&gt;</code> describes work to do later. <code>runOnce</code> creates a command that calls your private function once when the command starts, then finishes. Creating the command does not change the target yet.</li>
     <li>The subsystem’s <code>runOnce</code> also makes this command require this subsystem. The scheduler—the code that runs commands—uses requirements to prevent two commands from controlling the same subsystem at once.</li>
-    <li>The private setter uses <code>Math.clamp</code> to keep the requested number between the minimum and maximum in <code>Constants.java</code>, then remembers it as the target. <span data-track="elevator">The elevator’s configured maximum height is 0.9 m; the earlier 1 m animation was an illustration of the conversion.</span></li>
   </ul>
-  <p>For now, the setter only saves a number. We will add motor control after we can see that number change on a graph.</p>
+  <p>Next, we’ll connect buttons to this command so pressing a button changes the saved goal.</p>
 </section><section id="buttons">
   <h2>Bind your two buttons</h2>
   <p>Open <code>RobotContainer.java</code>. Near the top of the class, find the existing <code>joystick</code> field for port 0. Replace TODO 4 immediately below it with this new field:</p>
