@@ -40,9 +40,6 @@ pre code { font-size:1em; }
 details { border-top:1px solid var(--line); }
 summary { cursor:pointer; padding:.8rem 0; font-weight:600; }
 kbd { font:inherit; font-size:.85em; padding:.1em .3em; border:1px solid var(--line); border-radius:3px; background:var(--surface); }
-.screenshot-placeholder { max-width:74ch; margin:1rem 0 1.5rem; padding:1rem; border:1px dashed #a7b8ae; border-radius:6px; background:var(--surface); font-size:.9rem; }
-.screenshot-placeholder strong { display:block; }
-.screenshot-placeholder figcaption { margin-top:.3rem; color:var(--muted); }
 [hidden] { display:none !important; }
 .mechanism-picker { max-width:74ch; margin:0 0 1.2rem; padding:0; border:0; }
 .mechanism-picker legend { font-size:.9rem; font-weight:600; margin-bottom:.4rem; }
@@ -93,3 +90,11 @@ footer a { color:var(--muted); }
 .code-line { display:inline-block; min-width:100%; }
 .code-removed { color:#862b32; background:#fce9eb; }
 .code-added { color:#155534; background:#e1f3e6; }
+
+/* Actual application screenshots; highlights mark the next control to use. */
+.lesson-shot { margin:1rem 0 2rem; }
+.shot-frame { display:block; position:relative; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+.shot-frame img { display:block; width:100%; height:auto; }
+.shot-focus { position:absolute; border:3px solid #ffba08; outline:1px solid #332600; border-radius:4px; pointer-events:none; }
+.lesson-shot figcaption { margin-top:.6rem; color:var(--muted); font-size:.88rem; max-width:74ch; }
+.lesson-shot figcaption a { white-space:nowrap; }
