@@ -106,7 +106,7 @@ footer { padding-bottom:2rem; color:var(--muted); }
 </section>
 <section id="buttons">
   <h2>3. Bind two controller buttons</h2>
-  <p>In <code>RobotContainer.configurePreseasonMechanisms()</code>, create a <code>CommandXboxController(1)</code>. Port 0 is the driver. Combine your button with <code>RobotModeTriggers.teleop()</code> using <code>.and(...)</code>, then call <code>.onTrue(...)</code> with your subsystem’s <code>goToMeters(...)</code> or <code>goToDegrees(...)</code> command. Use the supplied <code>LOW_*</code> and <code>HIGH_*</code> constants.</p>
+  <p>In <code>RobotContainer.configureMechanisms()</code>, create a <code>CommandXboxController(1)</code>. Port 0 is the driver. Combine your button with <code>RobotModeTriggers.teleop()</code> using <code>.and(...)</code>, then call <code>.onTrue(...)</code> with your subsystem’s <code>goToMeters(...)</code> or <code>goToDegrees(...)</code> command. Use the supplied <code>LOW_*</code> and <code>HIGH_*</code> constants.</p>
   <p>Use <code>onTrue</code> because a press selects a new goal once. The Talon FX keeps running its onboard position loop between presses.</p>
 </section>
 <section id="test">
