@@ -17,10 +17,12 @@
   <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Find TODO 3a just below the existing <code>sim</code> and <code>motor</code> fields:</p>
 <div data-track="elevator"><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="target-field-location-elevator"><code>private final ElevatorSim sim = new ElevatorSim();
 private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-<span class="code-line code-removed">// TODO 3a: Add a field to store the target position.</span></code></pre></div>
+<span class="code-line code-removed">// TODO 3a: Add a field to store the target position.</span>
+// TODO 7b: Add a Motion Magic request field.</code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="target-field-location-arm"><code>private final ArmSim sim = new ArmSim();
 private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-<span class="code-line code-removed">// TODO 3a: Add a field to store the target position.</span></code></pre></div>
+<span class="code-line code-removed">// TODO 3a: Add a field to store the target position.</span>
+// TODO 7b: Add a Motion Magic request field.</code></pre></div>
 <p>Modify this part of the file to match the following. Keep the existing <code>sim</code> and <code>motor</code> fields; replace only the TODO line:</p>
 <div data-track="elevator"><p class="code-caption">After — the new field is green</p><pre data-snippet="goal-field-elevator"><code>private final ElevatorSim sim = new ElevatorSim();
 private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);

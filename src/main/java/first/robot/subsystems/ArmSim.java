@@ -4,12 +4,8 @@ import org.wpilib.system.RobotController;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.util.Units;
 import org.wpilib.simulation.SingleJointedArmSim;
-import org.wpilib.smartdashboard.Mechanism2d;
-import org.wpilib.smartdashboard.MechanismLigament2d;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
-import org.wpilib.util.Color;
-import org.wpilib.util.Color8Bit;
 
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -26,10 +22,6 @@ final class ArmSim {
         Units.degreesToRadians(ArmConstants.MIN_DEGREES), Units.degreesToRadians(ArmConstants.MAX_DEGREES), true, 0.0);
 
     private final TelemetryTable telemetry = Telemetry.getTable("Arm");
-    private final Mechanism2d drawing = new Mechanism2d(1.2, 1.2);
-    private final MechanismLigament2d link = drawing.getRoot("Pivot", 0.45, 0.40)
-        .append(new MechanismLigament2d("Arm", ArmConstants.ARM_LENGTH_METERS, 0.0, 6.0,
-            new Color8Bit(Color.ORANGE)));
 
     void step(TalonFXSimState motor) {
         motor.setSupplyVoltage(RobotController.getBatteryVoltage());
@@ -42,7 +34,20 @@ final class ArmSim {
     void update(double motorVolts) {
         physics.setInputVoltage(motorVolts);
         physics.update(0.020);
-        link.setAngle(Units.radiansToDegrees(physics.getAngle()));
-        telemetry.log("Mechanism", drawing);
+        // WPILib alpha 8 publishes root "position" arrays, but bundled AdvantageScope
+        // still expects Mechanism2d roots with separate x/y fields. Publish that format.
+        var drawing = telemetry.getTable("Mechanism");
+        drawing.log(".type", "Mechanism2d");
+        drawing.log("dims", new double[] {1.2, 1.2});
+        drawing.log("backgroundColor", "#000020");
+        var root = drawing.getTable("Pivot");
+        root.log("x", 0.45);
+        root.log("y", 0.40);
+        var segment = root.getTable("Arm");
+        segment.log(".type", "line");
+        segment.log("angle", Units.radiansToDegrees(physics.getAngle()));
+        segment.log("length", ArmConstants.ARM_LENGTH_METERS);
+        segment.log("color", "#FFA500");
+        segment.log("weight", 6.0);
     }
 }
