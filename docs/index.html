@@ -74,22 +74,23 @@ footer { padding-bottom:2rem; color:var(--muted); }
 <section id="start">
   <h2>Set up and pick a mechanism</h2>
   <ol>
-    <li>In <strong>GitHub Desktop</strong>, select <code>Code2027-Preseason</code> under <strong>Current Repository</strong>. If the folder is already on your computer but missing from the list, choose <strong>File → Add Local Repository</strong> and select that folder.</li>
-    <li>Choose <strong>Current Branch → main</strong>. If you are getting the lesson starter from GitHub, click <strong>Fetch origin</strong> and then <strong>Pull origin</strong> if it appears.</li>
-    <li>Choose <strong>Current Branch → New Branch</strong>. Enter <code>lab/pair-name</code> with a unique name for your pair, select <code>main</code> as the base if prompted, then click <strong>Create Branch</strong>. Confirm your new branch is shown under <strong>Current Branch</strong>.</li>
-    <li>Open the same <code>Code2027-Preseason</code> folder in the team's <strong>WPILib VS Code</strong>. Open the folder that contains <code>build.gradle</code>. Use the project's WPILib 2027 alpha toolchain and Java 25.</li>
+    <li>Open the <code>Code2027-Preseason</code> project using <strong>WPILib 2027 VS Code</strong>. Choose <strong>File → Open Folder</strong> and select the top-level folder named <code>Code2027-Preseason</code>.</li>
+    <li>In <strong>GitHub Desktop</strong>, select <code>Code2027-Preseason</code> under <strong>Current Repository</strong>. Then choose <strong>Current Branch → main</strong>.</li>
+    <li>Click <strong>Fetch origin</strong>. If the button changes to <strong>Pull origin</strong>, click it to bring the latest changes into <code>main</code>. These changes include new code Mr. Leibs added so the arm and elevator can show up in the simulator.</li>
+    <li>Choose <strong>Current Branch → New Branch</strong>. Give it a name your pair will recognize, such as <code>lab/ada-sam</code>, and click <strong>Create Branch</strong>. If asked where to start, choose <code>main</code>. The new branch gives your pair a place to edit the code.</li>
   </ol>
+  <p>Back in VS Code, choose the elevator or the arm. You’ll graph two numbers during the lab. The <strong>target</strong> is the position you ask for. The <strong>actual</strong> is where the mechanism is.</p>
   <div class="tracks" aria-label="Choose one mechanism">
     <div class="track">
       <h3>Elevator</h3>
-      <dl><dt>Subsystem and motor</dt><dd><code>Elevator.java</code> · CAN 20 · 12:1</dd><dt>Goals in meters</dt><dd>A: 0.00 m · Y: 0.65 m</dd><dt>Graph fields</dt><dd><code>Target_m</code> and <code>Actual_m</code></dd></dl>
+      <dl><dt>File to edit</dt><dd><code>Elevator.java</code></dd><dt>Goals in meters</dt><dd>A: 0.00 m · Y: 0.65 m</dd><dt>Graph fields</dt><dd><code>Target_m</code> and <code>Actual_m</code></dd></dl>
     </div>
     <div class="track">
       <h3>Arm</h3>
-      <dl><dt>Subsystem and motor</dt><dd><code>Arm.java</code> · CAN 21 · 80:1</dd><dt>Goals in degrees</dt><dd>X: 0° · B: 65°</dd><dt>Graph fields</dt><dd><code>Target_deg</code> and <code>Actual_deg</code></dd></dl>
+      <dl><dt>File to edit</dt><dd><code>Arm.java</code></dd><dt>Goals in degrees</dt><dd>X: 0° · B: 65°</dd><dt>Graph fields</dt><dd><code>Target_deg</code> and <code>Actual_deg</code></dd></dl>
     </div>
   </div>
-  <p>Choose one track. One partner can implement the subsystem while the other checks units and runs the simulator. Swap at the telemetry step.</p>
+  <p>One partner can write the code while the other checks the numbers and runs the simulator. Swap when you get to the graph.</p>
   <ul>
     <li>Edit <code>src/main/java/first/robot/subsystems/Elevator.java</code> or <code>src/main/java/first/robot/subsystems/Arm.java</code>. Start with the numbered TODOs.</li>
     <li>Read the matching <code>ElevatorSim.java</code> or <code>ArmSim.java</code> to find the model’s limits and conversion constants. That file runs the physics and publishes the drawing.</li>
@@ -179,7 +180,7 @@ public void periodic() {
 <section id="motor">
   <h2>4. Make the mechanism follow the goal</h2>
   <h3>Add the Talon and Motion Magic request</h3>
-  <p>In your subsystem, add these imports below the package declaration. Add the fields after the existing <code>sim</code> field. The CAN ID identifies the Talon on the bus. Keep the target field you added in checkpoint 1.</p>
+  <p>In your subsystem, add these imports below the package declaration. Add the fields after the existing <code>sim</code> field. The CAN ID is the address of the motor controller. Use 20 for the elevator or 21 for the arm. Keep the target field you added in checkpoint 1.</p>
   <pre data-snippet="motor-imports"><code>import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -280,7 +281,7 @@ telemetry.log("Actual_deg", measuredTurns * 360.0);</code></pre>
   <p class="check"><strong>Done when</strong> the same buttons pass both checkpoints. Point out where the target and actual differ most and explain why.</p>
   <details>
     <summary>The starter or your code fails to launch</summary>
-    <p>Check that VS Code opened the folder with <code>build.gradle</code> and is using the WPILib 2027 toolchain. Read the first error in the terminal. A Java compile error will point to a file and line. A Talon configuration exception names the subsystem and reports the Phoenix status. Recheck the CAN ID and bus against your track.</p>
+    <p>Check that you opened the top-level <code>Code2027-Preseason</code> folder in WPILib 2027 VS Code. Read the first error in the terminal. A Java compile error will point to a file and line. A Talon configuration exception names the subsystem and reports the Phoenix status. Recheck the CAN ID and bus against your track.</p>
   </details>
   <details>
     <summary>The drawing appears but the numeric fields are missing</summary>
