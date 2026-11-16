@@ -12,7 +12,7 @@ import first.robot.Constants.ArmConstants;
 /** Desktop arm for the preseason controls lesson. */
 public final class Arm extends SubsystemBase {
     private final ArmSim sim = new ArmSim();
-    private final TalonFX motor = new TalonFX(21, TunerConstants.kCANBus);
+    private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
 
     public Arm() {
         // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.

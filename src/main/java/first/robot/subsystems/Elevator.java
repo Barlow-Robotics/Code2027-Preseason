@@ -12,7 +12,7 @@ import first.robot.Constants.ElevatorConstants;
 /** Desktop elevator for the preseason controls lesson. */
 public final class Elevator extends SubsystemBase {
     private final ElevatorSim sim = new ElevatorSim();
-    private final TalonFX motor = new TalonFX(20, TunerConstants.kCANBus);
+    private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
 
     public Elevator() {
         // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.

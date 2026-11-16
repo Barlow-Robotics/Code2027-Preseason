@@ -7,6 +7,8 @@ public final class Constants {
     public static final class ElevatorConstants {
         private ElevatorConstants() {}
 
+        public static final int MOTOR_CAN_ID = 20;
+
         // Goal presets used by the operator buttons.
         public static final double LOW_METERS = 0.0;
         public static final double HIGH_METERS = 0.65;
@@ -21,6 +23,8 @@ public final class Constants {
 
     public static final class ArmConstants {
         private ArmConstants() {}
+
+        public static final int MOTOR_CAN_ID = 21;
 
         // Goal presets used by the operator buttons.
         public static final double LOW_DEGREES = 0.0;
