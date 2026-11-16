@@ -41,32 +41,22 @@ private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConsta
 }</code></pre></div>
 <p>TODO 7 is for the later Controllers section. The lines under <code>// Setup Simulation</code> are already prepared; keep them in place.</p>
 <h3>Set the gear ratio and find its import</h3>
-<p>Open <code>src/main/java/first/robot/Constants.java</code> and find <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code>. <strong>Find this existing block</strong> inside that constants class:</p>
-<div data-track="elevator"><pre data-existing="constants-before-elevator"><code>public static final class ElevatorConstants {
-    private ElevatorConstants() {}
+<div class="code-edit" data-edit="ratio"><p>Open <code>src/main/java/first/robot/Constants.java</code>. Under <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code>, find TODO 1 and the <code>GEAR_RATIO</code> line below it:</p>
+<div data-track="elevator"><p class="code-caption">Before — red lines will change</p><pre data-existing="ratio-elevator"><code>public static final double HIGH_METERS = 0.65;
 
-    public static final int MOTOR_CAN_ID = 20;
+<span class="code-line code-removed">// TODO 1: Set the gear ratio using the Mechanisms walkthrough.</span>
+<span class="code-line code-removed">public static final double GEAR_RATIO = 1.0; // motor turns per drum turn</span></code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">Before — red lines will change</p><pre data-existing="ratio-arm"><code>public static final double HIGH_DEGREES = 65.0;
 
-    // Goal presets used by the operator buttons.
-    public static final double LOW_METERS = 0.0;
-    public static final double HIGH_METERS = 0.65;
+<span class="code-line code-removed">// TODO 1: Set the gear ratio using the Mechanisms walkthrough.</span>
+<span class="code-line code-removed">public static final double GEAR_RATIO = 1.0; // motor turns per arm turn</span></code></pre></div>
+<p>Replace the TODO and placeholder ratio with the correct value we determined earlier. Keep the preset above it unchanged:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="ratio-elevator"><code>public static final double HIGH_METERS = 0.65;
 
-    // TODO 1: Set the gear ratio using the Mechanisms walkthrough.
-    public static final double GEAR_RATIO = 1.0; // motor turns per drum turn</code></pre></div>
-<div data-track="arm" hidden><pre data-existing="constants-before-arm"><code>public static final class ArmConstants {
-    private ArmConstants() {}
+<span class="code-line code-added">public static final double GEAR_RATIO = 12.0; // motor turns per drum turn</span></code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="ratio-arm"><code>public static final double HIGH_DEGREES = 65.0;
 
-    public static final int MOTOR_CAN_ID = 21;
-
-    // Goal presets used by the operator buttons.
-    public static final double LOW_DEGREES = 0.0;
-    public static final double HIGH_DEGREES = 65.0;
-
-    // TODO 1: Set the gear ratio using the Mechanisms walkthrough.
-    public static final double GEAR_RATIO = 1.0; // motor turns per arm turn</code></pre></div>
-<p><strong>Change only the <code>GEAR_RATIO</code> line at TODO 1.</strong> Update the placeholder value of <code>1.0</code> to the correct gear ratio. Use the value we determined earlier:</p>
-<div data-track="elevator"><pre data-snippet="ratio-elevator"><code>public static final double GEAR_RATIO = 12.0; // motor turns per drum turn</code></pre></div>
-<div data-track="arm" hidden><pre data-snippet="ratio-arm"><code>public static final double GEAR_RATIO = 80.0; // motor turns per arm turn</code></pre></div>
+<span class="code-line code-added">public static final double GEAR_RATIO = 80.0; // motor turns per arm turn</span></code></pre></div></div>
 <p>Save the file. These constants describe your mechanism:</p>
 <ul>
 <li><code>MOTOR_CAN_ID</code>: the motor controller’s CAN address, already set to <span data-elevator="20" data-arm="21">20</span>.</li>

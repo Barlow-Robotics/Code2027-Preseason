@@ -14,54 +14,83 @@
   <p>Your buttons now change the target on the graph. Next, we’ll send that target to the <strong>Talon FX motor controller</strong>, the device that drives the motor. We use CTRE’s <strong>Phoenix</strong> library to configure it and send requests.</p>
   <h3>Add a Motion Magic request</h3>
   <p><strong>Motion Magic</strong> moves toward a position using a planned speed and acceleration. The Talon compares the measured position with that plan and adjusts the motor output.</p>
-  <p>The new code already creates the <code>motor</code> field and connects it to the simulation. In your subsystem file, add these three imports alongside the existing imports near the top:</p>
-  <pre data-snippet="motor-imports"><code>import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.signals.GravityTypeValue;</code></pre>
-  <p>Add this field alongside your existing <code>motor</code> and target fields, inside the class and outside any method:</p>
-  <div data-track="elevator"><pre data-snippet="motor-elevator"><code>private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);</code></pre></div>
-  <div data-track="arm" hidden><pre data-snippet="motor-arm"><code>private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);</code></pre></div>
+<div class="code-edit" data-edit="motor-imports"><p>In your subsystem file, find the existing Phoenix imports:</p>
+<p class="code-caption">Before — find this code</p><pre data-existing="motor-imports"><code>import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.TalonFXSimState;</code></pre>
+<p>Keep these imports and add the three new ones for configuration and the Motion Magic request:</p>
+<p class="code-caption">After — green lines are new or changed</p><pre data-snippet="motor-imports"><code>import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.TalonFXSimState;
+<span class="code-line code-added">import com.ctre.phoenix6.configs.TalonFXConfiguration;</span>
+<span class="code-line code-added">import com.ctre.phoenix6.controls.MotionMagicVoltage;</span>
+<span class="code-line code-added">import com.ctre.phoenix6.signals.GravityTypeValue;</span></code></pre></div>
+<div class="code-edit" data-edit="motor"><p>Find the <code>motor</code> and target fields inside the class:</p>
+<div data-track="elevator"><p class="code-caption">Before — find this code</p><pre data-existing="motor-elevator"><code>private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+private double targetMeters = ElevatorConstants.LOW_METERS;</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">Before — find this code</p><pre data-existing="motor-arm"><code>private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+private double targetDegrees = ArmConstants.LOW_DEGREES;</code></pre></div>
+<p>Add the reusable position request below them. Creating this request object does not send it to the motor:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="motor-elevator"><code>private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+private double targetMeters = ElevatorConstants.LOW_METERS;
+<span class="code-line code-added">private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);</span></code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="motor-arm"><code>private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+private double targetDegrees = ArmConstants.LOW_DEGREES;
+<span class="code-line code-added">private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);</span></code></pre></div></div>
   <p>The existing <code>TalonFX</code> object talks to the motor controller. Its address on the CAN bus comes from <code><span data-elevator="ElevatorConstants.MOTOR_CAN_ID" data-arm="ArmConstants.MOTOR_CAN_ID">ElevatorConstants.MOTOR_CAN_ID</span></code>. <code>TunerConstants.kCANBus</code> selects the bus already set up by this project. <code>positionRequest</code> stores a reusable Motion Magic request, initially set to zero turns. Creating it does not send it to the motor.</p>
   <h3>Apply the configuration once</h3>
-  <p>Find the existing constructor containing TODO 7. Replace that whole constructor with the code below, keeping the simulator setup line at the end as shown. A constructor has the same name as the class and no return type. Java runs it once when <code>RobotContainer</code> creates the subsystem.</p>
-  <div data-track="elevator"><pre data-snippet="config-elevator"><code>public Elevator() {
-    var config = new TalonFXConfiguration();
-    config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;
-    config.Slot0.kP = 5.0;
-    config.Slot0.kV = 2.4;
-    config.Slot0.kG = 0.28;
-    config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-    config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
-    config.MotionMagic.MotionMagicAcceleration = 6.0;
-
-    var status = motor.getConfigurator().apply(config);
-    if (!status.isOK()) {
-        throw new IllegalStateException("Elevator Talon FX configuration failed: " + status);
-    }
+<div class="code-edit" data-edit="config"><p>Find your subsystem’s constructor containing TODO 7:</p>
+<div data-track="elevator"><p class="code-caption">Before — red lines will change</p><pre data-existing="config-elevator"><code>public Elevator() {
+<span class="code-line code-removed">    // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.</span>
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
     motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 }</code></pre></div>
-  <div data-track="arm" hidden><pre data-snippet="config-arm"><code>public Arm() {
-    var config = new TalonFXConfiguration();
-    config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;
-    config.Slot0.kP = 45.0;
-    config.Slot0.kV = 15.0;
-    config.Slot0.kG = 0.23;
-    config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    config.MotionMagic.MotionMagicCruiseVelocity = 0.45;
-    config.MotionMagic.MotionMagicAcceleration = 1.5;
-
-    var status = motor.getConfigurator().apply(config);
-    if (!status.isOK()) {
-        throw new IllegalStateException("Arm Talon FX configuration failed: " + status);
-    }
+<div data-track="arm" hidden><p class="code-caption">Before — red lines will change</p><pre data-existing="config-arm"><code>public Arm() {
+<span class="code-line code-removed">    // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.</span>
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
     motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 }</code></pre></div>
+<p>Replace TODO 7 with the configuration below. Keep the prepared simulation setup at the end. This constructor runs once when <code>RobotContainer</code> creates the subsystem:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="config-elevator"><code>public Elevator() {
+<span class="code-line code-added">    var config = new TalonFXConfiguration();</span>
+<span class="code-line code-added">    config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;</span>
+<span class="code-line code-added">    config.Slot0.kP = 5.0;</span>
+<span class="code-line code-added">    config.Slot0.kV = 2.4;</span>
+<span class="code-line code-added">    config.Slot0.kG = 0.28;</span>
+<span class="code-line code-added">    config.Slot0.GravityType = GravityTypeValue.Elevator_Static;</span>
+<span class="code-line code-added">    config.MotionMagic.MotionMagicCruiseVelocity = 2.0;</span>
+<span class="code-line code-added">    config.MotionMagic.MotionMagicAcceleration = 6.0;</span>
+
+<span class="code-line code-added">    var status = motor.getConfigurator().apply(config);</span>
+<span class="code-line code-added">    if (!status.isOK()) {</span>
+<span class="code-line code-added">        throw new IllegalStateException(&quot;Elevator Talon FX configuration failed: &quot; + status);</span>
+<span class="code-line code-added">    }</span>
+
+    // Setup Simulation
+    // Sets the simulated motor model. This setup is prepared for you; leave it in place.
+    motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
+}</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="config-arm"><code>public Arm() {
+<span class="code-line code-added">    var config = new TalonFXConfiguration();</span>
+<span class="code-line code-added">    config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;</span>
+<span class="code-line code-added">    config.Slot0.kP = 45.0;</span>
+<span class="code-line code-added">    config.Slot0.kV = 15.0;</span>
+<span class="code-line code-added">    config.Slot0.kG = 0.23;</span>
+<span class="code-line code-added">    config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;</span>
+<span class="code-line code-added">    config.MotionMagic.MotionMagicCruiseVelocity = 0.45;</span>
+<span class="code-line code-added">    config.MotionMagic.MotionMagicAcceleration = 1.5;</span>
+
+<span class="code-line code-added">    var status = motor.getConfigurator().apply(config);</span>
+<span class="code-line code-added">    if (!status.isOK()) {</span>
+<span class="code-line code-added">        throw new IllegalStateException(&quot;Arm Talon FX configuration failed: &quot; + status);</span>
+<span class="code-line code-added">    }</span>
+
+    // Setup Simulation
+    // Sets the simulated motor model. This setup is prepared for you; leave it in place.
+    motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
+}</code></pre></div></div>
   <ul>
     <li><code>new TalonFXConfiguration()</code> starts a configuration object. The following assignments fill in its settings.</li>
     <li><code>SensorToMechanismRatio</code> tells Phoenix how many motor turns make one <span data-elevator="drum" data-arm="arm">drum</span> turn. This is the <code>GEAR_RATIO</code> constant we introduced in Mechanisms, now used to relate the motor’s rotation to the mechanism’s rotation.</li>
@@ -73,19 +102,49 @@ import com.ctre.phoenix6.signals.GravityTypeValue;</code></pre>
   </ul>
   <h3>Send the saved goal to Phoenix</h3>
   <p data-track="elevator"><strong>Here is where the two constants do different jobs.</strong> We already gave <code>GEAR_RATIO</code> to Phoenix as <code>SensorToMechanismRatio</code>, so its positions are now in drum turns. Our subsystem still accepts goals in meters. Use <code>METERS_PER_DRUM_TURN</code> to convert that height into drum turns before sending the request.</p>
-  <p>Keep your button bindings and command factory. Add the following lines inside the private goal setter, immediately after it clamps and stores the goal. Motion Magic takes mechanism turns.</p>
-  <div data-track="elevator"><pre data-snippet="send-elevator"><code>double goalTurns = targetMeters / ElevatorConstants.METERS_PER_DRUM_TURN;
-motor.setControl(positionRequest.withPosition(goalTurns));</code></pre></div>
-  <div data-track="arm" hidden><pre data-snippet="send-arm"><code>double goalTurns = targetDegrees / 360.0;
-motor.setControl(positionRequest.withPosition(goalTurns));</code></pre></div>
+<div class="code-edit" data-edit="send"><p>Find the private goal function you added in Buttons and Commands:</p>
+<div data-track="elevator"><p class="code-caption">Before — find this code</p><pre data-existing="send-elevator"><code>private void setHeightGoal(double goal) {
+    targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
+}</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">Before — find this code</p><pre data-existing="send-arm"><code>private void setAngleGoal(double goal) {
+    targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
+}</code></pre></div>
+<p>Keep the line that clamps and saves the goal. Add the two green lines to convert it into mechanism turns and send the position request:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="send-elevator"><code>private void setHeightGoal(double goal) {
+    targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
+<span class="code-line code-added">    double goalTurns = targetMeters / ElevatorConstants.METERS_PER_DRUM_TURN;</span>
+<span class="code-line code-added">    motor.setControl(positionRequest.withPosition(goalTurns));</span>
+}</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="send-arm"><code>private void setAngleGoal(double goal) {
+    targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
+<span class="code-line code-added">    double goalTurns = targetDegrees / 360.0;</span>
+<span class="code-line code-added">    motor.setControl(positionRequest.withPosition(goalTurns));</span>
+}</code></pre></div></div>
   <p><span data-elevator="Dividing meters by meters per drum turn converts our height into drum turns. A 0.65 m goal is about 4.14 drum turns." data-arm="Dividing degrees by 360 converts our angle into arm turns. A 65° goal is about 0.181 arm turns.">Dividing meters by meters per drum turn converts our height into drum turns. A 0.65 m goal is about 4.14 drum turns.</span> <code>withPosition</code> updates the request with that goal. <code>motor.setControl</code> sends it to the Talon, which continues running its position control after our one-shot command finishes.</p>
   <h3>Log the actual position</h3>
   <p>The supplied <code>simulationPeriodic()</code> method already connects the Talon to the physics model and updates the drawing. Leave that method as it is. Now we can read the Talon’s position and graph it.</p>
-  <p>In <code>periodic()</code>, leave the target log in place. Add the actual position next to it. The Talon reports mechanism turns, so multiply by the same factor you divided by when sending the goal.</p>
-  <div data-track="elevator"><pre data-snippet="actual-elevator"><code>double measuredTurns = motor.getPosition().getValueAsDouble();
-telemetry.log("Actual_m", measuredTurns * ElevatorConstants.METERS_PER_DRUM_TURN);</code></pre></div>
-  <div data-track="arm" hidden><pre data-snippet="actual-arm"><code>double measuredTurns = motor.getPosition().getValueAsDouble();
-telemetry.log("Actual_deg", measuredTurns * 360.0);</code></pre></div>
+<div class="code-edit" data-edit="actual"><p>Find <code>periodic()</code>, where you are already logging the target:</p>
+<div data-track="elevator"><p class="code-caption">Before — find this code</p><pre data-existing="actual-elevator"><code>@Override
+public void periodic() {
+    telemetry.log(&quot;Target_m&quot;, targetMeters);
+}</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">Before — find this code</p><pre data-existing="actual-arm"><code>@Override
+public void periodic() {
+    telemetry.log(&quot;Target_deg&quot;, targetDegrees);
+}</code></pre></div>
+<p>Keep the target log. Add the two green lines to read the Talon’s position, convert it back to the same units as the target, and log the actual position:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="actual-elevator"><code>@Override
+public void periodic() {
+    telemetry.log(&quot;Target_m&quot;, targetMeters);
+<span class="code-line code-added">    double measuredTurns = motor.getPosition().getValueAsDouble();</span>
+<span class="code-line code-added">    telemetry.log(&quot;Actual_m&quot;, measuredTurns * ElevatorConstants.METERS_PER_DRUM_TURN);</span>
+}</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="actual-arm"><code>@Override
+public void periodic() {
+    telemetry.log(&quot;Target_deg&quot;, targetDegrees);
+<span class="code-line code-added">    double measuredTurns = motor.getPosition().getValueAsDouble();</span>
+<span class="code-line code-added">    telemetry.log(&quot;Actual_deg&quot;, measuredTurns * 360.0);</span>
+}</code></pre></div></div>
 <p><code>getPosition()</code> gets the Talon’s position signal. <code>getValueAsDouble()</code> reads its numeric value in mechanism turns. We convert it back into <span data-elevator="meters" data-arm="degrees">meters</span> so target and actual use the same units on the graph.</p>
 </section><section id="test">
   <h2>Checkpoint 2 · Compare target and actual</h2>

@@ -29,23 +29,53 @@ private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerC
 private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
 <span class="code-line code-added">private double targetDegrees = ArmConstants.LOW_DEGREES;</span></code></pre></div>
   <p>A <strong>field</strong> is a value the subsystem remembers between calls. <code>private double</code> declares a decimal number that only this class can change directly. It starts at the low preset, zero.</p>
-  <p>Now add this private function below the existing <code><span data-elevator="setHeightGoalCommand" data-arm="setAngleGoalCommand">setHeightGoalCommand</span></code> method and above <code>periodic()</code>. Keep it inside the class, outside the other methods:</p>
-<div data-track="elevator"><pre data-snippet="goal-setter-elevator"><code>private void setHeightGoal(double goal) {
-    targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
+<div class="code-edit" data-edit="goal-setter"><p>In your subsystem file, find <code>periodic()</code>. It is below the command factory and still contains TODO 6:</p>
+<div data-track="elevator"><p class="code-caption">Before — find this code</p><pre data-existing="goal-setter-elevator"><code>@Override
+public void periodic() {
+    // TODO 6: Publish the goal in meters.
 }</code></pre></div>
-<div data-track="arm" hidden><pre data-snippet="goal-setter-arm"><code>private void setAngleGoal(double goal) {
-    targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
+<div data-track="arm" hidden><p class="code-caption">Before — find this code</p><pre data-existing="goal-setter-arm"><code>@Override
+public void periodic() {
+    // TODO 6: Publish the goal in degrees.
 }</code></pre></div>
+<p>Add the private function immediately above <code>@Override</code>, as shown in green. Leave <code>periodic()</code> unchanged for now:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-setter-elevator"><code><span class="code-line code-added">private void setHeightGoal(double goal) {</span>
+<span class="code-line code-added">    targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);</span>
+<span class="code-line code-added">}</span>
+
+@Override
+public void periodic() {
+    // TODO 6: Publish the goal in meters.
+}</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-setter-arm"><code><span class="code-line code-added">private void setAngleGoal(double goal) {</span>
+<span class="code-line code-added">    targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);</span>
+<span class="code-line code-added">}</span>
+
+@Override
+public void periodic() {
+    // TODO 6: Publish the goal in degrees.
+}</code></pre></div></div>
   <p><code>goal</code> is the requested position. <code>Math.clamp</code> keeps it between the minimum and maximum in <code>Constants.java</code>, then the function saves it in the target field. <span data-track="elevator">The elevator’s configured maximum height is 0.9 m; the earlier 1 m animation was an illustration of the conversion.</span></p>
   <p>This function is <code>private</code>, so only this subsystem can call it. It saves a number for now; we’ll add motor control later.</p>
   <h3>Have the command factory call the function</h3>
-  <p>Find the existing <code><span data-elevator="setHeightGoalCommand" data-arm="setAngleGoalCommand">setHeightGoalCommand</span></code> method containing TODO 3. Modify it to match the following:</p>
-<div data-track="elevator"><pre data-snippet="goal-command-elevator"><code>public Command setHeightGoalCommand(double goal) {
-    return runOnce(() -&gt; setHeightGoal(goal));
+<div class="code-edit" data-edit="goal-command"><p>Find the command factory containing TODO 3:</p>
+<div data-track="elevator"><p class="code-caption">Before — red lines will change</p><pre data-existing="goal-command-elevator"><code>public Command setHeightGoalCommand(double goal) {
+<span class="code-line code-removed">    return runOnce(() -&gt; {</span>
+<span class="code-line code-removed">        // TODO 3: Add a target field and call a private method to clamp and save the goal.</span>
+<span class="code-line code-removed">    });</span>
 }</code></pre></div>
-<div data-track="arm" hidden><pre data-snippet="goal-command-arm"><code>public Command setAngleGoalCommand(double goal) {
-    return runOnce(() -&gt; setAngleGoal(goal));
+<div data-track="arm" hidden><p class="code-caption">Before — red lines will change</p><pre data-existing="goal-command-arm"><code>public Command setAngleGoalCommand(double goal) {
+<span class="code-line code-removed">    return runOnce(() -&gt; {</span>
+<span class="code-line code-removed">        // TODO 3: Add a target field and call a private method to clamp and save the goal.</span>
+<span class="code-line code-removed">    });</span>
 }</code></pre></div>
+<p>Change the <code>runOnce</code> body so it calls the private function you just added. Keep the method name and parameter:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-command-elevator"><code>public Command setHeightGoalCommand(double goal) {
+<span class="code-line code-added">    return runOnce(() -&gt; setHeightGoal(goal));</span>
+}</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-command-arm"><code>public Command setAngleGoalCommand(double goal) {
+<span class="code-line code-added">    return runOnce(() -&gt; setAngleGoal(goal));</span>
+}</code></pre></div></div>
   <ul>
     <li><code>public Command</code> means other code can call this method and receive a command. A method that creates and returns a command is called a <strong>command factory</strong>.</li>
     <li><code>() -&gt;</code> describes work to do later. <code>runOnce</code> creates a command that calls your private function once when the command starts, then finishes. Creating the command does not change the target yet.</li>
@@ -54,37 +84,70 @@ private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConsta
   <p>Next, we’ll connect buttons to this command so pressing a button changes the saved goal.</p>
 </section><section id="buttons">
   <h2>Bind your two buttons</h2>
-  <p>Open <code>RobotContainer.java</code>. Near the top of the class, find the existing <code>joystick</code> field for port 0. Replace TODO 4 immediately below it with this new field:</p>
-  <pre data-snippet="operator"><code>private final CommandXboxController operator = new CommandXboxController(1);</code></pre>
+<div class="code-edit" data-edit="operator"><p>Open <code>RobotContainer.java</code>. Find TODO 4 just below the existing <code>joystick</code> field:</p>
+<p class="code-caption">Before — red lines will change</p><pre data-existing="operator"><code>private final CommandXboxController joystick = new CommandXboxController(0);
+<span class="code-line code-removed">// TODO 4: Add an operator CommandXboxController field on port 1.</span></code></pre>
+<p>Replace the TODO with the new <code>operator</code> field. Keep the port-0 joystick:</p>
+<p class="code-caption">After — green lines are new or changed</p><pre data-snippet="operator"><code>private final CommandXboxController joystick = new CommandXboxController(0);
+<span class="code-line code-added">private final CommandXboxController operator = new CommandXboxController(1);</span></code></pre></div>
   <p><code>new CommandXboxController(1)</code> reads the controller assigned to port 1. The field named <code>operator</code> lets the elevator and arm bindings share that controller. Port 0 continues to drive the swerve. Keep both controller fields: <code>joystick</code> for driving and <code>operator</code> for your mechanism.</p>
   <p><code>configureBindings()</code> organizes the controls by calling <code>configureDriveBindings()</code>, <code>configureElevatorBindings()</code>, and <code>configureArmBindings()</code>.</p>
-  <p>Find <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>. Your subsystem already exists as a field in this class. The new code already imports <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code> here so the bindings can use its LOW and HIGH presets. Replace the TODO 5 comment with these two button bindings:</p>
-  <div data-track="elevator"><pre data-snippet="bind-elevator"><code>operator.a().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));
-operator.y().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));</code></pre></div>
-  <div data-track="arm" hidden><pre data-snippet="bind-arm"><code>operator.x().onTrue(arm.setAngleGoalCommand(ArmConstants.LOW_DEGREES));
-operator.b().onTrue(arm.setAngleGoalCommand(ArmConstants.HIGH_DEGREES));</code></pre></div>
+<div class="code-edit" data-edit="bind"><p>Find your mechanism’s binding method in <code>RobotContainer.java</code>:</p>
+<div data-track="elevator"><p class="code-caption">Before — red lines will change</p><pre data-existing="bind-elevator"><code>private void configureElevatorBindings() {
+<span class="code-line code-removed">    // TODO 5: Bind A and Y on the operator controller to the low and high elevator goals.</span>
+}</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">Before — red lines will change</p><pre data-existing="bind-arm"><code>private void configureArmBindings() {
+<span class="code-line code-removed">    // TODO 5: Bind X and B on the operator controller to the low and high arm goals.</span>
+}</code></pre></div>
+<p>Replace TODO 5 with these two bindings. The subsystem field already exists, and its constants are already imported:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="bind-elevator"><code>private void configureElevatorBindings() {
+<span class="code-line code-added">    operator.a().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));</span>
+<span class="code-line code-added">    operator.y().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));</span>
+}</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="bind-arm"><code>private void configureArmBindings() {
+<span class="code-line code-added">    operator.x().onTrue(arm.setAngleGoalCommand(ArmConstants.LOW_DEGREES));</span>
+<span class="code-line code-added">    operator.b().onTrue(arm.setAngleGoalCommand(ArmConstants.HIGH_DEGREES));</span>
+}</code></pre></div></div>
 <p><code>operator.<span data-elevator="a" data-arm="x">a</span>()</code> represents the low button. <code>onTrue</code> starts its command when the button changes from released to pressed. The second line does the same for the high button.</p>
   <p>The expression inside <code>onTrue(...)</code> calls your subsystem’s command factory. When you press the button, the scheduler runs that command, which calls your private setter and saves the goal. These commands do not run while the robot is disabled; we will test with Teleop enabled.</p>
 </section><section id="telemetry">
   <h2>Graph the target</h2>
-  <p>Return to <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Add these two lines alongside the existing imports near the top of the file, below <code>package first.robot.subsystems;</code> and above the class declaration. Imports let Java find the classes named in our code.</p>
-  <pre data-snippet="telemetry-imports"><code>import org.wpilib.telemetry.Telemetry;
-import org.wpilib.telemetry.TelemetryTable;</code></pre>
-<p>Inside the class, add the <code>telemetry</code> field next to your target field. Then replace the whole existing <code>periodic()</code> method at TODO 6, including its <code>@Override</code> line, with the method below:</p>
-  <div data-track="elevator"><pre data-snippet="target-elevator"><code>private final TelemetryTable telemetry =
-    Telemetry.getTable("Elevator");
-
-@Override
+<div class="code-edit" data-edit="telemetry-imports"><p>Return to your subsystem file. Find these imports near the top:</p>
+<p class="code-caption">Before — find this code</p><pre data-existing="telemetry-imports"><code>import org.wpilib.command2.Command;
+import org.wpilib.command2.SubsystemBase;</code></pre>
+<p>Add the two telemetry imports below them. Imports let Java find the classes used in our code:</p>
+<p class="code-caption">After — green lines are new or changed</p><pre data-snippet="telemetry-imports"><code>import org.wpilib.command2.Command;
+import org.wpilib.command2.SubsystemBase;
+<span class="code-line code-added">import org.wpilib.telemetry.Telemetry;</span>
+<span class="code-line code-added">import org.wpilib.telemetry.TelemetryTable;</span></code></pre></div>
+<div class="code-edit" data-edit="telemetry-field"><p>Inside the class, find the target field you added earlier:</p>
+<div data-track="elevator"><p class="code-caption">Before — find this code</p><pre data-existing="telemetry-field-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">Before — find this code</p><pre data-existing="telemetry-field-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;</code></pre></div>
+<p>Add the telemetry table field immediately below it. This table will hold the values we graph:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="telemetry-field-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;
+<span class="code-line code-added">private final TelemetryTable telemetry =</span>
+<span class="code-line code-added">    Telemetry.getTable(&quot;Elevator&quot;);</span></code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="telemetry-field-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;
+<span class="code-line code-added">private final TelemetryTable telemetry =</span>
+<span class="code-line code-added">    Telemetry.getTable(&quot;Arm&quot;);</span></code></pre></div></div>
+<div class="code-edit" data-edit="target"><p>Find <code>periodic()</code>, which still contains TODO 6:</p>
+<div data-track="elevator"><p class="code-caption">Before — red lines will change</p><pre data-existing="target-elevator"><code>@Override
 public void periodic() {
-    telemetry.log("Target_m", targetMeters);
+<span class="code-line code-removed">    // TODO 6: Publish the goal in meters.</span>
 }</code></pre></div>
-  <div data-track="arm" hidden><pre data-snippet="target-arm"><code>private final TelemetryTable telemetry =
-    Telemetry.getTable("Arm");
-
-@Override
+<div data-track="arm" hidden><p class="code-caption">Before — red lines will change</p><pre data-existing="target-arm"><code>@Override
 public void periodic() {
-    telemetry.log("Target_deg", targetDegrees);
+<span class="code-line code-removed">    // TODO 6: Publish the goal in degrees.</span>
 }</code></pre></div>
+<p>Replace the TODO with the target log call. The scheduler calls this method repeatedly, so the graph will keep receiving the current goal:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="target-elevator"><code>@Override
+public void periodic() {
+<span class="code-line code-added">    telemetry.log(&quot;Target_m&quot;, targetMeters);</span>
+}</code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="target-arm"><code>@Override
+public void periodic() {
+<span class="code-line code-added">    telemetry.log(&quot;Target_deg&quot;, targetDegrees);</span>
+}</code></pre></div></div>
   <ul>
     <li><code>private final TelemetryTable telemetry</code> remembers the table we write to. <code>final</code> means this field keeps referring to the same table.</li>
     <li>The <code>getTable</code> call creates a table named <code><span data-elevator="Elevator" data-arm="Arm">Elevator</span></code>.</li>
