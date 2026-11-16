@@ -2,48 +2,60 @@ package first.robot.subsystems;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
-// TODO 6a: Add the telemetry imports.
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-// TODO 7a: Add the Motion Magic and gravity imports.
-import first.robot.generated.TunerConstants;
 
 import first.robot.Constants.ElevatorConstants;
+import first.robot.generated.TunerConstants;
 
-/** Desktop elevator for the preseason controls lesson. */
+/** Simulated elevator used in the preseason controls lesson. */
 public final class Elevator extends SubsystemBase {
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-    // TODO 3a: Add a field to store the target position.
-    // TODO 7b: Add a Motion Magic request field.
-    // TODO 6b: Add a telemetry table field.
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
+    private final TelemetryTable telemetry = Telemetry.getTable("Elevator");
+    private double targetMeters = ElevatorConstants.LOW_METERS;
 
     public Elevator() {
-        // TODO 6c: Configure the sensor ratio here.
-        // TODO 7c: Add gains and Motion Magic settings here.
-
-        // Setup Simulation
-        // Sets the simulated motor model. This setup is prepared for you; leave it in place.
+        var config = new TalonFXConfiguration();
+        config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;
+        config.Slot0.kP = 5.0;
+        config.Slot0.kV = 2.4;
+        config.Slot0.kG = 0.28;
+        config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+        config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
+        config.MotionMagic.MotionMagicAcceleration = 6.0;
+        var status = motor.getConfigurator().apply(config);
+        if (!status.isOK()) {
+            throw new IllegalStateException("Elevator Talon FX configuration failed: " + status);
+        }
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
-    public Command setHeightGoalCommand(double goal) {
-        return runOnce(() -> {
-            // TODO 3c: Call the private function that saves the goal.
-        });
+    public Command setHeightGoalCommand(double meters) {
+        return runOnce(() -> setHeightGoal(meters));
     }
 
-    // TODO 3b: Add the private setHeightGoal(double goal) function here.
+    private void setHeightGoal(double meters) {
+        targetMeters = Math.clamp(meters, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
+        motor.setControl(positionRequest.withPosition(targetMeters / ElevatorConstants.METERS_PER_DRUM_TURN));
+    }
 
     @Override
     public void periodic() {
-        // TODO 6d: Publish target and actual position in meters.
+        double measuredTurns = motor.getPosition().getValueAsDouble();
+        telemetry.log("Target_m", targetMeters);
+        telemetry.log("Actual_m", measuredTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
     }
 
     @Override
     public void simulationPeriodic() {
-        // Updates the simulated mechanism and sends its position back to the Talon.
         sim.step(motor.getSimState());
     }
 }

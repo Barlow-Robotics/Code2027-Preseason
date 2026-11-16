@@ -43,10 +43,11 @@ public class RobotContainer {
     private final SwerveTelemetry logger = new SwerveTelemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
-    // TODO 4: Add an operator CommandXboxController field on port 1.
+    private final CommandXboxController operator = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    // TODO 2: Add your Elevator or Arm subsystem field here.
+    private final Elevator elevator = new Elevator();
+    private final Arm arm = new Arm();
 
     /* Path follower */
     private final Selectable<Command> autoChooser;
@@ -112,11 +113,13 @@ public class RobotContainer {
     }
 
     private void configureElevatorBindings() {
-        // TODO 5: Bind A and Y on the operator controller to the low and high elevator goals.
+        operator.a().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));
+        operator.y().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));
     }
 
     private void configureArmBindings() {
-        // TODO 5: Bind X and B on the operator controller to the low and high arm goals.
+        operator.x().onTrue(arm.setAngleGoalCommand(ArmConstants.LOW_DEGREES));
+        operator.b().onTrue(arm.setAngleGoalCommand(ArmConstants.HIGH_DEGREES));
     }
 
     public Command getAutonomousCommand() {
