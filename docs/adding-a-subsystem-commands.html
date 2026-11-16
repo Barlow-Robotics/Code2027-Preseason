@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buttons and Commands · Adding a subsystem</title><meta name="description" content="Make a controller button change a target, then watch it on a graph.">
+<link rel="stylesheet" href="walkthrough.css"><script src="walkthrough.js" defer></script></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Adding a subsystem</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a data-lesson-link href="adding-a-subsystem.html">1. Setup</a></li><li><a data-lesson-link href="adding-a-subsystem-mechanisms.html">2. Mechanisms</a></li><li><a data-lesson-link href="adding-a-subsystem-commands.html" aria-current="page">3. Buttons and Commands</a></li><li><a data-lesson-link href="adding-a-subsystem-controllers.html">4. Controllers</a></li></ul></div></nav><main class="wrap"><div class="intro"><h1>Buttons and Commands</h1><p>Make a controller button change a target, then watch it on a graph.</p></div><section id="selection"><fieldset class="mechanism-picker">
+    <legend>Which mechanism are you building?</legend>
+    <label><input type="radio" name="mechanism" value="elevator" checked> Elevator</label>
+    <label><input type="radio" name="mechanism" value="arm"> Arm</label>
+    <p id="selection-status" aria-live="polite">Showing the Elevator instructions below.</p>
+  </fieldset>
+  <noscript><p>Enable JavaScript to switch mechanisms. The Elevator instructions are shown by default.</p></noscript></section><section id="files">  <h2>Find the files we will use</h2><p>Return to WPILib 2027 VS Code. We’ll first make a button change the goal and graph that goal, before adding motor control. The <strong>target</strong> is the position we ask for; the <strong>actual</strong> is where the mechanism is.</p>
+  <ul>
+    <li>Open <code><span data-elevator="src/main/java/first/robot/subsystems/Elevator.java" data-arm="src/main/java/first/robot/subsystems/Arm.java">src/main/java/first/robot/subsystems/Elevator.java</span></code>. This is the main file we will be editing.</li>
+    <li>Open <code>src/main/java/first/robot/Constants.java</code>. Under <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code>, find <code>GEAR_RATIO</code>. This is the constant from the Mechanisms section: <strong><span data-elevator="12 motor turns per drum turn" data-arm="80 motor turns per arm turn">12 motor turns per drum turn</span></strong>. The file also contains the dimensions and allowed positions. The simulation uses these same values.</li>
+    <li>Open <code>src/main/java/first/robot/RobotContainer.java</code> and find <code>configureMechanisms()</code>. The starter creates both subsystems there during desktop simulation. You’ll add bindings for your track to this method.</li>
+  </ul>
+  <h3>Run the starter once</h3>
+  <ol>
+    <li>Open the Command Palette with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Choose <strong>WPILib: Simulate Robot Code</strong>, select <strong>Sim GUI</strong> if prompted, and wait for robot startup. Leave the simulated robot disabled.</li>
+    <li>Open the desktop <strong>AdvantageScope (WPILib)</strong> installed with the 2027 tools. Choose <strong>File → Connect to Simulator</strong> and select <strong>NetworkTables</strong> if prompted.</li>
+    <li>Add a <strong>Mechanism</strong> tab. In the sidebar expand <code>Telemetry → Preseason → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code> and drag the <code>Mechanism</code> field into the tab.</li>
+  </ol>
+<figure class="screenshot-placeholder" id="shot-simulate"><strong>Screenshot to add · Start the simulator</strong><figcaption>Show the VS Code Command Palette with WPILib: Simulate Robot Code selected, followed by the Sim GUI selection if shown.</figcaption></figure><figure class="screenshot-placeholder" id="shot-connect"><strong>Screenshot to add · Connect AdvantageScope</strong><figcaption>Show File → Connect to Simulator in the installed 2027 AdvantageScope, with the NetworkTables choice visible if available.</figcaption></figure><figure class="screenshot-placeholder" id="shot-drawing"><strong>Screenshot to add · Find the mechanism drawing</strong><figcaption>Show the Telemetry → Preseason fields and the Mechanism tab displaying the selected mechanism.</figcaption></figure>
+  <p class="check"><strong>Checkpoint.</strong> You can see the drawing while disabled. <span data-elevator="The elevator sits at the bottom." data-arm="The unpowered arm may settle at its lower stop.">The elevator sits at the bottom.</span> Stop the run in VS Code before editing.</p>
+</section><section id="goal">
+  <h2>Create the goal command</h2>
+  <p>The starter already imports <code><span data-elevator="Constants.ElevatorConstants" data-arm="Constants.ArmConstants">Constants.ElevatorConstants</span></code> into your subsystem file. For example, <code><span data-elevator="ElevatorConstants.MAX_METERS" data-arm="ArmConstants.MAX_DEGREES">ElevatorConstants.MAX_METERS</span></code> reads the largest allowed position from <code>Constants.java</code>. The simulation helpers are already prepared for you.</p>
+  <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Inside the class, immediately below the existing <code>sim</code> field, add the first line below. A <strong>field</strong> is a value the subsystem remembers between calls.</p>
+  <p>Find the existing <code><span data-elevator="setHeightGoalCommand" data-arm="setAngleGoalCommand">setHeightGoalCommand</span></code> method containing TODO 1. Replace that whole method, including its closing brace, with the two methods below. Keep the class’s final closing brace and the existing <code>periodic()</code> and <code>simulationPeriodic()</code> methods.</p>
+  <div data-track="elevator"><pre data-snippet="goal-elevator"><code>private double targetMeters = LOW_METERS;
+
+public Command setHeightGoalCommand(double goal) {
+    return runOnce(() -&gt; setHeightGoal(goal));
+}
+
+private void setHeightGoal(double goal) {
+    targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
+}</code></pre></div>
+  <div data-track="arm" hidden><pre data-snippet="goal-arm"><code>private double targetDegrees = LOW_DEGREES;
+
+public Command setAngleGoalCommand(double goal) {
+    return runOnce(() -&gt; setAngleGoal(goal));
+}
+
+private void setAngleGoal(double goal) {
+    targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
+}</code></pre></div>
+  <ul>
+    <li><code>private double</code> declares a decimal number that only this class can change directly. It starts at the low preset, zero.</li>
+    <li><code>public Command</code> means other code can call this method and receive a command. Creating the command does not change the target yet.</li>
+    <li><code>() -&gt;</code> describes work to do later. <code>runOnce</code> wraps that work in a command that calls the setter once when it starts, then finishes.</li>
+    <li>The subsystem’s <code>runOnce</code> also makes this command require this subsystem. The scheduler—the code that runs commands—uses requirements to prevent two commands from controlling the same subsystem at once.</li>
+    <li>The private setter uses <code>Math.clamp</code> to keep the requested number between the minimum and maximum in <code>Constants.java</code>, then remembers it as the target.</li>
+  </ul>
+  <p>For now, the setter only saves a number. We will add motor control after we can see that number change on a graph.</p>
+</section><section id="buttons">
+  <h2>Bind your two buttons</h2>
+  <p>In <code>RobotContainer.configureMechanisms()</code>, keep the two subsystem variables. At TODO 2, replace the TODO comment with this line. The controller import is already in that file.</p>
+  <pre data-snippet="operator"><code>var operator = new CommandXboxController(1);</code></pre>
+  <p><code>new CommandXboxController(1)</code> creates the object we use to read the controller assigned to port 1. <code>var operator</code> gives that object a name; Java figures out its type. Port 0 continues to drive the swerve.</p><p>Immediately below that line, still inside <code>configureMechanisms()</code>, add these two lines:</p>
+  <div data-track="elevator"><pre data-snippet="bind-elevator"><code>operator.a().onTrue(elevator.setHeightGoalCommand(Elevator.LOW_METERS));
+operator.y().onTrue(elevator.setHeightGoalCommand(Elevator.HIGH_METERS));</code></pre></div>
+  <div data-track="arm" hidden><pre data-snippet="bind-arm"><code>operator.x().onTrue(arm.setAngleGoalCommand(Arm.LOW_DEGREES));
+operator.b().onTrue(arm.setAngleGoalCommand(Arm.HIGH_DEGREES));</code></pre></div>
+<p><code>operator.<span data-elevator="a" data-arm="x">a</span>()</code> represents the low button. <code>onTrue</code> starts its command when the button changes from released to pressed. The second line does the same for the high button.</p>
+  <p>The expression inside <code>onTrue(...)</code> calls your subsystem’s command factory. When you press the button, the scheduler runs that command, which calls your private setter and saves the goal. These commands do not run while the robot is disabled; we will test with Teleop enabled.</p>
+</section><section id="telemetry">
+  <h2>Graph the target</h2>
+  <p>Return to <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Add these two lines alongside the existing imports near the top of the file, below <code>package first.robot.subsystems;</code> and above the class declaration. Imports let Java find the classes named in our code.</p>
+  <pre data-snippet="telemetry-imports"><code>import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;</code></pre>
+<p>Inside the class, add the <code>telemetry</code> field next to your target field. Then replace the whole existing <code>periodic()</code> method at TODO 3, including its <code>@Override</code> line, with the method below:</p>
+  <div data-track="elevator"><pre data-snippet="target-elevator"><code>private final TelemetryTable telemetry =
+    Telemetry.getTable("Preseason").getTable("Elevator");
+
+@Override
+public void periodic() {
+    telemetry.log("Target_m", targetMeters);
+}</code></pre></div>
+  <div data-track="arm" hidden><pre data-snippet="target-arm"><code>private final TelemetryTable telemetry =
+    Telemetry.getTable("Preseason").getTable("Arm");
+
+@Override
+public void periodic() {
+    telemetry.log("Target_deg", targetDegrees);
+}</code></pre></div>
+  <ul>
+    <li><code>private final TelemetryTable telemetry</code> remembers the table we write to. <code>final</code> means this field keeps referring to the same table.</li>
+    <li>The two <code>getTable</code> calls organize our values under <code>Preseason → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code>.</li>
+    <li><code>@Override</code> marks a method supplied by the subsystem framework that we are filling in. The scheduler calls <code>periodic()</code> repeatedly, normally every 20 milliseconds.</li>
+    <li><code>telemetry.log</code> publishes the target under the name in quotes. The suffix <code><span data-elevator="_m" data-arm="_deg">_m</span></code> tells us the unit. This project’s WPILib telemetry sends these values to NetworkTables, where AdvantageScope can read them.</li>
+  </ul>
+  <h3>Checkpoint 1 · Press the buttons and watch the target</h3>
+  <ol>
+    <li>Save and restart <strong>WPILib: Simulate Robot Code</strong>. While disabled, drag your Xbox controller from <strong>System Joysticks</strong> to port <strong>1</strong> in <strong>Joysticks</strong>. Check that the face-button indicators change. For keyboard input, assign a Keyboard entry to port 1 and check its mappings in the simulator’s <strong>DS</strong> menu.</li>
+    <li>In AdvantageScope, connect to the simulator. Open a <strong>Line Graph</strong> tab and drag <code><span data-elevator="Target_m" data-arm="Target_deg">Target_m</span></code> from <code>Telemetry → Preseason → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code> to the graph.</li>
+    <li>Release the buttons, enable simulated <strong>Teleop</strong>, then press high and low a few seconds apart. Use <strong><span data-elevator="Y then A" data-arm="B then X">Y then A</span></strong>.</li>
+  </ol>
+<figure class="screenshot-placeholder" id="shot-controller"><strong>Screenshot to add · Put the controller on port 1</strong><figcaption>Show the Sim GUI with the operator controller assigned to port 1 and the matching face-button indicators visible.</figcaption></figure><figure class="screenshot-placeholder" id="shot-target"><strong>Screenshot to add · Checkpoint 1 in AdvantageScope</strong><figcaption>Show a target-only Line Graph with the high and low button presses visible as steps. Show the field name and units.</figcaption></figure>
+  <p class="check"><strong>Expected.</strong> The target jumps from 0 to <span data-elevator="0.65 m" data-arm="65°">0.65 m</span> and back to 0. The simulation is already connected to the Talon, but we have not sent a motor-control request, so its output is still zero volts. The unpowered mechanism may move under gravity. If the target stays flat, check Teleop, the port 1 button indicator, and whether the command calls the setter. Stop the simulator before the next step.</p>
+</section><div class="lesson-next"><a data-lesson-link href="adding-a-subsystem-mechanisms.html">← Mechanisms</a><a data-lesson-link href="adding-a-subsystem-controllers.html">Next section: Controllers →</a></div></main>
+<footer class="wrap">
+  <a href="https://docs.github.com/en/desktop/making-changes-in-a-branch/managing-branches-in-github-desktop">GitHub Desktop branches</a> ·
+  <a href="https://docs.wpilib.org/en/latest/docs/software/wpilib-tools/robot-simulation/simulation-gui.html">WPILib Simulation GUI</a> · <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html">Phoenix position control</a> ·
+  <a href="https://github.com/wpilibsuite/allwpilib/blob/main/telemetry/doc/telemetry.md">WPILib telemetry</a> ·
+  <a href="https://docs.advantagescope.org/tab-reference/line-graph/">AdvantageScope Line Graph</a>
+</footer></body></html>

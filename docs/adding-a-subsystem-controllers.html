@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Controllers · Adding a subsystem</title><meta name="description" content="Configure the motor controller and make the mechanism follow the target.">
+<link rel="stylesheet" href="walkthrough.css"><script src="walkthrough.js" defer></script></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Adding a subsystem</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a data-lesson-link href="adding-a-subsystem.html">1. Setup</a></li><li><a data-lesson-link href="adding-a-subsystem-mechanisms.html">2. Mechanisms</a></li><li><a data-lesson-link href="adding-a-subsystem-commands.html">3. Buttons and Commands</a></li><li><a data-lesson-link href="adding-a-subsystem-controllers.html" aria-current="page">4. Controllers</a></li></ul></div></nav><main class="wrap"><div class="intro"><h1>Controllers</h1><p>Configure the motor controller and make the mechanism follow the target.</p></div><section id="selection"><fieldset class="mechanism-picker">
+    <legend>Which mechanism are you building?</legend>
+    <label><input type="radio" name="mechanism" value="elevator" checked> Elevator</label>
+    <label><input type="radio" name="mechanism" value="arm"> Arm</label>
+    <p id="selection-status" aria-live="polite">Showing the Elevator instructions below.</p>
+  </fieldset>
+  <noscript><p>Enable JavaScript to switch mechanisms. The Elevator instructions are shown by default.</p></noscript></section><section id="motor">
+  <h2>Make the mechanism follow the goal</h2>
+  <h3>Add a Motion Magic request</h3>
+  <p>The starter already creates the <code>motor</code> field and connects it to the simulation. In your subsystem file, add these three imports alongside the existing imports near the top:</p>
+  <pre data-snippet="motor-imports"><code>import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.signals.GravityTypeValue;</code></pre>
+  <p>Add this field alongside your existing <code>motor</code> and target fields, inside the class and outside any method:</p>
+  <div data-track="elevator"><pre data-snippet="motor-elevator"><code>private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);</code></pre></div>
+  <div data-track="arm" hidden><pre data-snippet="motor-arm"><code>private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);</code></pre></div>
+  <p>The existing <code>TalonFX</code> object talks to the motor controller. Its CAN ID is its address on the bus: <span data-elevator="20 for the elevator" data-arm="21 for the arm">20 for the elevator</span>. <code>TunerConstants.kCANBus</code> selects the bus already set up by this project. <code>positionRequest</code> stores a reusable Motion Magic request, initially set to zero turns. Creating it does not send it to the motor.</p>
+  <h3>Apply the configuration once</h3>
+  <p>Find the existing constructor containing TODO 4. Replace that whole constructor with the code below, keeping the simulator setup line at the end as shown. A constructor has the same name as the class and no return type. Java runs it once when <code>RobotContainer</code> creates the subsystem.</p>
+  <div data-track="elevator"><pre data-snippet="config-elevator"><code>public Elevator() {
+    var config = new TalonFXConfiguration();
+    config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;
+    config.Slot0.kP = 5.0;
+    config.Slot0.kV = 2.4;
+    config.Slot0.kG = 0.28;
+    config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+    config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
+    config.MotionMagic.MotionMagicAcceleration = 6.0;
+
+    var status = motor.getConfigurator().apply(config);
+    if (!status.isOK()) {
+        throw new IllegalStateException("Elevator Talon FX configuration failed: " + status);
+    }
+    motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
+}</code></pre></div>
+  <div data-track="arm" hidden><pre data-snippet="config-arm"><code>public Arm() {
+    var config = new TalonFXConfiguration();
+    config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;
+    config.Slot0.kP = 45.0;
+    config.Slot0.kV = 15.0;
+    config.Slot0.kG = 0.23;
+    config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+    config.MotionMagic.MotionMagicCruiseVelocity = 0.45;
+    config.MotionMagic.MotionMagicAcceleration = 1.5;
+
+    var status = motor.getConfigurator().apply(config);
+    if (!status.isOK()) {
+        throw new IllegalStateException("Arm Talon FX configuration failed: " + status);
+    }
+    motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
+}</code></pre></div>
+  <ul>
+    <li><code>new TalonFXConfiguration()</code> starts a configuration object. The following assignments fill in its settings.</li>
+    <li><code>SensorToMechanismRatio</code> tells Phoenix how many motor turns make one <span data-elevator="drum" data-arm="arm">drum</span> turn. This is the <code>GEAR_RATIO</code> constant we introduced in Mechanisms, now used to relate the motor’s rotation to the mechanism’s rotation.</li>
+    <li><code>Slot0</code> is the set of control gains used by this request. <code>kP</code> adds voltage based on position error, <code>kV</code> adds voltage for the planned velocity, and <code>kG</code> adds voltage to counter gravity.</li>
+    <li><code>GravityType</code> selects <span data-elevator="constant gravity compensation for the elevator" data-arm="gravity compensation that changes with the arm’s angle">constant gravity compensation for the elevator</span>.</li>
+    <li>The Motion Magic settings limit the planned speed (mechanism turns per second) and acceleration (turns per second squared). These values and gains are prepared for our desktop model.</li>
+    <li><code>apply(config)</code> sends the settings to the Talon. If it fails, the <code>if</code> block stops startup with an error describing the problem.</li>
+    <li>The last line tells Phoenix’s simulator which motor model we are using.</li>
+  </ul>
+  <h3>Send the saved goal to Phoenix</h3>
+  <p>Keep your button bindings and command factory. Add the following lines inside the private goal setter, immediately after it clamps and stores the goal. Motion Magic takes mechanism turns.</p>
+  <div data-track="elevator"><pre data-snippet="send-elevator"><code>double goalTurns = targetMeters / ElevatorConstants.METERS_PER_DRUM_TURN;
+motor.setControl(positionRequest.withPosition(goalTurns));</code></pre></div>
+  <div data-track="arm" hidden><pre data-snippet="send-arm"><code>double goalTurns = targetDegrees / 360.0;
+motor.setControl(positionRequest.withPosition(goalTurns));</code></pre></div>
+  <p><span data-elevator="Dividing meters by meters per drum turn converts our height into drum turns. A 0.65 m goal is about 4.14 drum turns." data-arm="Dividing degrees by 360 converts our angle into arm turns. A 65° goal is about 0.181 arm turns.">Dividing meters by meters per drum turn converts our height into drum turns. A 0.65 m goal is about 4.14 drum turns.</span> <code>withPosition</code> updates the request with that goal. <code>motor.setControl</code> sends it to the Talon, which continues running its position control after our one-shot command finishes.</p>
+  <h3>Log the actual position</h3>
+  <p>The starter’s <code>simulationPeriodic()</code> already connects the Talon to the physics model and updates the drawing. Leave that method as it is. Now we can read the Talon’s position and graph it.</p>
+  <p>In <code>periodic()</code>, leave the target log in place. Add the actual position next to it. The Talon reports mechanism turns, so multiply by the same factor you divided by when sending the goal.</p>
+  <div data-track="elevator"><pre data-snippet="actual-elevator"><code>double measuredTurns = motor.getPosition().getValueAsDouble();
+telemetry.log("Actual_m", measuredTurns * ElevatorConstants.METERS_PER_DRUM_TURN);</code></pre></div>
+  <div data-track="arm" hidden><pre data-snippet="actual-arm"><code>double measuredTurns = motor.getPosition().getValueAsDouble();
+telemetry.log("Actual_deg", measuredTurns * 360.0);</code></pre></div>
+<p><code>getPosition()</code> gets the Talon’s position signal. <code>getValueAsDouble()</code> reads its numeric value in mechanism turns. We convert it back into <span data-elevator="meters" data-arm="degrees">meters</span> so target and actual use the same units on the graph.</p>
+</section><section id="test">
+  <h2>Checkpoint 2 · Compare target and actual</h2>
+  <ol>
+    <li>Save and restart the simulator. Check port 1, reconnect AdvantageScope if needed, and add <code><span data-elevator="Actual_m" data-arm="Actual_deg">Actual_m</span></code> to the same axis as the target.</li>
+    <li>Enable Teleop with the buttons released. Press the same high button, wait about three seconds, then press low. Disable when both moves are done.</li>
+    <li>The target steps first, then actual position moves toward it. Check that the actual settles near the goal and that the Mechanism drawing follows it.</li>
+  </ol>
+<figure class="screenshot-placeholder" id="shot-actual"><strong>Screenshot to add · Checkpoint 2 in AdvantageScope</strong><figcaption>Show target and actual on the same axis after a high and low move, with readable field names and units.</figcaption></figure>
+  <p class="check"><strong>Done when</strong> the same buttons pass both checkpoints. Point out where the target and actual differ most and explain why.</p>
+  <details>
+    <summary>The starter or your code fails to launch</summary>
+    <p>Check that you opened the top-level <code>Code2027-Preseason</code> folder in WPILib 2027 VS Code. Read the first error in the terminal. A Java compile error will point to a file and line. A Talon configuration exception names the subsystem and reports the Phoenix status. Recheck the CAN ID and bus against your track.</p>
+  </details>
+  <details>
+    <summary>The drawing appears but the numeric fields are missing</summary>
+    <p>Check that you restarted the robot after editing and that the expected <code>telemetry.log</code> call is in the existing <code>periodic()</code> override. Check the case of <code>Preseason</code>, the track name, and the two keys.</p>
+  </details>
+  <details>
+    <summary>The target stays flat when I press high</summary>
+    <p>Verify Teleop is enabled and the button indicator lights up under port 1. Check the track’s high button and put a breakpoint inside the <code>runOnce</code> body. If the breakpoint never hits, inspect the trigger in <code>configureMechanisms()</code>. If it hits, check where you assign and log the target.</p>
+  </details>
+  <details>
+    <summary>The target moves but actual stays flat or moves the wrong distance</summary>
+    <p>Check that <code>simulationPeriodic()</code> calls <code>sim.step(motor.getSimState())</code> and that <code>SensorToMechanismRatio</code> matches the gear ratio in <code>Constants.java</code>. Compare the request against the expected drum or arm turns. A correct drawing with a wrong graph scale points to the conversion in <code>periodic()</code>.</p>
+  </details>
+  <details>
+    <summary>AdvantageScope shows no data</summary>
+    <p>Use desktop AdvantageScope 2027 on the same computer as the simulator. Select ordinary <strong>NetworkTables</strong> in the simulator connection menu. Look for <code>Telemetry → Swerve</code> first. If that table is absent too, check that the robot is running and close any second simulator instance.</p>
+  </details>
+</section><div class="lesson-next"><a data-lesson-link href="adding-a-subsystem-commands.html">← Buttons and Commands</a><a href="index.html">Back to walkthroughs →</a></div></main>
+<footer class="wrap">
+  <a href="https://docs.github.com/en/desktop/making-changes-in-a-branch/managing-branches-in-github-desktop">GitHub Desktop branches</a> ·
+  <a href="https://docs.wpilib.org/en/latest/docs/software/wpilib-tools/robot-simulation/simulation-gui.html">WPILib Simulation GUI</a> · <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html">Phoenix position control</a> ·
+  <a href="https://github.com/wpilibsuite/allwpilib/blob/main/telemetry/doc/telemetry.md">WPILib telemetry</a> ·
+  <a href="https://docs.advantagescope.org/tab-reference/line-graph/">AdvantageScope Line Graph</a>
+</footer></body></html>

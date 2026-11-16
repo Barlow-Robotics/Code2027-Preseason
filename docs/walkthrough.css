@@ -1,0 +1,88 @@
+/* Shared reading layout for the four-part subsystem lesson. */
+:root { color-scheme:light; --ink:#172b26; --muted:#52635e; --paper:#ffffff; --line:#dce4df; --link:#16634d; --dark:#18372e; --accent:#edf5e6; --surface:#f6f8f6; }
+* { box-sizing:border-box; }
+html { scroll-padding-top:6rem; }
+body { margin:0; color:var(--ink); background:var(--paper); font:1rem/1.65 "Segoe UI",sans-serif; }
+::selection { background:#d8ebc9; }
+a { color:var(--link); text-underline-offset:.2em; }
+a:hover { text-decoration-thickness:2px; }
+:focus-visible { outline:2px solid var(--link); outline-offset:4px; }
+.wrap { width:min(100% - 3rem,56rem); margin-inline:auto; }
+.mast { border-bottom:1px solid var(--line); padding:.8rem 0; font-size:.85rem; color:var(--muted); }
+.mast .wrap { display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; }
+.mast a { color:var(--muted); }
+.lesson-name { color:var(--ink); font-weight:650; }
+nav { position:sticky; top:0; z-index:5; background:var(--paper); border-bottom:1px solid var(--line); }
+nav ul { display:flex; gap:1.4rem; list-style:none; padding:0; margin:0; }
+nav li { margin:0; }
+nav a { display:block; padding:.9rem 0 .75rem; border-bottom:3px solid transparent; color:var(--muted); text-decoration:none; font-weight:600; font-size:.9rem; }
+nav a:hover { color:var(--link); }
+nav [aria-current="page"] { color:var(--link); border-bottom-color:var(--link); }
+main { padding-bottom:3rem; }
+.intro { padding:2rem 0 1.25rem; }
+h1,h2,h3,h4 { color:var(--ink); text-wrap:balance; }
+h1 { font-size:2rem; line-height:1.2; letter-spacing:-.025em; margin:0 0 .4rem; }
+.intro p { color:var(--muted); margin:0; max-width:70ch; }
+h2 { font-size:1.4rem; line-height:1.3; letter-spacing:-.015em; margin:0 0 .8rem; }
+h3 { font-size:1.12rem; line-height:1.4; margin:1.6rem 0 .5rem; }
+h4 { font-size:1rem; margin:1.4rem 0 .5rem; }
+section { padding:1.5rem 0; }
+section + section { border-top:1px solid var(--line); }
+section > :is(p,ol,ul,details) { max-width:74ch; }
+p { margin:.5rem 0 1rem; }
+ul,ol { padding-inline-start:1.4rem; }
+li + li { margin-top:.5rem; }
+code,pre { font-family:Consolas,"Courier New",monospace; font-size:.9em; }
+p code,li code { background:#eff3f0; padding:.12em .3em; border-radius:3px; overflow-wrap:anywhere; }
+pre { max-width:100%; overflow:auto; margin:1rem 0; padding:1rem 1.2rem; border:1px solid var(--line); border-radius:6px; background:var(--surface); color:var(--ink); line-height:1.6; tab-size:4; }
+pre code { font-size:1em; }
+.check { background:var(--accent); padding:.9rem 1rem; border-radius:6px; }
+details { border-top:1px solid var(--line); }
+summary { cursor:pointer; padding:.8rem 0; font-weight:600; }
+kbd { font:inherit; font-size:.85em; padding:.1em .3em; border:1px solid var(--line); border-radius:3px; background:var(--surface); }
+.screenshot-placeholder { max-width:74ch; margin:1rem 0 1.5rem; padding:1rem; border:1px dashed #a7b8ae; border-radius:6px; background:var(--surface); font-size:.9rem; }
+.screenshot-placeholder strong { display:block; }
+.screenshot-placeholder figcaption { margin-top:.3rem; color:var(--muted); }
+[hidden] { display:none !important; }
+.mechanism-picker { max-width:74ch; margin:0 0 1.2rem; padding:0; border:0; }
+.mechanism-picker legend { font-size:.9rem; font-weight:600; margin-bottom:.4rem; }
+.mechanism-picker label { display:inline-flex; align-items:center; gap:.5rem; margin-right:.4rem; padding:.5rem .9rem; border:1px solid var(--line); border-radius:5px; cursor:pointer; }
+.mechanism-picker label:has(input:checked) { background:var(--accent); border-color:var(--link); }
+.mechanism-picker input { accent-color:var(--link); }
+.mechanism-picker p { color:var(--muted); font-size:.82rem; margin:.5rem 0 0; }
+#selection { padding-top:0; }
+.lesson-next { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-top:1px solid var(--line); padding-top:1.5rem; margin-top:1rem; }
+.lesson-next a { font-size:.95rem; font-weight:600; }
+.lesson-next a:last-child { margin-left:auto; background:var(--dark); color:#fff; border-radius:5px; padding:.65rem 1rem; text-decoration:none; }
+.lesson-next a:last-child:hover { background:var(--link); }
+footer { color:var(--muted); padding-block:1rem 2rem; font-size:.8rem; }
+footer a { color:var(--muted); }
+.lessons { list-style:none; padding:0; margin:0; }
+.lessons li { border-top:1px solid var(--line); padding:1.5rem 0; }
+.lessons p { color:var(--muted); max-width:65ch; }
+@media(max-width:40rem) {
+ .wrap { width:calc(100% - 2rem); }
+ nav ul { display:grid; grid-template-columns:1fr 1fr; gap:0 1rem; }
+ nav a { padding:.55rem 0; font-size:.82rem; }
+ .intro { padding-top:1.5rem; }
+ h1 { font-size:1.7rem; }
+ section { padding:1.2rem 0; }
+}
+@media print { nav,.gear-controls,.lesson-next { display:none; } pre { white-space:pre-wrap; } }
+.ratio-figure { width:min(100%,34rem); margin:1.25rem 0; padding:1rem; border:1px solid var(--line); }
+.gear-strip { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.35rem; }
+.gear-demo[data-mechanism="arm"] { width:min(100%,40rem); }
+.gear-demo[data-mechanism="arm"] .gear-strip { grid-template-columns:150fr 150fr 290fr; }
+.gear-stage { min-width:0; text-align:center; }
+.gear-stage svg { display:block; width:100%; height:auto; margin:auto; }
+.gear-stage svg text { font:11px "Segoe UI",sans-serif; font-weight:700; }
+.gear-stage p { font-size:.72rem; line-height:1.5; margin:.25rem 0; white-space:nowrap; }
+.gear-controls { display:flex; align-items:center; flex-wrap:wrap; gap:.7rem; margin:1rem 0 .65rem; }
+.gear-controls button { font:inherit; background:var(--dark); color:var(--paper); border:1px solid var(--dark); padding:.45rem .9rem; cursor:pointer; }
+.gear-controls button:hover { background:var(--link); }
+.gear-controls label { flex:1 1 14rem; }
+.gear-controls input { display:block; width:100%; accent-color:var(--link); }
+.gear-readout { font-variant-numeric:tabular-nums; margin:.5rem 0; }
+.gear-readout span { white-space:nowrap; }
+.ratio-figure figcaption { border-top:1px solid var(--line); padding-top:.6rem; }
+@media(max-width:36rem) { .gear-strip { gap:.35rem; } .ratio-figure { padding:.6rem; } .gear-stage p { font-size:.65rem; white-space:normal; } }
