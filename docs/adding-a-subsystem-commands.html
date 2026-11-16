@@ -13,7 +13,7 @@
   <ul>
     <li>Open <code><span data-elevator="src/main/java/first/robot/subsystems/Elevator.java" data-arm="src/main/java/first/robot/subsystems/Arm.java">src/main/java/first/robot/subsystems/Elevator.java</span></code>. This is the main file we will be editing.</li>
     <li>Open <code>src/main/java/first/robot/Constants.java</code>. Under <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code>, find <code>GEAR_RATIO</code>. This is the constant from the Mechanisms section: <strong><span data-elevator="12 motor turns per drum turn" data-arm="80 motor turns per arm turn">12 motor turns per drum turn</span></strong>. <span data-track="elevator">Also find <code>METERS_PER_DRUM_TURN</code>, our second conversion constant: the circumference that relates drum turns to elevator height. Notice how it is calculated from <code>DRUM_RADIUS_METERS</code>. </span>The file also contains the dimensions and allowed positions. The simulation uses these same values.</li>
-    <li>Open <code>src/main/java/first/robot/RobotContainer.java</code> and find <code>configureMechanisms()</code>. The starter creates both subsystems there during desktop simulation. You’ll connect your mechanism’s commands to controller buttons in this method.</li>
+    <li>Open <code>src/main/java/first/robot/RobotContainer.java</code> and find <code>configureBindings()</code>. It calls separate methods for the drivetrain, elevator, and arm. You’ll add your button bindings in <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>. The mechanism methods run only during desktop simulation.</li>
   </ul>
   <h3>See what the system does before we add any code</h3>
   <ol>
@@ -56,9 +56,11 @@ private void setAngleGoal(double goal) {
   <p>For now, the setter only saves a number. We will add motor control after we can see that number change on a graph.</p>
 </section><section id="buttons">
   <h2>Bind your two buttons</h2>
-  <p>In <code>RobotContainer.configureMechanisms()</code>, keep the two subsystem variables. At TODO 2, replace the TODO comment with this line. The controller import is already in that file.</p>
-  <pre data-snippet="operator"><code>var operator = new CommandXboxController(1);</code></pre>
-  <p><code>new CommandXboxController(1)</code> creates the object we use to read the controller assigned to port 1. <code>var operator</code> gives that object a name; Java figures out its type. Port 0 continues to drive the swerve.</p><p>Immediately below that line, still inside <code>configureMechanisms()</code>, add these two lines:</p>
+  <p>Open <code>RobotContainer.java</code>. The starter already creates an <code>operator</code> controller near the top of the class:</p>
+  <pre data-snippet="operator"><code>private final CommandXboxController operator = new CommandXboxController(1);</code></pre>
+  <p><code>new CommandXboxController(1)</code> reads the controller assigned to port 1. The field named <code>operator</code> lets the elevator and arm bindings share that controller. Port 0 continues to drive the swerve. This line is already supplied; you do not need to add it.</p>
+  <p><code>configureBindings()</code> organizes the controls by calling <code>configureDriveBindings()</code>, <code>configureElevatorBindings()</code>, and <code>configureArmBindings()</code>.</p>
+  <p>Find <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>. Keep the existing line that creates your subsystem. Replace its TODO 2 comment with these two button bindings:</p>
   <div data-track="elevator"><pre data-snippet="bind-elevator"><code>operator.a().onTrue(elevator.setHeightGoalCommand(Elevator.LOW_METERS));
 operator.y().onTrue(elevator.setHeightGoalCommand(Elevator.HIGH_METERS));</code></pre></div>
   <div data-track="arm" hidden><pre data-snippet="bind-arm"><code>operator.x().onTrue(arm.setAngleGoalCommand(Arm.LOW_DEGREES));
