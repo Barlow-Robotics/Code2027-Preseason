@@ -86,3 +86,10 @@ footer a { color:var(--muted); }
 .gear-readout span { white-space:nowrap; }
 .ratio-figure figcaption { border-top:1px solid var(--line); padding-top:.6rem; }
 @media(max-width:36rem) { .gear-strip { gap:.35rem; } .ratio-figure { padding:.6rem; } .gear-stage p { font-size:.65rem; white-space:normal; } }
+
+/* Before/after examples keep surrounding code and mark only edited lines. */
+.code-caption { font-size:.82rem; font-weight:600; color:var(--muted); margin:1rem 0 .25rem; }
+.code-caption + pre { margin-top:0; }
+.code-line { display:inline-block; min-width:100%; }
+.code-removed { color:#862b32; background:#fce9eb; }
+.code-added { color:#155534; background:#e1f3e6; }

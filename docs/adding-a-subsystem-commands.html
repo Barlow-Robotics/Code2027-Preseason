@@ -15,15 +15,19 @@
   <p>We’ll use the constants you found in the previous section to keep the goal within the mechanism’s allowed positions.</p>
   <h3>Add a private function to save the goal</h3>
   <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Find TODO 3 just below the existing <code>sim</code> and <code>motor</code> fields:</p>
-<div data-track="elevator"><pre data-existing="target-field-location-elevator"><code>private final ElevatorSim sim = new ElevatorSim();
+<div data-track="elevator"><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="target-field-location-elevator"><code>private final ElevatorSim sim = new ElevatorSim();
 private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-// TODO 3: Add a field to store the target position.</code></pre></div>
-<div data-track="arm" hidden><pre data-existing="target-field-location-arm"><code>private final ArmSim sim = new ArmSim();
+<span class="code-line code-removed">// TODO 3: Add a field to store the target position.</span></code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="target-field-location-arm"><code>private final ArmSim sim = new ArmSim();
 private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-// TODO 3: Add a field to store the target position.</code></pre></div>
-<p>Replace that TODO comment with this target field:</p>
-<div data-track="elevator"><pre data-snippet="goal-field-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;</code></pre></div>
-<div data-track="arm" hidden><pre data-snippet="goal-field-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;</code></pre></div>
+<span class="code-line code-removed">// TODO 3: Add a field to store the target position.</span></code></pre></div>
+<p>Modify this part of the file to match the following. Keep the existing <code>sim</code> and <code>motor</code> fields; replace only the TODO line:</p>
+<div data-track="elevator"><p class="code-caption">After — the new field is green</p><pre data-snippet="goal-field-elevator"><code>private final ElevatorSim sim = new ElevatorSim();
+private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+<span class="code-line code-added">private double targetMeters = ElevatorConstants.LOW_METERS;</span></code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — the new field is green</p><pre data-snippet="goal-field-arm"><code>private final ArmSim sim = new ArmSim();
+private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+<span class="code-line code-added">private double targetDegrees = ArmConstants.LOW_DEGREES;</span></code></pre></div>
   <p>A <strong>field</strong> is a value the subsystem remembers between calls. <code>private double</code> declares a decimal number that only this class can change directly. It starts at the low preset, zero.</p>
   <p>Now add this private function below the existing <code><span data-elevator="setHeightGoalCommand" data-arm="setAngleGoalCommand">setHeightGoalCommand</span></code> method and above <code>periodic()</code>. Keep it inside the class, outside the other methods:</p>
 <div data-track="elevator"><pre data-snippet="goal-setter-elevator"><code>private void setHeightGoal(double goal) {
