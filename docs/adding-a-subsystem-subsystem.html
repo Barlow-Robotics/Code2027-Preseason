@@ -81,12 +81,9 @@ private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConsta
 <p>The import lets us use the shorter name <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code> in this file. For example, <code><span data-elevator="ElevatorConstants.GEAR_RATIO" data-arm="ArmConstants.GEAR_RATIO">ElevatorConstants.GEAR_RATIO</span></code> reads the ratio you just set. Importing a class makes its name available; it does not create a subsystem.</p>
 </section><section id="create">  <h3>Create an instance in RobotContainer</h3>
   <p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find this existing block</strong> near the top of the class:</p>
-<pre data-existing="container-before"><code>private final CommandXboxController joystick = new CommandXboxController(0);
-// TODO 4: Add an operator CommandXboxController field on port 1.
-
-public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+<pre data-existing="container-before"><code>public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 // TODO 2: Add your Elevator or Arm subsystem field here.</code></pre>
-<p><strong>Replace only the TODO 2 comment</strong> with this line for your chosen mechanism. Keep the <code>drivetrain</code> line; leave TODO 4 for the next section:</p>
+<p><strong>Replace only the TODO 2 comment</strong> with this line for your chosen mechanism. Keep the existing <code>drivetrain</code> line:</p>
   <div data-track="elevator"><pre data-snippet="create-elevator"><code>private final Elevator elevator = new Elevator();</code></pre></div>
   <div data-track="arm" hidden><pre data-snippet="create-arm"><code>private final Arm arm = new Arm();</code></pre></div>
   <p><code>new <span data-elevator="Elevator()" data-arm="Arm()">Elevator()</span></code> creates an <strong>instance</strong>—the actual object described by the class. Creating it also runs its constructor and creates its motor object. The field named <code><span data-elevator="elevator" data-arm="arm">elevator</span></code> keeps it available to the rest of <code>RobotContainer</code>, including the button-binding methods. <code>private final</code> means only this class can access the field directly and the field will keep referring to this subsystem.</p>
