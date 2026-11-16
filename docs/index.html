@@ -54,6 +54,9 @@ caption { text-align:left; font-weight:650; margin-bottom:.4rem; }
 th, td { border-bottom:1px solid var(--line); padding:.45rem .55rem; vertical-align:top; }
 tbody th { font-weight:550; }
 kbd { padding:.08em .28em; border:1px solid var(--line); background:#eff2e7; }
+.screenshot-placeholder { max-width:70ch; margin:1.2rem 0 1.7rem; padding:1.1rem; border:2px dashed var(--line); background:#eff2e7; }
+.screenshot-placeholder strong { display:block; }
+.screenshot-placeholder figcaption { margin-top:.45rem; color:var(--muted); }
 footer { padding-bottom:2rem; color:var(--muted); }
 @media(max-width:36rem) { .wrap { width:calc(100% - 1.7rem); } .tracks { grid-template-columns:1fr; } }
 @media print { header, pre { color:#000; background:#fff; } .intro p, .mast a { color:#000; } nav { display:none; } section { break-inside:avoid; } }
@@ -73,13 +76,26 @@ footer { padding-bottom:2rem; color:var(--muted); }
 <main class="wrap">
 <section id="start">
   <h2>Set up and pick a mechanism</h2>
-  <ol>
-    <li>Open the <code>Code2027-Preseason</code> project using <strong>WPILib 2027 VS Code</strong>. Choose <strong>File → Open Folder</strong> and select the top-level folder named <code>Code2027-Preseason</code>.</li>
-    <li>In <strong>GitHub Desktop</strong>, select <code>Code2027-Preseason</code> under <strong>Current Repository</strong>. Then choose <strong>Current Branch → main</strong>.</li>
-    <li>Click <strong>Fetch origin</strong>. If the button changes to <strong>Pull origin</strong>, click it to bring the latest changes into <code>main</code>. These changes include new code Mr. Leibs added so the arm and elevator can show up in the simulator.</li>
-    <li>Choose <strong>Current Branch → New Branch</strong>. Give it a name your pair will recognize, such as <code>lab/ada-sam</code>, and click <strong>Create Branch</strong>. If asked where to start, choose <code>main</code>. The new branch gives your pair a place to edit the code.</li>
-  </ol>
-  <p>Back in VS Code, choose the elevator or the arm. You’ll graph two numbers during the lab. The <strong>target</strong> is the position you ask for. The <strong>actual</strong> is where the mechanism is.</p>
+  <h3>Open the project</h3>
+  <p>Open <strong>WPILib 2027 VS Code</strong>. Click <strong>File → Open Folder</strong>, select the folder named <code>Code2027-Preseason</code>, and click <strong>Select Folder</strong>. Remember to open the top-level folder.</p>
+  <p>Look at the file list on the left. You should see <code>src</code> and <code>build.gradle</code> inside <code>Code2027-Preseason</code>. This tells you the whole project is open.</p>
+  <figure class="screenshot-placeholder" id="shot-project"><strong>Screenshot to add · The project open in VS Code</strong><figcaption>Show the student clone open in WPILib 2027 VS Code. Highlight the project name, src folder, and build.gradle in the file list.</figcaption></figure>
+  <h3>Get the new code from Mr. Leibs</h3>
+  <p>Open <strong>GitHub Desktop</strong>. At the top left, click <strong>Current Repository</strong> and select <code>Code2027-Preseason</code>. A repository is the project and its saved history.</p>
+  <p>Click <strong>Current Branch</strong> near the top of the window. In the list, click <code>main</code>. A branch is a named version of the project. We use <code>main</code> as our shared starting point.</p>
+  <figure class="screenshot-placeholder" id="shot-checkout"><strong>Screenshot to add · Choose main</strong><figcaption>Show the Current Branch list open in the student clone, with main visible. Highlight main as the next click.</figcaption></figure>
+  <p>Check that <strong>Current Branch</strong> now says <code>main</code>. Click <strong>Fetch origin</strong> to check GitHub for new changes. Wait for the check to finish.</p>
+  <figure class="screenshot-placeholder" id="shot-fetch"><strong>Screenshot to add · Check for updates</strong><figcaption>Show the student clone on main before fetching, with the Fetch origin button visible and highlighted. Capture after the lesson has been pushed.</figcaption></figure>
+  <p>If the button changes to <strong>Pull origin</strong>, click it. This downloads the new code into your project. Wait for it to finish. These changes include code Mr. Leibs added so the arm and elevator can show up in the simulator.</p>
+  <figure class="screenshot-placeholder" id="shot-pull"><strong>Screenshot to add · Download the new code</strong><figcaption>Show the student clone after fetching, still on the older main, with Pull origin visible and highlighted. Capture before clicking Pull origin.</figcaption></figure>
+  <p>When the download finishes, the button returns to <strong>Fetch origin</strong>. If it already says Fetch origin after checking for updates, your copy is up to date.</p>
+  <figure class="screenshot-placeholder" id="shot-updated"><strong>Screenshot to add · The update is complete</strong><figcaption>Show the student clone after pulling, with Current Branch set to main, Fetch origin visible, and no local changes.</figcaption></figure>
+  <h3>Make a branch for your pair</h3>
+  <p>Click <strong>Current Branch</strong>, then <strong>New Branch</strong>. Type a name such as <code>lab/ada-sam</code>, using your own names. If the dialog asks which branch to start from, choose <code>main</code>. Click <strong>Create Branch</strong>.</p>
+  <figure class="screenshot-placeholder" id="shot-new-branch"><strong>Screenshot to add · Create your pair's branch</strong><figcaption>Show the Create a Branch dialog with lab/ada-sam entered and main selected if a base choice is shown. Highlight Create Branch.</figcaption></figure>
+  <p>Check that <strong>Current Branch</strong> shows your pair’s branch name. Your edits will now belong to that branch. Return to VS Code to begin the exercise.</p>
+  <figure class="screenshot-placeholder" id="shot-pair-branch"><strong>Screenshot to add · Check your branch name</strong><figcaption>Show the student clone after creating lab/ada-sam, with the new name highlighted under Current Branch.</figcaption></figure>
+  <p>Choose the elevator or the arm. You’ll graph two numbers during the lab. The <strong>target</strong> is the position you ask for. The <strong>actual</strong> is where the mechanism is.</p>
   <div class="tracks" aria-label="Choose one mechanism">
     <div class="track">
       <h3>Elevator</h3>
@@ -102,6 +118,7 @@ footer { padding-bottom:2rem; color:var(--muted); }
     <li>Open the desktop <strong>AdvantageScope (WPILib)</strong> installed with the 2027 tools. Choose <strong>File → Connect to Simulator</strong> and select <strong>NetworkTables</strong> if prompted.</li>
     <li>Add a <strong>Mechanism</strong> tab. In the sidebar expand <code>Telemetry → Preseason → Elevator</code> or <code>Arm</code> and drag the <code>Mechanism</code> field into the tab.</li>
   </ol>
+<figure class="screenshot-placeholder" id="shot-simulate"><strong>Screenshot to add · Start the simulator</strong><figcaption>Show the VS Code Command Palette with WPILib: Simulate Robot Code selected, followed by the Sim GUI selection if shown.</figcaption></figure><figure class="screenshot-placeholder" id="shot-connect"><strong>Screenshot to add · Connect AdvantageScope</strong><figcaption>Show File → Connect to Simulator in the installed 2027 AdvantageScope, with the NetworkTables choice visible if available.</figcaption></figure><figure class="screenshot-placeholder" id="shot-drawing"><strong>Screenshot to add · Find the mechanism drawing</strong><figcaption>Show the Telemetry → Preseason fields and the Mechanism tab displaying the selected mechanism.</figcaption></figure>
   <p class="check"><strong>Checkpoint.</strong> You can see the drawing while disabled. The elevator sits at the bottom and the unpowered arm may settle at its lower stop. Stop the run in VS Code before editing.</p>
 </section>
 <section id="goal">
@@ -175,6 +192,7 @@ public void periodic() {
     <li>In AdvantageScope, connect to the simulator. Open a <strong>Line Graph</strong> tab and drag <code>Target_m</code> or <code>Target_deg</code> from <code>Telemetry → Preseason → Elevator</code> or <code>Arm</code> to the graph.</li>
     <li>Release the buttons, enable simulated <strong>Teleop</strong>, then press high and low a few seconds apart. Use <strong>Y then A</strong> for the elevator or <strong>B then X</strong> for the arm.</li>
   </ol>
+<figure class="screenshot-placeholder" id="shot-controller"><strong>Screenshot to add · Put the controller on port 1</strong><figcaption>Show the Sim GUI with the operator controller assigned to port 1 and the matching face-button indicators visible.</figcaption></figure><figure class="screenshot-placeholder" id="shot-target"><strong>Screenshot to add · Checkpoint 1 in AdvantageScope</strong><figcaption>Show a target-only Line Graph with the high and low button presses visible as steps. Show the field name and units.</figcaption></figure>
   <p class="check"><strong>Expected.</strong> The target jumps from 0 to 0.65 m or 65° and back to 0. The simulation still receives zero motor voltage. If the target stays flat, check Teleop, the port 1 button indicator, and whether the command calls the setter. Stop the simulator before the next step.</p>
 </section>
 <section id="motor">
@@ -278,6 +296,7 @@ telemetry.log("Actual_deg", measuredTurns * 360.0);</code></pre>
     <li>Enable Teleop with the buttons released. Press the same high button, wait about three seconds, then press low. Disable when both moves are done.</li>
     <li>The target steps first, then actual position moves toward it. Check that the actual settles near the goal and that the Mechanism drawing follows it.</li>
   </ol>
+<figure class="screenshot-placeholder" id="shot-actual"><strong>Screenshot to add · Checkpoint 2 in AdvantageScope</strong><figcaption>Show target and actual on the same axis after a high and low move, with readable field names and units.</figcaption></figure>
   <p class="check"><strong>Done when</strong> the same buttons pass both checkpoints. Point out where the target and actual differ most and explain why.</p>
   <details>
     <summary>The starter or your code fails to launch</summary>
