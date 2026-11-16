@@ -14,7 +14,7 @@
   <p>Your subsystem now exists and its simulation drawing is running. A <strong>command</strong> describes an action for it to perform. We’ll make one that changes the <strong>target</strong>—the position we ask for—and graph that target before adding motor control.</p>
   <p>We’ll use the constants you found in the previous section to keep the goal within the mechanism’s allowed positions.</p>
   <p>Open <code><span data-elevator="Elevator.java" data-arm="Arm.java">Elevator.java</span></code>. Inside the class, immediately below the existing <code>sim</code> field, add the first line below. A <strong>field</strong> is a value the subsystem remembers between calls.</p>
-  <p>Find the existing <code><span data-elevator="setHeightGoalCommand" data-arm="setAngleGoalCommand">setHeightGoalCommand</span></code> method containing TODO 3. Replace that whole method, including its closing brace, with the two methods below. Keep the class’s final closing brace and the existing <code>periodic()</code> and <code>simulationPeriodic()</code> methods.</p>
+  <p>Find the existing <code><span data-elevator="setHeightGoalCommand" data-arm="setAngleGoalCommand">setHeightGoalCommand</span></code> method containing TODO 3. Modify the code to match the following. Keep the class’s final closing brace and the existing <code>periodic()</code> and <code>simulationPeriodic()</code> methods.</p>
   <div data-track="elevator"><pre data-snippet="goal-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;
 
 public Command setHeightGoalCommand(double goal) {
