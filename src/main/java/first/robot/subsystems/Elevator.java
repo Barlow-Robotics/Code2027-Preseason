@@ -17,7 +17,7 @@ import first.robot.generated.TunerConstants;
 /** Simulated elevator used in the preseason controls lesson. */
 public final class Elevator extends SubsystemBase {
     private final ElevatorSim sim = new ElevatorSim();
-    private final TalonFX motor = new TalonFX(20, TunerConstants.kCANBus);
+    private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
     private final TelemetryTable telemetry = Telemetry.getTable("Elevator");
     private double targetMeters = ElevatorConstants.LOW_METERS;
