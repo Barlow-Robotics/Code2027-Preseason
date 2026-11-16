@@ -18,7 +18,8 @@ public final class Elevator extends SubsystemBase {
     // TODO 6b: Add a telemetry table field.
 
     public Elevator() {
-        // TODO 7: Configure feedback, gains, and Motion Magic after the first graph checkpoint.
+        // TODO 6c: Configure the sensor ratio here.
+        // TODO 7: Add gains and Motion Magic settings here.
 
         // Setup Simulation
         // Sets the simulated motor model. This setup is prepared for you; leave it in place.
@@ -35,7 +36,7 @@ public final class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // TODO 6c: Publish target and actual position in meters.
+        // TODO 6d: Publish target and actual position in meters.
     }
 
     @Override

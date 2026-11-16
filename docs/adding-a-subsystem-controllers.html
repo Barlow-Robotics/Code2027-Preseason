@@ -17,10 +17,9 @@
 <div class="code-edit" data-edit="motor-imports"><p>In your subsystem file, find the existing Phoenix imports:</p>
 <p class="code-caption">Before — find this code</p><pre data-existing="motor-imports"><code>import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;</code></pre>
-<p>Keep these imports and add the three new ones for configuration and the Motion Magic request:</p>
+<p>Keep these imports and add the two new ones for the Motion Magic request and gravity compensation:</p>
 <p class="code-caption">After — green lines are new or changed</p><pre data-snippet="motor-imports"><code>import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-<span class="code-line code-added">import com.ctre.phoenix6.configs.TalonFXConfiguration;</span>
 <span class="code-line code-added">import com.ctre.phoenix6.controls.MotionMagicVoltage;</span>
 <span class="code-line code-added">import com.ctre.phoenix6.signals.GravityTypeValue;</span></code></pre></div>
 <div class="code-edit" data-edit="motor"><p>Find the <code>motor</code> and target fields inside the class:</p>
@@ -36,26 +35,40 @@ private double targetMeters = ElevatorConstants.LOW_METERS;
 private double targetDegrees = ArmConstants.LOW_DEGREES;
 <span class="code-line code-added">private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);</span></code></pre></div></div>
   <p>The existing <code>TalonFX</code> object talks to the motor controller. Its address on the CAN bus comes from <code><span data-elevator="ElevatorConstants.MOTOR_CAN_ID" data-arm="ArmConstants.MOTOR_CAN_ID">ElevatorConstants.MOTOR_CAN_ID</span></code>. <code>TunerConstants.kCANBus</code> selects the bus already set up by this project. <code>positionRequest</code> stores a reusable Motion Magic request, initially set to zero turns. Creating it does not send it to the motor.</p>
-  <h3>Apply the configuration once</h3>
+  <h3>Add control settings to the configuration</h3>
 <div class="code-edit" data-edit="config"><p>Find your subsystem’s constructor containing TODO 7:</p>
 <div data-track="elevator"><p class="code-caption">Before — red lines will change</p><pre data-existing="config-elevator"><code>public Elevator() {
-<span class="code-line code-removed">    // TODO 7: Configure feedback, gains, and Motion Magic after the first graph checkpoint.</span>
+    var config = new TalonFXConfiguration();
+    config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;
+<span class="code-line code-removed">    // TODO 7: Add gains and Motion Magic settings here.</span>
+
+    var status = motor.getConfigurator().apply(config);
+    if (!status.isOK()) {
+        throw new IllegalStateException(&quot;Elevator Talon FX configuration failed: &quot; + status);
+    }
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
     motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 }</code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">Before — red lines will change</p><pre data-existing="config-arm"><code>public Arm() {
-<span class="code-line code-removed">    // TODO 7: Configure feedback, gains, and Motion Magic after the first graph checkpoint.</span>
+    var config = new TalonFXConfiguration();
+    config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;
+<span class="code-line code-removed">    // TODO 7: Add gains and Motion Magic settings here.</span>
+
+    var status = motor.getConfigurator().apply(config);
+    if (!status.isOK()) {
+        throw new IllegalStateException(&quot;Arm Talon FX configuration failed: &quot; + status);
+    }
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
     motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 }</code></pre></div>
-<p>Replace TODO 7 with the configuration below. Keep the prepared simulation setup at the end. This constructor runs once when <code>RobotContainer</code> creates the subsystem:</p>
+<p>Replace TODO 7 with the gains and Motion Magic settings below. Keep the sensor ratio and the existing call to apply the configuration. Keep the prepared simulation setup at the end. This constructor runs once when <code>RobotContainer</code> creates the subsystem:</p>
 <div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="config-elevator"><code>public Elevator() {
-<span class="code-line code-added">    var config = new TalonFXConfiguration();</span>
-<span class="code-line code-added">    config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;</span>
+    var config = new TalonFXConfiguration();
+    config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;
 <span class="code-line code-added">    config.Slot0.kP = 5.0;</span>
 <span class="code-line code-added">    config.Slot0.kV = 2.4;</span>
 <span class="code-line code-added">    config.Slot0.kG = 0.28;</span>
@@ -63,18 +76,18 @@ private double targetDegrees = ArmConstants.LOW_DEGREES;
 <span class="code-line code-added">    config.MotionMagic.MotionMagicCruiseVelocity = 2.0;</span>
 <span class="code-line code-added">    config.MotionMagic.MotionMagicAcceleration = 6.0;</span>
 
-<span class="code-line code-added">    var status = motor.getConfigurator().apply(config);</span>
-<span class="code-line code-added">    if (!status.isOK()) {</span>
-<span class="code-line code-added">        throw new IllegalStateException(&quot;Elevator Talon FX configuration failed: &quot; + status);</span>
-<span class="code-line code-added">    }</span>
+    var status = motor.getConfigurator().apply(config);
+    if (!status.isOK()) {
+        throw new IllegalStateException(&quot;Elevator Talon FX configuration failed: &quot; + status);
+    }
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
     motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 }</code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="config-arm"><code>public Arm() {
-<span class="code-line code-added">    var config = new TalonFXConfiguration();</span>
-<span class="code-line code-added">    config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;</span>
+    var config = new TalonFXConfiguration();
+    config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;
 <span class="code-line code-added">    config.Slot0.kP = 45.0;</span>
 <span class="code-line code-added">    config.Slot0.kV = 15.0;</span>
 <span class="code-line code-added">    config.Slot0.kG = 0.23;</span>
@@ -82,10 +95,10 @@ private double targetDegrees = ArmConstants.LOW_DEGREES;
 <span class="code-line code-added">    config.MotionMagic.MotionMagicCruiseVelocity = 0.45;</span>
 <span class="code-line code-added">    config.MotionMagic.MotionMagicAcceleration = 1.5;</span>
 
-<span class="code-line code-added">    var status = motor.getConfigurator().apply(config);</span>
-<span class="code-line code-added">    if (!status.isOK()) {</span>
-<span class="code-line code-added">        throw new IllegalStateException(&quot;Arm Talon FX configuration failed: &quot; + status);</span>
-<span class="code-line code-added">    }</span>
+    var status = motor.getConfigurator().apply(config);
+    if (!status.isOK()) {
+        throw new IllegalStateException(&quot;Arm Talon FX configuration failed: &quot; + status);
+    }
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
