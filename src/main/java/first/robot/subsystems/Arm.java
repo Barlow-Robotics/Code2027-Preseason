@@ -19,6 +19,9 @@ public final class Arm extends SubsystemBase {
 
     public Arm() {
         // TODO 5: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
+
+        // Setup Simulation
+        // Sets the simulated motor model. This setup is prepared for you; leave it in place.
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 

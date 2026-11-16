@@ -19,6 +19,9 @@ public final class Elevator extends SubsystemBase {
 
     public Elevator() {
         // TODO 5: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
+
+        // Setup Simulation
+        // Sets the simulated motor model. This setup is prepared for you; leave it in place.
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 

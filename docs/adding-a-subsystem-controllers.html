@@ -38,6 +38,9 @@ import com.ctre.phoenix6.signals.GravityTypeValue;</code></pre>
     if (!status.isOK()) {
         throw new IllegalStateException("Elevator Talon FX configuration failed: " + status);
     }
+
+    // Setup Simulation
+    // Sets the simulated motor model. This setup is prepared for you; leave it in place.
     motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 }</code></pre></div>
   <div data-track="arm" hidden><pre data-snippet="config-arm"><code>public Arm() {
@@ -54,6 +57,9 @@ import com.ctre.phoenix6.signals.GravityTypeValue;</code></pre>
     if (!status.isOK()) {
         throw new IllegalStateException("Arm Talon FX configuration failed: " + status);
     }
+
+    // Setup Simulation
+    // Sets the simulated motor model. This setup is prepared for you; leave it in place.
     motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 }</code></pre></div>
   <ul>
