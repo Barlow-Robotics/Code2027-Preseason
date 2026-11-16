@@ -22,7 +22,7 @@ public final class Elevator extends SubsystemBase {
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(20, TunerConstants.kCANBus);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
-    private final TelemetryTable telemetry = Telemetry.getTable("Preseason").getTable("Elevator");
+    private final TelemetryTable telemetry = Telemetry.getTable("Elevator");
     private double targetMeters = LOW_METERS;
 
     public Elevator() {

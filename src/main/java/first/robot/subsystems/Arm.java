@@ -22,7 +22,7 @@ public final class Arm extends SubsystemBase {
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(21, TunerConstants.kCANBus);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
-    private final TelemetryTable telemetry = Telemetry.getTable("Preseason").getTable("Arm");
+    private final TelemetryTable telemetry = Telemetry.getTable("Arm");
     private double targetDegrees = LOW_DEGREES;
 
     public Arm() {
