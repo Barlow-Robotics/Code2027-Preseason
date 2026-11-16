@@ -3,6 +3,8 @@ package first.robot.subsystems;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 
+import first.robot.Constants.ArmConstants;
+
 /** Desktop arm for the preseason controls lesson. */
 public final class Arm extends SubsystemBase {
     public static final double LOW_DEGREES = 0.0;

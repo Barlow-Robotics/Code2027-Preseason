@@ -3,6 +3,8 @@ package first.robot.subsystems;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 
+import first.robot.Constants.ElevatorConstants;
+
 /** Desktop elevator for the preseason controls lesson. */
 public final class Elevator extends SubsystemBase {
     public static final double LOW_METERS = 0.0;

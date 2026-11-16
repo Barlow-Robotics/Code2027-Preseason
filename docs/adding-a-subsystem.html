@@ -109,7 +109,7 @@ footer { padding-bottom:2rem; color:var(--muted); }
   <p>Work through the steps below and check your results in the simulator as you go.</p>
   <ul>
     <li>Edit <code>src/main/java/first/robot/subsystems/Elevator.java</code> or <code>src/main/java/first/robot/subsystems/Arm.java</code>. Start with the numbered TODOs.</li>
-    <li>Read the matching <code>ElevatorSim.java</code> or <code>ArmSim.java</code> to find the model’s limits and conversion constants. That file runs the physics and publishes the drawing.</li>
+    <li>Open <code>src/main/java/first/robot/Constants.java</code>. Under <code>ElevatorConstants</code> or <code>ArmConstants</code>, you will find the smallest and largest allowed positions, the gear ratio, and the dimensions used to convert positions. The simulation uses these same values.</li>
     <li>Open <code>src/main/java/first/robot/RobotContainer.java</code> and find <code>configureMechanisms()</code>. The starter creates both subsystems there during desktop simulation. You’ll add bindings for your track to this method.</li>
   </ul>
   <h3>Run the starter once</h3>
@@ -123,6 +123,7 @@ footer { padding-bottom:2rem; color:var(--muted); }
 </section>
 <section id="goal">
   <h2>1. Create the goal command</h2>
+  <p>The starter already imports <code>Constants.ElevatorConstants</code> or <code>Constants.ArmConstants</code> into your subsystem file. For example, <code>ElevatorConstants.MAX_METERS</code> reads the largest allowed elevator height from <code>Constants.java</code>. The simulation helpers are already prepared for you.</p>
   <p>In <code>Elevator.java</code> or <code>Arm.java</code>, add a target field initialized to the low preset. Replace the existing command factory at TODO 1 with the completed factory and private setter. Use <code>runOnce</code> to call a private setter that clamps and stores the goal in meters or degrees.</p>
   <details><summary>Check your elevator code</summary>
   <pre data-snippet="goal-elevator"><code>private double targetMeters = LOW_METERS;
@@ -132,7 +133,7 @@ public Command setHeightGoalCommand(double goal) {
 }
 
 private void setHeightGoal(double goal) {
-    targetMeters = Math.clamp(goal, ElevatorSim.MIN_METERS, ElevatorSim.MAX_METERS);
+    targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
 }</code></pre>
   </details>
   <details><summary>Check your arm code</summary>
@@ -143,7 +144,7 @@ public Command setAngleGoalCommand(double goal) {
 }
 
 private void setAngleGoal(double goal) {
-    targetDegrees = Math.clamp(goal, ArmSim.MIN_DEGREES, ArmSim.MAX_DEGREES);
+    targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
 }</code></pre>
   </details>
   <p>The factory builds a command when <code>RobotContainer</code> sets up the binding. The setter runs when the scheduler starts the command. The subsystem’s <code>runOnce</code> makes the command require that subsystem.</p>
@@ -232,7 +233,7 @@ private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);<
   <details><summary>Check your elevator code</summary>
 <pre data-snippet="config-elevator"><code>public Elevator() {
     var config = new TalonFXConfiguration();
-    config.Feedback.SensorToMechanismRatio = ElevatorSim.GEAR_RATIO;
+    config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;
     config.Slot0.kP = 5.0;
     config.Slot0.kV = 2.4;
     config.Slot0.kG = 0.28;
@@ -250,7 +251,7 @@ private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);<
   <details><summary>Check your arm code</summary>
 <pre data-snippet="config-arm"><code>public Arm() {
     var config = new TalonFXConfiguration();
-    config.Feedback.SensorToMechanismRatio = ArmSim.GEAR_RATIO;
+    config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;
     config.Slot0.kP = 45.0;
     config.Slot0.kV = 15.0;
     config.Slot0.kG = 0.23;
@@ -268,7 +269,7 @@ private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);<
   <h3>Send the saved goal to Phoenix</h3>
   <p>Keep your button bindings and command factory. Add the following lines inside the private goal setter, immediately after it clamps and stores the goal. Motion Magic takes mechanism turns.</p>
   <details><summary>Check your elevator code</summary>
-  <pre data-snippet="send-elevator"><code>double goalTurns = targetMeters / ElevatorSim.METERS_PER_DRUM_TURN;
+  <pre data-snippet="send-elevator"><code>double goalTurns = targetMeters / ElevatorConstants.METERS_PER_DRUM_TURN;
 motor.setControl(positionRequest.withPosition(goalTurns));</code></pre>
   </details>
   <details><summary>Check your arm code</summary>
@@ -282,7 +283,7 @@ motor.setControl(positionRequest.withPosition(goalTurns));</code></pre>
   <p>In <code>periodic()</code>, leave the target log in place. Add the actual position next to it. The Talon reports mechanism turns, so multiply by the same factor you divided by when sending the goal.</p>
   <details><summary>Check your elevator code</summary>
   <pre data-snippet="actual-elevator"><code>double measuredTurns = motor.getPosition().getValueAsDouble();
-telemetry.log("Actual_m", measuredTurns * ElevatorSim.METERS_PER_DRUM_TURN);</code></pre>
+telemetry.log("Actual_m", measuredTurns * ElevatorConstants.METERS_PER_DRUM_TURN);</code></pre>
   </details>
   <details><summary>Check your arm code</summary>
   <pre data-snippet="actual-arm"><code>double measuredTurns = motor.getPosition().getValueAsDouble();
@@ -312,7 +313,7 @@ telemetry.log("Actual_deg", measuredTurns * 360.0);</code></pre>
   </details>
   <details>
     <summary>The target moves but actual stays flat or moves the wrong distance</summary>
-    <p>Check that <code>simulationPeriodic()</code> calls <code>sim.step(motor.getSimState())</code> and that <code>SensorToMechanismRatio</code> matches the sim. Compare the request against the expected drum or arm turns. A correct drawing with a wrong graph scale points to the conversion in <code>periodic()</code>.</p>
+    <p>Check that <code>simulationPeriodic()</code> calls <code>sim.step(motor.getSimState())</code> and that <code>SensorToMechanismRatio</code> matches the gear ratio in <code>Constants.java</code>. Compare the request against the expected drum or arm turns. A correct drawing with a wrong graph scale points to the conversion in <code>periodic()</code>.</p>
   </details>
   <details>
     <summary>AdvantageScope shows no data</summary>
