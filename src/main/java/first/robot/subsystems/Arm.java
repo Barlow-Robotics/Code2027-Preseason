@@ -3,6 +3,10 @@ package first.robot.subsystems;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.TalonFXSimState;
+import first.robot.generated.TunerConstants;
+
 import first.robot.Constants.ArmConstants;
 
 /** Desktop arm for the preseason controls lesson. */
@@ -11,6 +15,12 @@ public final class Arm extends SubsystemBase {
     public static final double HIGH_DEGREES = 65.0;
 
     private final ArmSim sim = new ArmSim();
+    private final TalonFX motor = new TalonFX(21, TunerConstants.kCANBus);
+
+    public Arm() {
+        // TODO 4: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
+        motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
+    }
 
     public Command setAngleGoalCommand(double goal) {
         return runOnce(() -> {
@@ -25,7 +35,7 @@ public final class Arm extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        // TODO 4: Connect the Talon FX simulation feedback after the target-only checkpoint.
-        sim.update(0.0);
+        // Prepared simulation connection: no motor output until we send a control request.
+        sim.step(motor.getSimState());
     }
 }
