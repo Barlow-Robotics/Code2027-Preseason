@@ -38,7 +38,7 @@ private void setAngleGoal(double goal) {
     <li><code>public Command</code> means other code can call this method and receive a command. A method that creates and returns a command is called a <strong>command factory</strong>. Creating the command does not change the target yet.</li>
     <li><code>() -&gt;</code> describes work to do later. <code>runOnce</code> wraps that work in a command that calls the setter once when it starts, then finishes.</li>
     <li>The subsystem’s <code>runOnce</code> also makes this command require this subsystem. The scheduler—the code that runs commands—uses requirements to prevent two commands from controlling the same subsystem at once.</li>
-    <li>The private setter uses <code>Math.clamp</code> to keep the requested number between the minimum and maximum in <code>Constants.java</code>, then remembers it as the target. <span data-track="elevator">The starter’s maximum height is 0.9 m; the earlier 1 m animation was an illustration of the conversion.</span></li>
+    <li>The private setter uses <code>Math.clamp</code> to keep the requested number between the minimum and maximum in <code>Constants.java</code>, then remembers it as the target. <span data-track="elevator">The elevator’s configured maximum height is 0.9 m; the earlier 1 m animation was an illustration of the conversion.</span></li>
   </ul>
   <p>For now, the setter only saves a number. We will add motor control after we can see that number change on a graph.</p>
 </section><section id="buttons">
@@ -47,7 +47,7 @@ private void setAngleGoal(double goal) {
   <pre data-snippet="operator"><code>private final CommandXboxController operator = new CommandXboxController(1);</code></pre>
   <p><code>new CommandXboxController(1)</code> reads the controller assigned to port 1. The field named <code>operator</code> lets the elevator and arm bindings share that controller. Port 0 continues to drive the swerve. Keep both controller fields: <code>joystick</code> for driving and <code>operator</code> for your mechanism.</p>
   <p><code>configureBindings()</code> organizes the controls by calling <code>configureDriveBindings()</code>, <code>configureElevatorBindings()</code>, and <code>configureArmBindings()</code>.</p>
-  <p>Find <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>. Your subsystem already exists as a field in this class. The starter also imports <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code> here so the bindings can use its LOW and HIGH presets. Replace the TODO 5 comment with these two button bindings:</p>
+  <p>Find <code><span data-elevator="configureElevatorBindings()" data-arm="configureArmBindings()">configureElevatorBindings()</span></code>. Your subsystem already exists as a field in this class. The new code already imports <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code> here so the bindings can use its LOW and HIGH presets. Replace the TODO 5 comment with these two button bindings:</p>
   <div data-track="elevator"><pre data-snippet="bind-elevator"><code>operator.a().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));
 operator.y().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));</code></pre></div>
   <div data-track="arm" hidden><pre data-snippet="bind-arm"><code>operator.x().onTrue(arm.setAngleGoalCommand(ArmConstants.LOW_DEGREES));

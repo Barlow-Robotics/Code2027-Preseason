@@ -14,7 +14,7 @@
   <p>Your buttons now change the target on the graph. Next, we’ll send that target to the <strong>Talon FX motor controller</strong>, the device that drives the motor. We use CTRE’s <strong>Phoenix</strong> library to configure it and send requests.</p>
   <h3>Add a Motion Magic request</h3>
   <p><strong>Motion Magic</strong> moves toward a position using a planned speed and acceleration. The Talon compares the measured position with that plan and adjusts the motor output.</p>
-  <p>The starter already creates the <code>motor</code> field and connects it to the simulation. In your subsystem file, add these three imports alongside the existing imports near the top:</p>
+  <p>The new code already creates the <code>motor</code> field and connects it to the simulation. In your subsystem file, add these three imports alongside the existing imports near the top:</p>
   <pre data-snippet="motor-imports"><code>import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.signals.GravityTypeValue;</code></pre>
@@ -80,7 +80,7 @@ motor.setControl(positionRequest.withPosition(goalTurns));</code></pre></div>
 motor.setControl(positionRequest.withPosition(goalTurns));</code></pre></div>
   <p><span data-elevator="Dividing meters by meters per drum turn converts our height into drum turns. A 0.65 m goal is about 4.14 drum turns." data-arm="Dividing degrees by 360 converts our angle into arm turns. A 65° goal is about 0.181 arm turns.">Dividing meters by meters per drum turn converts our height into drum turns. A 0.65 m goal is about 4.14 drum turns.</span> <code>withPosition</code> updates the request with that goal. <code>motor.setControl</code> sends it to the Talon, which continues running its position control after our one-shot command finishes.</p>
   <h3>Log the actual position</h3>
-  <p>The starter’s <code>simulationPeriodic()</code> already connects the Talon to the physics model and updates the drawing. Leave that method as it is. Now we can read the Talon’s position and graph it.</p>
+  <p>The supplied <code>simulationPeriodic()</code> method already connects the Talon to the physics model and updates the drawing. Leave that method as it is. Now we can read the Talon’s position and graph it.</p>
   <p>In <code>periodic()</code>, leave the target log in place. Add the actual position next to it. The Talon reports mechanism turns, so multiply by the same factor you divided by when sending the goal.</p>
   <div data-track="elevator"><pre data-snippet="actual-elevator"><code>double measuredTurns = motor.getPosition().getValueAsDouble();
 telemetry.log("Actual_m", measuredTurns * ElevatorConstants.METERS_PER_DRUM_TURN);</code></pre></div>
@@ -97,7 +97,7 @@ telemetry.log("Actual_deg", measuredTurns * 360.0);</code></pre></div>
 <figure class="screenshot-placeholder" id="shot-actual"><strong>Screenshot to add · Checkpoint 2 in AdvantageScope</strong><figcaption>Show target and actual on the same axis after a high and low move, with readable field names and units.</figcaption></figure>
   <p class="check"><strong>Done when</strong> the same buttons pass both checkpoints. Point out where the target and actual differ most and explain why.</p>
   <details>
-    <summary>The starter or your code fails to launch</summary>
+    <summary>The robot code fails to launch</summary>
     <p>Check that you opened the top-level <code>Code2027-Preseason</code> folder in WPILib 2027 VS Code. Read the first error in the terminal. A Java compile error will point to a file and line. A Talon configuration exception names the subsystem and reports the Phoenix status. Recheck the CAN ID and bus against the example for your mechanism.</p>
   </details>
   <details>
