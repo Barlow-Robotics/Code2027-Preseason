@@ -42,6 +42,7 @@ public class RobotContainer {
     private final SwerveTelemetry logger = new SwerveTelemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController operator = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -53,15 +54,21 @@ public class RobotContainer {
         Tunables.publish("Auto Mode", autoChooser);
 
         configureBindings();
-        if (RobotBase.isSimulation()) {
-            configureMechanisms();
-        }
 
         // Warmup PathPlanner to avoid Java pauses
         CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
     }
 
     private void configureBindings() {
+        configureDriveBindings();
+        // These tutorial mechanisms are only created in desktop simulation.
+        if (RobotBase.isSimulation()) {
+            configureElevatorBindings();
+            configureArmBindings();
+        }
+    }
+
+    private void configureDriveBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -105,14 +112,14 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-    private void configureMechanisms() {
+    private void configureElevatorBindings() {
         var elevator = new Elevator();
-        var arm = new Arm();
-
-        // Use the second controller so the existing drive controls keep their bindings.
-        var operator = new CommandXboxController(1);
         operator.a().onTrue(elevator.setHeightGoalCommand(Elevator.LOW_METERS));
         operator.y().onTrue(elevator.setHeightGoalCommand(Elevator.HIGH_METERS));
+    }
+
+    private void configureArmBindings() {
+        var arm = new Arm();
         operator.x().onTrue(arm.setAngleGoalCommand(Arm.LOW_DEGREES));
         operator.b().onTrue(arm.setAngleGoalCommand(Arm.HIGH_DEGREES));
     }
