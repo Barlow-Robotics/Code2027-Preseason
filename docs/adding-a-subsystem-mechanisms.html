@@ -3,7 +3,7 @@
 <title>Mechanisms · Adding a subsystem</title><meta name="description" content="Explore how motor rotation becomes mechanism movement.">
 <link rel="stylesheet" href="walkthrough.css"><script src="walkthrough.js" defer></script></head><body>
 <header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Adding a subsystem</span></div></div></header>
-<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a data-lesson-link href="adding-a-subsystem.html">1. Setup</a></li><li><a data-lesson-link href="adding-a-subsystem-mechanisms.html" aria-current="page">2. Mechanisms</a></li><li><a data-lesson-link href="adding-a-subsystem-commands.html">3. Buttons and Commands</a></li><li><a data-lesson-link href="adding-a-subsystem-controllers.html">4. Controllers</a></li></ul></div></nav><main class="wrap"><div class="intro"><h1>Mechanisms</h1><p>Explore how motor rotation becomes mechanism movement.</p></div><section id="mechanisms"><fieldset class="mechanism-picker">
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a data-lesson-link href="adding-a-subsystem.html">1. Setup</a></li><li><a data-lesson-link href="adding-a-subsystem-mechanisms.html" aria-current="page">2. Mechanisms</a></li><li><a data-lesson-link href="adding-a-subsystem-subsystem.html">3. Adding your subsystem</a></li><li><a data-lesson-link href="adding-a-subsystem-commands.html">4. Buttons and Commands</a></li><li><a data-lesson-link href="adding-a-subsystem-controllers.html">5. Controllers</a></li></ul></div></nav><main class="wrap"><div class="intro"><h1>Mechanisms</h1><p>Explore how motor rotation becomes mechanism movement.</p></div><section id="mechanisms"><fieldset class="mechanism-picker">
     <legend>Which mechanism are you building?</legend>
     <label><input type="radio" name="mechanism" value="elevator" checked> Elevator</label>
     <label><input type="radio" name="mechanism" value="arm"> Arm</label>
@@ -53,8 +53,8 @@
  <p>The second constant is calculated as <code>2.0 * Math.PI * DRUM_RADIUS_METERS</code>. We use the calculated circumference in code, not the rounded 0.157 shown above.</p>
 </div>
 <div data-track="arm" hidden><p><code>GEAR_RATIO = 80.0</code> saves the number of motor turns per arm turn. Our code converts between arm turns and degrees using 360 degrees per turn.</p></div>
-<p>Next, we’ll find these constants in the project and make a button change the target position.</p>
-</section><div class="lesson-next"><a data-lesson-link href="adding-a-subsystem.html">← Setup</a><a data-lesson-link href="adding-a-subsystem-commands.html">Next section: Buttons and Commands →</a></div></main>
+<p>Next, we’ll find these constants in the project and create the subsystem that owns the motor.</p>
+</section><div class="lesson-next"><a data-lesson-link href="adding-a-subsystem.html">← Setup</a><a data-lesson-link href="adding-a-subsystem-subsystem.html">Next section: Adding your subsystem →</a></div></main>
 <footer class="wrap">
   <a href="https://docs.github.com/en/desktop/making-changes-in-a-branch/managing-branches-in-github-desktop">GitHub Desktop branches</a> ·
   <a href="https://docs.wpilib.org/en/latest/docs/software/wpilib-tools/robot-simulation/simulation-gui.html">WPILib Simulation GUI</a> · <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html">Phoenix position control</a> ·

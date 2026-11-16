@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adding your subsystem · Adding a subsystem</title><meta name="description" content="Understand the subsystem, create it, and see it in the simulator.">
+<link rel="stylesheet" href="walkthrough.css"><script src="walkthrough.js" defer></script></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Adding a subsystem</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a data-lesson-link href="adding-a-subsystem.html">1. Setup</a></li><li><a data-lesson-link href="adding-a-subsystem-mechanisms.html">2. Mechanisms</a></li><li><a data-lesson-link href="adding-a-subsystem-subsystem.html" aria-current="page">3. Adding your subsystem</a></li><li><a data-lesson-link href="adding-a-subsystem-commands.html">4. Buttons and Commands</a></li><li><a data-lesson-link href="adding-a-subsystem-controllers.html">5. Controllers</a></li></ul></div></nav><main class="wrap"><div class="intro"><h1>Adding your subsystem</h1><p>Understand the subsystem, create it, and see it in the simulator.</p></div><section id="selection"><fieldset class="mechanism-picker">
+    <legend>Which mechanism are you building?</legend>
+    <label><input type="radio" name="mechanism" value="elevator" checked> Elevator</label>
+    <label><input type="radio" name="mechanism" value="arm"> Arm</label>
+    <p id="selection-status" aria-live="polite">Showing the Elevator instructions below.</p>
+  </fieldset>
+  <noscript><p>Enable JavaScript to switch mechanisms. The Elevator instructions are shown by default.</p></noscript></section><section id="basics"><h2>A class for one mechanism</h2>
+<p>Open <code><span data-elevator="src/main/java/first/robot/subsystems/Elevator.java" data-arm="src/main/java/first/robot/subsystems/Arm.java">src/main/java/first/robot/subsystems/Elevator.java</span></code> in WPILib 2027 VS Code. This is the main file we will be editing. The starter supplies the class and its simulation; we’ll add its behavior in the following sections.</p>
+<p>Near the top, find this class declaration:</p>
+<div data-track="elevator"><pre data-snippet="class-elevator"><code>public final class Elevator extends SubsystemBase {</code></pre></div>
+<div data-track="arm" hidden><pre data-snippet="class-arm"><code>public final class Arm extends SubsystemBase {</code></pre></div>
+<p>A <strong>class</strong> describes an object’s data and behavior. <code>extends SubsystemBase</code> means our class inherits WPILib’s subsystem behavior. When we create an instance, it registers with the command scheduler, which calls its <code>periodic()</code> method and keeps track of commands that use it.</p>
+<h3>The subsystem owns its motor</h3>
+<p>Find the <code>motor</code> field, already supplied in this class:</p>
+<div data-track="elevator"><pre data-snippet="owned-motor-elevator"><code>private final TalonFX motor = new TalonFX(20, TunerConstants.kCANBus);</code></pre></div>
+<div data-track="arm" hidden><pre data-snippet="owned-motor-arm"><code>private final TalonFX motor = new TalonFX(21, TunerConstants.kCANBus);</code></pre></div>
+<p><code>TalonFX</code> is the object our code uses to talk to the motor controller. <code>new</code> creates that object, and <code>motor</code> is the name we use to refer to it. The number <span data-elevator="20" data-arm="21">20</span> is its address on the CAN bus, the connection between the robot computer and motor controllers.</p>
+<p><strong>Only this subsystem should decide how its motor is controlled.</strong> The <code>private</code> field prevents other classes from accessing this motor object directly. Other code will ask the subsystem to move to a height or angle; the subsystem will decide what to send to the motor. <code>final</code> keeps this field referring to the same motor-controller object.</p>
+<h3>Find the constants and their import</h3>
+<p>Open <code>src/main/java/first/robot/Constants.java</code> and find <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code>. These are the measurements from the Mechanisms section:</p>
+<ul>
+<li><code>GEAR_RATIO</code>: <span data-elevator="12 motor turns per drum turn" data-arm="80 motor turns per arm turn">12 motor turns per drum turn</span>.</li>
+<li data-track="elevator"><code>METERS_PER_DRUM_TURN</code>: the drum circumference that converts drum turns to elevator height, calculated from <code>DRUM_RADIUS_METERS</code>.</li>
+<li><code><span data-elevator="MIN_METERS" data-arm="MIN_DEGREES">MIN_METERS</span></code> and <code><span data-elevator="MAX_METERS" data-arm="MAX_DEGREES">MAX_METERS</span></code>: the allowed positions.</li>
+</ul>
+<p>Return to your subsystem file. This import is already present above the class declaration:</p>
+<div data-track="elevator"><pre data-snippet="constants-import-elevator"><code>import first.robot.Constants.ElevatorConstants;</code></pre></div>
+<div data-track="arm" hidden><pre data-snippet="constants-import-arm"><code>import first.robot.Constants.ArmConstants;</code></pre></div>
+<p>The import lets us use the shorter name <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code> in this file. For example, <code><span data-elevator="ElevatorConstants.GEAR_RATIO" data-arm="ArmConstants.GEAR_RATIO">ElevatorConstants.GEAR_RATIO</span></code> reads the ratio we just found. Importing a class makes its name available; it does not create a subsystem.</p>
+</section><section id="create">  <h3>Create an instance in RobotContainer</h3>
+  <p>In <code>RobotContainer.java</code>, find TODO 1 immediately below the <code>drivetrain</code> field. Replace that comment with this line for your chosen mechanism:</p>
+  <div data-track="elevator"><pre data-snippet="create-elevator"><code>private final Elevator elevator = new Elevator();</code></pre></div>
+  <div data-track="arm" hidden><pre data-snippet="create-arm"><code>private final Arm arm = new Arm();</code></pre></div>
+  <p><code>new <span data-elevator="Elevator()" data-arm="Arm()">Elevator()</span></code> creates an <strong>instance</strong>—the actual object described by the class. Creating it also runs its constructor and creates its motor object. The field named <code><span data-elevator="elevator" data-arm="arm">elevator</span></code> keeps it available to the rest of <code>RobotContainer</code>, including the button-binding methods. <code>private final</code> means only this class can access the field directly and the field will keep referring to this subsystem.</p>
+  <h3>See your mechanism in the simulator</h3>
+  <ol>
+    <li>Save your changes. Open the Command Palette with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Choose <strong>WPILib: Simulate Robot Code</strong>, select <strong>Sim GUI</strong> if prompted, and wait for robot startup. Leave the simulated robot disabled.</li>
+    <li>Open the desktop <strong>AdvantageScope (WPILib)</strong> installed with the 2027 tools. Choose <strong>File → Connect to Simulator</strong> and select <strong>NetworkTables</strong> if prompted.</li>
+    <li>Add a <strong>Mechanism</strong> tab. In the sidebar expand <code>Telemetry → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code> and drag the <code>Mechanism</code> field into the tab.</li>
+  </ol>
+<figure class="screenshot-placeholder" id="shot-simulate"><strong>Screenshot to add · Start the simulator</strong><figcaption>Show the VS Code Command Palette with WPILib: Simulate Robot Code selected, followed by the Sim GUI selection if shown.</figcaption></figure>
+<figure class="screenshot-placeholder" id="shot-connect"><strong>Screenshot to add · Connect AdvantageScope</strong><figcaption>Show File → Connect to Simulator in the installed 2027 AdvantageScope, with the NetworkTables choice visible if available.</figcaption></figure><figure class="screenshot-placeholder" id="shot-drawing"><strong>Screenshot to add · Find the mechanism drawing</strong><figcaption>Show the Arm and Elevator tables under Telemetry and the Mechanism tab displaying the selected mechanism.</figcaption></figure>
+  <p class="check"><strong>Checkpoint.</strong> Creating the subsystem also creates its prepared simulation and drawing. <span data-elevator="The elevator sits at the bottom." data-arm="The unpowered arm may settle at its lower stop.">The elevator sits at the bottom.</span> Stop the run in VS Code before editing.</p>
+<p>You now have an instance of your subsystem in <code>RobotContainer</code>, and its drawing is running. Next, we’ll give it a goal command and connect that command to a button.</p></section><div class="lesson-next"><a data-lesson-link href="adding-a-subsystem-mechanisms.html">← Mechanisms</a><a data-lesson-link href="adding-a-subsystem-commands.html">Next section: Buttons and Commands →</a></div></main>
+<footer class="wrap">
+  <a href="https://docs.github.com/en/desktop/making-changes-in-a-branch/managing-branches-in-github-desktop">GitHub Desktop branches</a> ·
+  <a href="https://docs.wpilib.org/en/latest/docs/software/wpilib-tools/robot-simulation/simulation-gui.html">WPILib Simulation GUI</a> · <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html">Phoenix position control</a> ·
+  <a href="https://github.com/wpilibsuite/allwpilib/blob/main/telemetry/doc/telemetry.md">WPILib telemetry</a> ·
+  <a href="https://docs.advantagescope.org/tab-reference/line-graph/">AdvantageScope Line Graph</a>
+</footer></body></html>
