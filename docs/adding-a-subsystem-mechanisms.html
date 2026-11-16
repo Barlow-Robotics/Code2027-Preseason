@@ -46,10 +46,21 @@
  <figcaption><strong>4 × 3 = 12 motor turns per mechanism turn.</strong></figcaption></figure>
     <p>The allowed elevator heights are 0 to 0.9 meters.</p>
   </div>
-  <h3>Save the ratio as a constant</h3>
-  <p>Now that we know how motor turns relate to mechanism turns, we need our code to remember that relationship. We’ll save the ratio as a <strong>constant</strong>: a named value that stays the same while the program runs.</p>
-  <p>We’ll call it <code>GEAR_RATIO</code> and give it the value <strong><span data-elevator="12.0" data-arm="80.0">12.0</span></strong>. Whenever our code needs the number of motor turns per mechanism turn, it can use that name.</p>
-  <p>The starter already saves this value in <code>Constants.java</code>, along with the mechanism’s dimensions and allowed positions. In the next section, we’ll open that file and find the values we just explored.</p>
+  <h3>Save these relationships as constants</h3>
+  <p>Our code needs to remember the relationships we just explored. A <strong>constant</strong> is a named value that stays the same while the program runs.</p>
+  <div data-track="elevator">
+    <p><strong>The elevator needs two conversion constants:</strong></p>
+    <ol>
+      <li><code>GEAR_RATIO = 12.0</code> means <strong>12 motor turns per drum turn</strong>. It relates the motor’s rotation to the drum’s rotation.</li>
+      <li><code>METERS_PER_DRUM_TURN ≈ 0.157</code> means <strong>0.157 meters of elevator travel per drum turn</strong>. It relates the drum’s rotation to the elevator’s height.</li>
+    </ol>
+    <p>Use them in order: <strong>motor turns ÷ GEAR_RATIO = drum turns</strong>, then <strong>drum turns × METERS_PER_DRUM_TURN = height change</strong>.</p>
+    <p>The second constant is the drum’s circumference. The starter calculates it as <code>2.0 * Math.PI * DRUM_RADIUS_METERS</code>, using the measured radius of 0.025 meters. We keep the calculated value rather than rounding it to 0.157 in code.</p>
+  </div>
+  <div data-track="arm" hidden>
+    <p>We’ll save the arm’s ratio as <code>GEAR_RATIO = 80.0</code>: <strong>80 motor turns per arm turn</strong>. To express arm turns as an angle, we multiply by 360 degrees per turn.</p>
+  </div>
+  <p>The starter already saves these values in <code>Constants.java</code>, along with the mechanism’s dimensions and allowed positions. In the next section, we’ll open that file and find the values we just explored.</p>
 </section><div class="lesson-next"><a data-lesson-link href="adding-a-subsystem.html">← Setup</a><a data-lesson-link href="adding-a-subsystem-commands.html">Next section: Buttons and Commands →</a></div></main>
 <footer class="wrap">
   <a href="https://docs.github.com/en/desktop/making-changes-in-a-branch/managing-branches-in-github-desktop">GitHub Desktop branches</a> ·

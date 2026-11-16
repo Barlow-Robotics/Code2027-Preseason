@@ -64,6 +64,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;</code></pre>
     <li>The last line tells Phoenix’s simulator which motor model we are using.</li>
   </ul>
   <h3>Send the saved goal to Phoenix</h3>
+  <p data-track="elevator"><strong>Here is where the two constants do different jobs.</strong> We already gave <code>GEAR_RATIO</code> to Phoenix as <code>SensorToMechanismRatio</code>, so its positions are now in drum turns. Our subsystem still accepts goals in meters. Use <code>METERS_PER_DRUM_TURN</code> to convert that height into drum turns before sending the request.</p>
   <p>Keep your button bindings and command factory. Add the following lines inside the private goal setter, immediately after it clamps and stores the goal. Motion Magic takes mechanism turns.</p>
   <div data-track="elevator"><pre data-snippet="send-elevator"><code>double goalTurns = targetMeters / ElevatorConstants.METERS_PER_DRUM_TURN;
 motor.setControl(positionRequest.withPosition(goalTurns));</code></pre></div>
