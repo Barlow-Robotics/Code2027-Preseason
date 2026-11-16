@@ -11,18 +11,56 @@
   </fieldset>
   <noscript><p>Enable JavaScript to switch mechanisms. The Elevator instructions are shown by default.</p></noscript></section><section id="basics"><h2>A class for one mechanism</h2>
 <p>Open <code><span data-elevator="src/main/java/first/robot/subsystems/Elevator.java" data-arm="src/main/java/first/robot/subsystems/Arm.java">src/main/java/first/robot/subsystems/Elevator.java</span></code> in WPILib 2027 VS Code. This is the main file we will be editing. The new code from Mr. Leibs includes this class and its simulation; we’ll add its behavior in the following sections.</p>
-<p>Near the top, find this class declaration:</p>
+<p>Below the imports, find this existing class declaration:</p>
 <div data-track="elevator"><pre data-snippet="class-elevator"><code>public final class Elevator extends SubsystemBase {</code></pre></div>
 <div data-track="arm" hidden><pre data-snippet="class-arm"><code>public final class Arm extends SubsystemBase {</code></pre></div>
 <p>A <strong>class</strong> describes an object’s data and behavior. <code>extends SubsystemBase</code> means our class inherits WPILib’s subsystem behavior. When we create an instance, it registers with the command scheduler, which calls its <code>periodic()</code> method and keeps track of commands that use it.</p>
 <h3>The subsystem owns its motor</h3>
-<p>Find the <code>motor</code> field, already supplied in this class:</p>
-<div data-track="elevator"><pre data-snippet="owned-motor-elevator"><code>private final TalonFX motor = new TalonFX(20, TunerConstants.kCANBus);</code></pre></div>
-<div data-track="arm" hidden><pre data-snippet="owned-motor-arm"><code>private final TalonFX motor = new TalonFX(21, TunerConstants.kCANBus);</code></pre></div>
+<p><strong>Existing code—leave it as it is.</strong> Just inside the class, find these two fields. <code>sim</code> holds the prepared simulation helper; <code>motor</code> holds the Talon FX object:</p>
+<div data-track="elevator"><pre data-snippet="owned-motor-elevator"><code>private final ElevatorSim sim = new ElevatorSim();
+private final TalonFX motor = new TalonFX(20, TunerConstants.kCANBus);</code></pre></div>
+<div data-track="arm" hidden><pre data-snippet="owned-motor-arm"><code>private final ArmSim sim = new ArmSim();
+private final TalonFX motor = new TalonFX(21, TunerConstants.kCANBus);</code></pre></div>
 <p><code>TalonFX</code> is the object our code uses to talk to the motor controller. <code>new</code> creates that object, and <code>motor</code> is the name we use to refer to it. The number <span data-elevator="20" data-arm="21">20</span> is its address on the CAN bus, the connection between the robot computer and motor controllers.</p>
 <p><strong>Only this subsystem should decide how its motor is controlled.</strong> The <code>private</code> field prevents other classes from accessing this motor object directly. Other code will ask the subsystem to move to a height or angle; the subsystem will decide what to send to the motor. <code>final</code> keeps this field referring to the same motor-controller object.</p>
+<h3>Recognize the constructor</h3>
+<p><strong>Existing code—leave it as it is for now.</strong> Immediately below the fields, find the constructor. It has the same name as the class and runs when we create an instance:</p>
+<div data-track="elevator"><pre data-existing="constructor-elevator"><code>public Elevator() {
+    // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
+
+    // Setup Simulation
+    // Sets the simulated motor model. This setup is prepared for you; leave it in place.
+    motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
+}</code></pre></div>
+<div data-track="arm" hidden><pre data-existing="constructor-arm"><code>public Arm() {
+    // TODO 7: Configure feedback, gains, and Motion Magic after the target-only checkpoint.
+
+    // Setup Simulation
+    // Sets the simulated motor model. This setup is prepared for you; leave it in place.
+    motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
+}</code></pre></div>
+<p>TODO 7 is for the later Controllers section. The lines under <code>// Setup Simulation</code> are already prepared; keep them in place.</p>
 <h3>Set the gear ratio and find its import</h3>
-<p>Open <code>src/main/java/first/robot/Constants.java</code> and find <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code>. At TODO 1, <code>GEAR_RATIO</code> starts at <code>1.0</code>, a placeholder meaning one motor turn per mechanism turn. Replace that line with the ratio from the animation:</p>
+<p>Open <code>src/main/java/first/robot/Constants.java</code> and find <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code>. <strong>Find this existing block</strong> inside that constants class:</p>
+<div data-track="elevator"><pre data-existing="constants-before-elevator"><code>public static final class ElevatorConstants {
+    private ElevatorConstants() {}
+
+    // Goal presets used by the operator buttons.
+    public static final double LOW_METERS = 0.0;
+    public static final double HIGH_METERS = 0.65;
+
+    // TODO 1: Set the gear ratio using the Mechanisms walkthrough.
+    public static final double GEAR_RATIO = 1.0; // motor turns per drum turn</code></pre></div>
+<div data-track="arm" hidden><pre data-existing="constants-before-arm"><code>public static final class ArmConstants {
+    private ArmConstants() {}
+
+    // Goal presets used by the operator buttons.
+    public static final double LOW_DEGREES = 0.0;
+    public static final double HIGH_DEGREES = 65.0;
+
+    // TODO 1: Set the gear ratio using the Mechanisms walkthrough.
+    public static final double GEAR_RATIO = 1.0; // motor turns per arm turn</code></pre></div>
+<p><strong>Change only the <code>GEAR_RATIO</code> line at TODO 1.</strong> Its value starts at <code>1.0</code>, a placeholder meaning one motor turn per mechanism turn. Use the ratio from the animation:</p>
 <div data-track="elevator"><pre data-snippet="ratio-elevator"><code>public static final double GEAR_RATIO = 12.0; // motor turns per drum turn</code></pre></div>
 <div data-track="arm" hidden><pre data-snippet="ratio-arm"><code>public static final double GEAR_RATIO = 80.0; // motor turns per arm turn</code></pre></div>
 <p>Save the file. These constants describe your mechanism:</p>
@@ -32,12 +70,18 @@
 <li><code><span data-elevator="MIN_METERS" data-arm="MIN_DEGREES">MIN_METERS</span></code> and <code><span data-elevator="MAX_METERS" data-arm="MAX_DEGREES">MAX_METERS</span></code>: the allowed positions.</li>
 <li><code><span data-elevator="LOW_METERS" data-arm="LOW_DEGREES">LOW_METERS</span></code> and <code><span data-elevator="HIGH_METERS" data-arm="HIGH_DEGREES">HIGH_METERS</span></code>: the two goal presets our buttons will request. LOW is zero; HIGH is <span data-elevator="0.65 meters" data-arm="65 degrees">0.65 meters</span>. These are positions we choose to move to; MIN and MAX define the allowed range.</li>
 </ul>
-<p>Return to your subsystem file. This import is already present above the class declaration:</p>
+<p>Return to your subsystem file. Find this existing import above the class declaration; it is already supplied, so you do not need to add it:</p>
 <div data-track="elevator"><pre data-snippet="constants-import-elevator"><code>import first.robot.Constants.ElevatorConstants;</code></pre></div>
 <div data-track="arm" hidden><pre data-snippet="constants-import-arm"><code>import first.robot.Constants.ArmConstants;</code></pre></div>
 <p>The import lets us use the shorter name <code><span data-elevator="ElevatorConstants" data-arm="ArmConstants">ElevatorConstants</span></code> in this file. For example, <code><span data-elevator="ElevatorConstants.GEAR_RATIO" data-arm="ArmConstants.GEAR_RATIO">ElevatorConstants.GEAR_RATIO</span></code> reads the ratio you just set. Importing a class makes its name available; it does not create a subsystem.</p>
 </section><section id="create">  <h3>Create an instance in RobotContainer</h3>
-  <p>In <code>RobotContainer.java</code>, find TODO 2 immediately below the <code>drivetrain</code> field. Replace that comment with this line for your chosen mechanism:</p>
+  <p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find this existing block</strong> near the top of the class:</p>
+<pre data-existing="container-before"><code>private final CommandXboxController joystick = new CommandXboxController(0);
+// TODO 4: Add an operator CommandXboxController field on port 1.
+
+public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+// TODO 2: Add your Elevator or Arm subsystem field here.</code></pre>
+<p><strong>Replace only the TODO 2 comment</strong> with this line for your chosen mechanism. Keep the <code>drivetrain</code> line; leave TODO 4 for the next section:</p>
   <div data-track="elevator"><pre data-snippet="create-elevator"><code>private final Elevator elevator = new Elevator();</code></pre></div>
   <div data-track="arm" hidden><pre data-snippet="create-arm"><code>private final Arm arm = new Arm();</code></pre></div>
   <p><code>new <span data-elevator="Elevator()" data-arm="Arm()">Elevator()</span></code> creates an <strong>instance</strong>—the actual object described by the class. Creating it also runs its constructor and creates its motor object. The field named <code><span data-elevator="elevator" data-arm="arm">elevator</span></code> keeps it available to the rest of <code>RobotContainer</code>, including the button-binding methods. <code>private final</code> means only this class can access the field directly and the field will keep referring to this subsystem.</p>
@@ -50,7 +94,7 @@
 <figure class="screenshot-placeholder" id="shot-simulate"><strong>Screenshot to add · Start the simulator</strong><figcaption>Show the VS Code Command Palette with WPILib: Simulate Robot Code selected, followed by the Sim GUI selection if shown.</figcaption></figure>
 <figure class="screenshot-placeholder" id="shot-connect"><strong>Screenshot to add · Connect AdvantageScope</strong><figcaption>Show File → Connect to Simulator in the installed 2027 AdvantageScope, with the NetworkTables choice visible if available.</figcaption></figure><figure class="screenshot-placeholder" id="shot-drawing"><strong>Screenshot to add · Find the mechanism drawing</strong><figcaption>Show the Arm and Elevator tables under Telemetry and the Mechanism tab displaying the selected mechanism.</figcaption></figure>
   <p class="check"><strong>Checkpoint.</strong> Creating the subsystem also creates its prepared simulation and drawing. <span data-elevator="The elevator sits at the bottom." data-arm="The unpowered arm may settle at its lower stop.">The elevator sits at the bottom.</span> Stop the run in VS Code before editing.</p>
-<p>You now have an instance of your subsystem in <code>RobotContainer</code>, and its drawing is running. Next, we’ll give it a goal command and connect that command to a button.</p></section><div class="lesson-next"><a data-lesson-link href="adding-a-subsystem-mechanisms.html">← Mechanisms</a><a data-lesson-link href="adding-a-subsystem-commands.html">Next section: Buttons and Commands →</a></div></main>
+<p>You now have an instance of your subsystem in <code>RobotContainer</code>, and you’ve seen its drawing in the simulator. Next, we’ll give it a goal command and connect that command to a button.</p></section><div class="lesson-next"><a data-lesson-link href="adding-a-subsystem-mechanisms.html">← Mechanisms</a><a data-lesson-link href="adding-a-subsystem-commands.html">Next section: Buttons and Commands →</a></div></main>
 <footer class="wrap">
   <a href="https://docs.github.com/en/desktop/making-changes-in-a-branch/managing-branches-in-github-desktop">GitHub Desktop branches</a> ·
   <a href="https://docs.wpilib.org/en/latest/docs/software/wpilib-tools/robot-simulation/simulation-gui.html">WPILib Simulation GUI</a> · <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html">Phoenix position control</a> ·
