@@ -19,7 +19,7 @@ final class ElevatorSim {
         DCMotor.getKrakenX60(1), ElevatorConstants.GEAR_RATIO, 5.0, ElevatorConstants.DRUM_RADIUS_METERS,
         ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS, true, 0.0);
 
-    private final TelemetryTable telemetry = Telemetry.getTable("Preseason").getTable("Elevator");
+    private final TelemetryTable telemetry = Telemetry.getTable("Elevator");
     private final Mechanism2d drawing = new Mechanism2d(1.2, 1.2);
     private final MechanismLigament2d extension = drawing.getRoot("Base", 0.6, 0.1)
         .append(new MechanismLigament2d("Extension", 0.10, 90.0, 6.0,

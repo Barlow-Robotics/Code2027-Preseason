@@ -22,7 +22,7 @@ final class ArmSim {
         SingleJointedArmSim.estimateMOI(ArmConstants.ARM_LENGTH_METERS, 3.0), ArmConstants.ARM_LENGTH_METERS,
         Units.degreesToRadians(ArmConstants.MIN_DEGREES), Units.degreesToRadians(ArmConstants.MAX_DEGREES), true, 0.0);
 
-    private final TelemetryTable telemetry = Telemetry.getTable("Preseason").getTable("Arm");
+    private final TelemetryTable telemetry = Telemetry.getTable("Arm");
     private final Mechanism2d drawing = new Mechanism2d(1.2, 1.2);
     private final MechanismLigament2d link = drawing.getRoot("Pivot", 0.45, 0.40)
         .append(new MechanismLigament2d("Arm", ArmConstants.ARM_LENGTH_METERS, 0.0, 6.0,

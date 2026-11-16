@@ -24,10 +24,10 @@
   <ol>
     <li>Save your changes. Open the Command Palette with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>. Choose <strong>WPILib: Simulate Robot Code</strong>, select <strong>Sim GUI</strong> if prompted, and wait for robot startup. Leave the simulated robot disabled.</li>
     <li>Open the desktop <strong>AdvantageScope (WPILib)</strong> installed with the 2027 tools. Choose <strong>File → Connect to Simulator</strong> and select <strong>NetworkTables</strong> if prompted.</li>
-    <li>Add a <strong>Mechanism</strong> tab. In the sidebar expand <code>Telemetry → Preseason → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code> and drag the <code>Mechanism</code> field into the tab.</li>
+    <li>Add a <strong>Mechanism</strong> tab. In the sidebar expand <code>Telemetry → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code> and drag the <code>Mechanism</code> field into the tab.</li>
   </ol>
 <figure class="screenshot-placeholder" id="shot-simulate"><strong>Screenshot to add · Start the simulator</strong><figcaption>Show the VS Code Command Palette with WPILib: Simulate Robot Code selected, followed by the Sim GUI selection if shown.</figcaption></figure>
-<figure class="screenshot-placeholder" id="shot-connect"><strong>Screenshot to add · Connect AdvantageScope</strong><figcaption>Show File → Connect to Simulator in the installed 2027 AdvantageScope, with the NetworkTables choice visible if available.</figcaption></figure><figure class="screenshot-placeholder" id="shot-drawing"><strong>Screenshot to add · Find the mechanism drawing</strong><figcaption>Show the Telemetry → Preseason fields and the Mechanism tab displaying the selected mechanism.</figcaption></figure>
+<figure class="screenshot-placeholder" id="shot-connect"><strong>Screenshot to add · Connect AdvantageScope</strong><figcaption>Show File → Connect to Simulator in the installed 2027 AdvantageScope, with the NetworkTables choice visible if available.</figcaption></figure><figure class="screenshot-placeholder" id="shot-drawing"><strong>Screenshot to add · Find the mechanism drawing</strong><figcaption>Show the Arm and Elevator tables under Telemetry and the Mechanism tab displaying the selected mechanism.</figcaption></figure>
   <p class="check"><strong>Checkpoint.</strong> Creating the subsystem also creates its prepared simulation and drawing. <span data-elevator="The elevator sits at the bottom." data-arm="The unpowered arm may settle at its lower stop.">The elevator sits at the bottom.</span> Stop the run in VS Code before editing.</p>
 </section><section id="goal">
   <h2>Create the goal command</h2>
@@ -80,14 +80,14 @@ operator.b().onTrue(arm.setAngleGoalCommand(Arm.HIGH_DEGREES));</code></pre></di
 import org.wpilib.telemetry.TelemetryTable;</code></pre>
 <p>Inside the class, add the <code>telemetry</code> field next to your target field. Then replace the whole existing <code>periodic()</code> method at TODO 4, including its <code>@Override</code> line, with the method below:</p>
   <div data-track="elevator"><pre data-snippet="target-elevator"><code>private final TelemetryTable telemetry =
-    Telemetry.getTable("Preseason").getTable("Elevator");
+    Telemetry.getTable("Elevator");
 
 @Override
 public void periodic() {
     telemetry.log("Target_m", targetMeters);
 }</code></pre></div>
   <div data-track="arm" hidden><pre data-snippet="target-arm"><code>private final TelemetryTable telemetry =
-    Telemetry.getTable("Preseason").getTable("Arm");
+    Telemetry.getTable("Arm");
 
 @Override
 public void periodic() {
@@ -95,14 +95,14 @@ public void periodic() {
 }</code></pre></div>
   <ul>
     <li><code>private final TelemetryTable telemetry</code> remembers the table we write to. <code>final</code> means this field keeps referring to the same table.</li>
-    <li>The two <code>getTable</code> calls organize our values under <code>Preseason → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code>.</li>
+    <li>The <code>getTable</code> call creates a table named <code><span data-elevator="Elevator" data-arm="Arm">Elevator</span></code>.</li>
     <li><code>@Override</code> marks a method supplied by the subsystem framework that we are filling in. The scheduler calls <code>periodic()</code> repeatedly, normally every 20 milliseconds.</li>
     <li><code>telemetry.log</code> publishes the target under the name in quotes. The suffix <code><span data-elevator="_m" data-arm="_deg">_m</span></code> tells us the unit. This project’s WPILib telemetry sends these values to NetworkTables, where AdvantageScope can read them.</li>
   </ul>
   <h3>Checkpoint 1 · Press the buttons and watch the target</h3>
   <ol>
     <li>Save and restart <strong>WPILib: Simulate Robot Code</strong>. While disabled, drag your Xbox controller from <strong>System Joysticks</strong> to port <strong>1</strong> in <strong>Joysticks</strong>. Check that the face-button indicators change. For keyboard input, assign a Keyboard entry to port 1 and check its mappings in the simulator’s <strong>DS</strong> menu.</li>
-    <li>In AdvantageScope, connect to the simulator. Open a <strong>Line Graph</strong> tab and drag <code><span data-elevator="Target_m" data-arm="Target_deg">Target_m</span></code> from <code>Telemetry → Preseason → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code> to the graph.</li>
+    <li>In AdvantageScope, connect to the simulator. Open a <strong>Line Graph</strong> tab and drag <code><span data-elevator="Target_m" data-arm="Target_deg">Target_m</span></code> from <code>Telemetry → <span data-elevator="Elevator" data-arm="Arm">Elevator</span></code> to the graph.</li>
     <li>Release the buttons, enable simulated <strong>Teleop</strong>, then press high and low a few seconds apart. Use <strong><span data-elevator="Y then A" data-arm="B then X">Y then A</span></strong>.</li>
   </ol>
 <figure class="screenshot-placeholder" id="shot-controller"><strong>Screenshot to add · Put the controller on port 1</strong><figcaption>Show the Sim GUI with the operator controller assigned to port 1 and the matching face-button indicators visible.</figcaption></figure><figure class="screenshot-placeholder" id="shot-target"><strong>Screenshot to add · Checkpoint 1 in AdvantageScope</strong><figcaption>Show a target-only Line Graph with the high and low button presses visible as steps. Show the field name and units.</figcaption></figure>
