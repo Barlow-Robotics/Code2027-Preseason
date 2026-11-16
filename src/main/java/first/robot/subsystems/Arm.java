@@ -6,6 +6,7 @@ import org.wpilib.command2.SubsystemBase;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+// TODO 7a: Add the Motion Magic and gravity imports.
 import first.robot.generated.TunerConstants;
 
 import first.robot.Constants.ArmConstants;
@@ -15,11 +16,12 @@ public final class Arm extends SubsystemBase {
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
     // TODO 3a: Add a field to store the target position.
+    // TODO 7b: Add a Motion Magic request field.
     // TODO 6b: Add a telemetry table field.
 
     public Arm() {
         // TODO 6c: Configure the sensor ratio here.
-        // TODO 7: Add gains and Motion Magic settings here.
+        // TODO 7c: Add gains and Motion Magic settings here.
 
         // Setup Simulation
         // Sets the simulated motor model. This setup is prepared for you; leave it in place.

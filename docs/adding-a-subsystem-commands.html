@@ -24,10 +24,12 @@ private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConsta
 <p>Modify this part of the file to match the following. Keep the existing <code>sim</code> and <code>motor</code> fields; replace only the TODO line:</p>
 <div data-track="elevator"><p class="code-caption">After — the new field is green</p><pre data-snippet="goal-field-elevator"><code>private final ElevatorSim sim = new ElevatorSim();
 private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-<span class="code-line code-added">private double targetMeters = ElevatorConstants.LOW_METERS;</span></code></pre></div>
+<span class="code-line code-added">private double targetMeters = ElevatorConstants.LOW_METERS;</span>
+// TODO 7b: Add a Motion Magic request field.</code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">After — the new field is green</p><pre data-snippet="goal-field-arm"><code>private final ArmSim sim = new ArmSim();
 private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-<span class="code-line code-added">private double targetDegrees = ArmConstants.LOW_DEGREES;</span></code></pre></div>
+<span class="code-line code-added">private double targetDegrees = ArmConstants.LOW_DEGREES;</span>
+// TODO 7b: Add a Motion Magic request field.</code></pre></div>
   <p>A <strong>field</strong> is a value the subsystem remembers between calls. <code>private double</code> declares a decimal number that only this class can change directly. It starts at the low preset, zero.</p>
 <div class="code-edit" data-edit="goal-setter"><p>In your subsystem file, find the TODO 3b placeholder immediately below the command factory:</p>
 <div data-track="elevator"><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="goal-setter-elevator"><code>public Command setHeightGoalCommand(double goal) {
@@ -53,6 +55,7 @@ private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConsta
 
 <span class="code-line code-added">private void setHeightGoal(double goal) {</span>
 <span class="code-line code-added">    targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);</span>
+<span class="code-line code-added">    // TODO 7d: Send the goal to the motor controller.</span>
 <span class="code-line code-added">}</span></code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-setter-arm"><code>public Command setAngleGoalCommand(double goal) {
     return runOnce(() -&gt; {
@@ -62,6 +65,7 @@ private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConsta
 
 <span class="code-line code-added">private void setAngleGoal(double goal) {</span>
 <span class="code-line code-added">    targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);</span>
+<span class="code-line code-added">    // TODO 7d: Send the goal to the motor controller.</span>
 <span class="code-line code-added">}</span></code></pre></div></div>
   <p><code>goal</code> is the requested position. <code>Math.clamp</code> keeps it between the minimum and maximum in <code>Constants.java</code>, then the function saves it in the target field. <span data-track="elevator">The elevator’s configured maximum height is 0.9 m; the earlier 1 m animation was an illustration of the conversion.</span></p>
   <p>This function is <code>private</code>, so only this subsystem can call it. It saves a number for now; we’ll add motor control later.</p>
@@ -130,23 +134,27 @@ import org.wpilib.command2.SubsystemBase;
 <span class="code-line code-added">import org.wpilib.telemetry.Telemetry;</span>
 <span class="code-line code-added">import org.wpilib.telemetry.TelemetryTable;</span>
 <span class="code-line code-added">import com.ctre.phoenix6.configs.TalonFXConfiguration;</span></code></pre></div>
-<div class="code-edit" data-edit="telemetry-field"><p>Inside the class, find TODO 6b below the target field you added earlier:</p>
+<div class="code-edit" data-edit="telemetry-field"><p>Inside the class, find TODO 6b below the target field and the TODO 7b placeholder:</p>
 <div data-track="elevator"><p class="code-caption">Before — find this code</p><pre data-existing="telemetry-field-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;
+// TODO 7b: Add a Motion Magic request field.
 <span class="code-line code-removed">// TODO 6b: Add a telemetry table field.</span></code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">Before — find this code</p><pre data-existing="telemetry-field-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;
+// TODO 7b: Add a Motion Magic request field.
 <span class="code-line code-removed">// TODO 6b: Add a telemetry table field.</span></code></pre></div>
 <p>Replace TODO 6b with the telemetry table field. This table will hold the values we graph:</p>
 <div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="telemetry-field-elevator"><code>private double targetMeters = ElevatorConstants.LOW_METERS;
+// TODO 7b: Add a Motion Magic request field.
 <span class="code-line code-added">private final TelemetryTable telemetry =</span>
 <span class="code-line code-added">    Telemetry.getTable(&quot;Elevator&quot;);</span></code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="telemetry-field-arm"><code>private double targetDegrees = ArmConstants.LOW_DEGREES;
+// TODO 7b: Add a Motion Magic request field.
 <span class="code-line code-added">private final TelemetryTable telemetry =</span>
 <span class="code-line code-added">    Telemetry.getTable(&quot;Arm&quot;);</span></code></pre></div></div>
 <h3>Tell the Talon the gear ratio</h3>
 <div class="code-edit" data-edit="sensor-config"><p>Find TODO 6c in the constructor. This is where we will tell the motor controller how motor turns relate to mechanism turns.</p>
 <div data-track="elevator"><p class="code-caption">Before — find the red TODO</p><pre data-existing="sensor-config-elevator"><code>public Elevator() {
 <span class="code-line code-removed">    // TODO 6c: Configure the sensor ratio here.</span>
-    // TODO 7: Add gains and Motion Magic settings here.
+    // TODO 7c: Add gains and Motion Magic settings here.
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
@@ -154,17 +162,17 @@ import org.wpilib.command2.SubsystemBase;
 }</code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">Before — find the red TODO</p><pre data-existing="sensor-config-arm"><code>public Arm() {
 <span class="code-line code-removed">    // TODO 6c: Configure the sensor ratio here.</span>
-    // TODO 7: Add gains and Motion Magic settings here.
+    // TODO 7c: Add gains and Motion Magic settings here.
 
     // Setup Simulation
     // Sets the simulated motor model. This setup is prepared for you; leave it in place.
     motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
 }</code></pre></div>
-<p>Create a configuration, set <code>SensorToMechanismRatio</code> to the ratio we determined earlier, and apply it to the Talon. Leave TODO 7 for the Controllers section. Applying these settings does not ask the motor to move.</p>
+<p>Create a configuration, set <code>SensorToMechanismRatio</code> to the ratio we determined earlier, and apply it to the Talon. Leave TODO 7c for the Controllers section. Applying these settings does not ask the motor to move.</p>
 <div data-track="elevator"><p class="code-caption">After — green lines are new</p><pre data-snippet="sensor-config-elevator"><code>public Elevator() {
 <span class="code-line code-added">    var config = new TalonFXConfiguration();</span>
 <span class="code-line code-added">    config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;</span>
-    // TODO 7: Add gains and Motion Magic settings here.
+    // TODO 7c: Add gains and Motion Magic settings here.
 <span class="code-line code-added"></span>
 <span class="code-line code-added">    var status = motor.getConfigurator().apply(config);</span>
 <span class="code-line code-added">    if (!status.isOK()) {</span>
@@ -178,7 +186,7 @@ import org.wpilib.command2.SubsystemBase;
 <div data-track="arm" hidden><p class="code-caption">After — green lines are new</p><pre data-snippet="sensor-config-arm"><code>public Arm() {
 <span class="code-line code-added">    var config = new TalonFXConfiguration();</span>
 <span class="code-line code-added">    config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;</span>
-    // TODO 7: Add gains and Motion Magic settings here.
+    // TODO 7c: Add gains and Motion Magic settings here.
 <span class="code-line code-added"></span>
 <span class="code-line code-added">    var status = motor.getConfigurator().apply(config);</span>
 <span class="code-line code-added">    if (!status.isOK()) {</span>
