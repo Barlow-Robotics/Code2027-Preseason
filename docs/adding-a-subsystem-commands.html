@@ -29,44 +29,52 @@ private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerC
 private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
 <span class="code-line code-added">private double targetDegrees = ArmConstants.LOW_DEGREES;</span></code></pre></div>
   <p>A <strong>field</strong> is a value the subsystem remembers between calls. <code>private double</code> declares a decimal number that only this class can change directly. It starts at the low preset, zero.</p>
-<div class="code-edit" data-edit="goal-setter"><p>In your subsystem file, find <code>periodic()</code>. It is below the command factory and still contains TODO 6:</p>
-<div data-track="elevator"><p class="code-caption">Before — find this code</p><pre data-existing="goal-setter-elevator"><code>@Override
-public void periodic() {
-    // TODO 6: Publish the goal in meters.
-}</code></pre></div>
-<div data-track="arm" hidden><p class="code-caption">Before — find this code</p><pre data-existing="goal-setter-arm"><code>@Override
-public void periodic() {
-    // TODO 6: Publish the goal in degrees.
-}</code></pre></div>
-<p>Add the private function immediately above <code>@Override</code>, as shown in green. Leave <code>periodic()</code> unchanged for now:</p>
-<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-setter-elevator"><code><span class="code-line code-added">private void setHeightGoal(double goal) {</span>
+<div class="code-edit" data-edit="goal-setter"><p>In your subsystem file, find the TODO 3 placeholder immediately below the command factory:</p>
+<div data-track="elevator"><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="goal-setter-elevator"><code>public Command setHeightGoalCommand(double goal) {
+    return runOnce(() -&gt; {
+        // TODO 3: Call the private function that saves the goal.
+    });
+}
+
+<span class="code-line code-removed">// TODO 3: Add the private setHeightGoal(double goal) function here.</span></code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">Before — replace the red TODO line</p><pre data-existing="goal-setter-arm"><code>public Command setAngleGoalCommand(double goal) {
+    return runOnce(() -&gt; {
+        // TODO 3: Call the private function that saves the goal.
+    });
+}
+
+<span class="code-line code-removed">// TODO 3: Add the private setAngleGoal(double goal) function here.</span></code></pre></div>
+<p>Replace the placeholder with the private function shown in green. Keep the command factory above it unchanged for this edit:</p>
+<div data-track="elevator"><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-setter-elevator"><code>public Command setHeightGoalCommand(double goal) {
+    return runOnce(() -&gt; {
+        // TODO 3: Call the private function that saves the goal.
+    });
+}
+
+<span class="code-line code-added">private void setHeightGoal(double goal) {</span>
 <span class="code-line code-added">    targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);</span>
-<span class="code-line code-added">}</span>
+<span class="code-line code-added">}</span></code></pre></div>
+<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-setter-arm"><code>public Command setAngleGoalCommand(double goal) {
+    return runOnce(() -&gt; {
+        // TODO 3: Call the private function that saves the goal.
+    });
+}
 
-@Override
-public void periodic() {
-    // TODO 6: Publish the goal in meters.
-}</code></pre></div>
-<div data-track="arm" hidden><p class="code-caption">After — green lines are new or changed</p><pre data-snippet="goal-setter-arm"><code><span class="code-line code-added">private void setAngleGoal(double goal) {</span>
+<span class="code-line code-added">private void setAngleGoal(double goal) {</span>
 <span class="code-line code-added">    targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);</span>
-<span class="code-line code-added">}</span>
-
-@Override
-public void periodic() {
-    // TODO 6: Publish the goal in degrees.
-}</code></pre></div></div>
+<span class="code-line code-added">}</span></code></pre></div></div>
   <p><code>goal</code> is the requested position. <code>Math.clamp</code> keeps it between the minimum and maximum in <code>Constants.java</code>, then the function saves it in the target field. <span data-track="elevator">The elevator’s configured maximum height is 0.9 m; the earlier 1 m animation was an illustration of the conversion.</span></p>
   <p>This function is <code>private</code>, so only this subsystem can call it. It saves a number for now; we’ll add motor control later.</p>
   <h3>Have the command factory call the function</h3>
 <div class="code-edit" data-edit="goal-command"><p>Find the command factory containing TODO 3:</p>
 <div data-track="elevator"><p class="code-caption">Before — red lines will change</p><pre data-existing="goal-command-elevator"><code>public Command setHeightGoalCommand(double goal) {
 <span class="code-line code-removed">    return runOnce(() -&gt; {</span>
-<span class="code-line code-removed">        // TODO 3: Add a target field and call a private method to clamp and save the goal.</span>
+<span class="code-line code-removed">        // TODO 3: Call the private function that saves the goal.</span>
 <span class="code-line code-removed">    });</span>
 }</code></pre></div>
 <div data-track="arm" hidden><p class="code-caption">Before — red lines will change</p><pre data-existing="goal-command-arm"><code>public Command setAngleGoalCommand(double goal) {
 <span class="code-line code-removed">    return runOnce(() -&gt; {</span>
-<span class="code-line code-removed">        // TODO 3: Add a target field and call a private method to clamp and save the goal.</span>
+<span class="code-line code-removed">        // TODO 3: Call the private function that saves the goal.</span>
 <span class="code-line code-removed">    });</span>
 }</code></pre></div>
 <p>Change the <code>runOnce</code> body so it calls the private function you just added. Keep the method name and parameter:</p>
