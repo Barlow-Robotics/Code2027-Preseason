@@ -46,7 +46,7 @@ public class RobotContainer {
     // TODO 3a: Add an operator CommandXboxController field on port 1.
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    // TODO 1: Add your Elevator or Arm subsystem field here.
+    // TODO 1b: Add your Elevator or Arm subsystem field here.
 
     /* Path follower */
     private final Selectable<Command> autoChooser;

@@ -17,8 +17,11 @@ import first.robot.Constants.ArmConstants;
 
 /** Physics and Mechanism2d drawing for the desktop arm. */
 final class ArmSim {
+    // Physical gearbox in this model, independent of the student's controller configuration.
+    private static final double MODEL_GEAR_RATIO = 80.0;
+
     private final SingleJointedArmSim physics = new SingleJointedArmSim(
-        DCMotor.getKrakenX60(1), ArmConstants.GEAR_RATIO,
+        DCMotor.getKrakenX60(1), MODEL_GEAR_RATIO,
         SingleJointedArmSim.estimateMOI(ArmConstants.ARM_LENGTH_METERS, 3.0), ArmConstants.ARM_LENGTH_METERS,
         Units.degreesToRadians(ArmConstants.MIN_DEGREES), Units.degreesToRadians(ArmConstants.MAX_DEGREES), true, 0.0);
 
@@ -32,8 +35,8 @@ final class ArmSim {
         motor.setSupplyVoltage(RobotController.getBatteryVoltage());
         update(motor.getMotorVoltage());
         // Phoenix simulation needs raw motor rotations, before SensorToMechanismRatio is applied.
-        motor.setRawRotorPosition(Units.radiansToRotations(physics.getAngle()) * ArmConstants.GEAR_RATIO);
-        motor.setRotorVelocity(Units.radiansToRotations(physics.getVelocity()) * ArmConstants.GEAR_RATIO);
+        motor.setRawRotorPosition(Units.radiansToRotations(physics.getAngle()) * MODEL_GEAR_RATIO);
+        motor.setRotorVelocity(Units.radiansToRotations(physics.getVelocity()) * MODEL_GEAR_RATIO);
     }
 
     void update(double motorVolts) {
