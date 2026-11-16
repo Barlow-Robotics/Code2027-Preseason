@@ -28,7 +28,9 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 document.querySelectorAll('.gear-demo').forEach(figure => {
   const arm = figure.dataset.mechanism === 'arm';
   const ratio = arm ? 80 : 12;
-  const maxMotorTurns = arm ? 20 : 12;
+  const metersPerDrumTurn = 2 * Math.PI * 0.025;
+  const maxMotorTurns = arm ? 20 : ratio / metersPerDrumTurn; // Elevator example: 1 meter.
+  const durationMs = arm ? 16000 : 24000;
   const slider = figure.querySelector('[data-part="slider"]');
   const play = figure.querySelector('[data-action="play"]');
   const part = name => figure.querySelector(`[data-part="${name}"]`);
@@ -37,7 +39,7 @@ document.querySelectorAll('.gear-demo').forEach(figure => {
   function render() {
     const motorTurns = progress * maxMotorTurns;
     const outputTurns = motorTurns / ratio;
-    const height = outputTurns * 2 * Math.PI * 0.025;
+    const height = outputTurns * metersPerDrumTurn;
     // Every meshing pair reverses direction. Gears on one shaft share one angle.
     const shaftTurns = arm
       ? [motorTurns, -motorTurns / 4, motorTurns / 16, -motorTurns / 80]
@@ -50,7 +52,7 @@ document.querySelectorAll('.gear-demo').forEach(figure => {
     });
     part('output').setAttribute('transform', `rotate(${shaftTurns[shaftTurns.length - 1] * 360})`);
     if (!arm) {
-      const lift = height * 500; // 12.5 px drum radius represents 0.025 meters.
+      const lift = height * 78.54; // 1 meter of carriage travel; drum drawn enlarged for clarity.
       part('carriage').setAttribute('transform', `translate(0 ${-lift})`);
       part('cable').setAttribute('d', `M82.5 30V${135 - lift}`);
       part('height-line').setAttribute('d', `M152 135V${135 - lift}`);
@@ -66,7 +68,7 @@ document.querySelectorAll('.gear-demo').forEach(figure => {
     frame = null; previousTime = null; play.textContent = reducedMotion.matches ? 'Advance 10%' : 'Play';
   }
   function tick(time) {
-    if (previousTime !== null) progress = Math.min(1, progress + Math.min(time - previousTime, 100) / 16000);
+    if (previousTime !== null) progress = Math.min(1, progress + Math.min(time - previousTime, 100) / durationMs);
     previousTime = time;
     render();
     if (progress >= 1) { pause(); return; }
