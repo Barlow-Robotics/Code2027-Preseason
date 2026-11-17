@@ -28,7 +28,7 @@ public final class Constants {
 
         // Goal presets used by the operator buttons.
         public static final double LOW_DEGREES = 0.0;
-        public static final double HIGH_DEGREES = 65.0;
+        public static final double HIGH_DEGREES = 80.0;
 
         // TODO 1: Set the gear ratio using the Mechanisms walkthrough.
         public static final double GEAR_RATIO = 1.0; // motor turns per arm turn

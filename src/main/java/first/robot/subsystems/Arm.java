@@ -2,11 +2,14 @@ package first.robot.subsystems;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
-// TODO 6a: Add the telemetry imports.
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-// TODO 7a: Add the Motion Magic and gravity imports.
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import first.robot.generated.TunerConstants;
 
 import first.robot.Constants.ArmConstants;
@@ -15,13 +18,25 @@ import first.robot.Constants.ArmConstants;
 public final class Arm extends SubsystemBase {
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-    // TODO 3a: Add a field to store the target position.
-    // TODO 7b: Add a Motion Magic request field.
-    // TODO 6b: Add a telemetry table field.
+    private double targetDegrees = ArmConstants.LOW_DEGREES;
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
+    private final TelemetryTable telemetry =
+        Telemetry.getTable("Arm");
 
     public Arm() {
-        // TODO 6c: Configure the sensor ratio here.
-        // TODO 7c: Add gains and Motion Magic settings here.
+        var config = new TalonFXConfiguration();
+        config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;
+        config.Slot0.kP = 45.0;
+        config.Slot0.kV = 15.0;
+        config.Slot0.kG = 0.23;
+       config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+       config.MotionMagic.MotionMagicCruiseVelocity = 0.45;
+       config.MotionMagic.MotionMagicAcceleration = 1.5;
+
+        var status = motor.getConfigurator().apply(config);
+        if (!status.isOK()) { 
+            throw new IllegalStateException("Arn Talon FX configuration failed: " + status);
+        }
 
         // Setup Simulation
         // Sets the simulated motor model. This setup is prepared for you; leave it in place.
@@ -29,21 +44,28 @@ public final class Arm extends SubsystemBase {
     }
 
     public Command setAngleGoalCommand(double goal) {
-        return runOnce(() -> {
-            // TODO 3c: Call the private function that saves the goal.
-        });
+            return runOnce(() -> setAngleGoal(goal));
     }
 
-    // TODO 3b: Add the private setAngleGoal(double goal) function here.
+    private void setAngleGoal(double goal){ 
+        targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
+       double goalTurns = targetDegrees / 360.0;
+       motor.setControl(positionRequest.withPosition(goalTurns));
+    }
 
     @Override
     public void periodic() {
-        // TODO 6d: Publish target and actual position in degrees.
+       telemetry.log("Target_deg", targetDegrees);
+       double mechanismTurns = motor.getPosition().getValueAsDouble();
+       telemetry.log("Actual_deg", mechanismTurns * 360);
     }
 
     @Override
     public void simulationPeriodic() {
         // Updates the simulated mechanism and sends its position back to the Talon.
         sim.step(motor.getSimState());
+
+
+        
     }
 }
