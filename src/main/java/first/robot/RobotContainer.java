@@ -43,7 +43,7 @@ public class RobotContainer {
     private final SwerveTelemetry logger = new SwerveTelemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
-    // TODO 4: Add an operator CommandXboxController field on port 1.
+    private final CommandXboxController operator = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private final Arm arm = new Arm();

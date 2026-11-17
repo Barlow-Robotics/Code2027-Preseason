@@ -15,7 +15,7 @@ import first.robot.Constants.ArmConstants;
 public final class Arm extends SubsystemBase {
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-    // TODO 3a: Add a field to store the target position.
+    private double targetDegrees = ArmConstants . LOW_DEGREES;
     // TODO 7b: Add a Motion Magic request field.
     // TODO 6b: Add a telemetry table field.
 
@@ -34,7 +34,10 @@ public final class Arm extends SubsystemBase {
         });
     }
 
-    // TODO 3b: Add the private setAngleGoal(double goal) function here.
+    private void setAngleGoal(double goal) {
+        targetDegrees = Math.clamp(goal, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
+        //TODO 7d: Send the goal to the motor controller 
+    }
 
     @Override
     public void periodic() {
