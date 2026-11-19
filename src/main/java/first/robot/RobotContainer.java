@@ -22,7 +22,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
 import first.robot.Constants.ArmConstants;
-import first.robot.Constants.ElevatorConstants;
 import first.robot.generated.TunerConstants;
 import first.robot.subsystems.Arm;
 import first.robot.subsystems.CommandSwerveDrivetrain;
@@ -113,8 +112,8 @@ public class RobotContainer {
     }
 
     private void configureElevatorBindings() {
-        operator.a().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));
-        operator.y().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));
+        operator.a().onTrue(elevator.decreaseLevelCommand());
+        operator.y().onTrue(elevator.increaseLevelCommand());
     }
 
     private void configureArmBindings() {

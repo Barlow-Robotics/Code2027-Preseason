@@ -10,8 +10,11 @@ public final class Constants {
         public static final int MOTOR_CAN_ID = 20;
 
         // Goal presets used by the operator buttons.
-        public static final double LOW_METERS = 0.0;
-        public static final double HIGH_METERS = 0.65;
+        public static final double BOTTOM_METERS = 0.0;
+        public static final double MID_METERS = 0.35;
+        public static final double TOP_METERS = 0.65;
+        public static final double POSITION_TOLERANCE_METERS = 0.01;
+        public static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.02;
 
         // Profile limits are drum rotations per second and per second squared.
         public static final double CRUISE_ROTATIONS_PER_SECOND = 0.6;

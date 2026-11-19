@@ -17,9 +17,36 @@ import first.robot.Constants.ElevatorConstants;
 
 /** Desktop elevator for the preseason controls lesson. */
 public final class Elevator extends SubsystemBase {
+    public enum Level {
+        BOTTOM(ElevatorConstants.BOTTOM_METERS),
+        MID(ElevatorConstants.MID_METERS),
+        TOP(ElevatorConstants.TOP_METERS);
+
+        private final double heightMeters;
+
+        Level(double heightMeters) {
+            this.heightMeters = heightMeters;
+        }
+
+        public Level increase() {
+            return switch (this) {
+                case BOTTOM -> MID;
+                case MID, TOP -> TOP;
+            };
+        }
+
+        public Level decrease() {
+            return switch (this) {
+                case TOP -> MID;
+                case MID, BOTTOM -> BOTTOM;
+            };
+        }
+    }
+
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
-    private double targetMeters = ElevatorConstants.LOW_METERS;
+    private Level selectedLevel = Level.BOTTOM;
+    private double targetMeters = ElevatorConstants.BOTTOM_METERS;
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
     private final PositionVoltage holdRequest = new PositionVoltage(0.0);
     private boolean movementActive = false;
@@ -46,27 +73,43 @@ public final class Elevator extends SubsystemBase {
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
-    public Command setHeightGoalCommand(double goal) {
-        return new MoveToHeightCommand(goal);
+    public Command goToLevelCommand(Level level) {
+        return new MoveToLevelCommand(level);
     }
 
-    private final class MoveToHeightCommand extends Command {
-        private final double goal;
+    public Command increaseLevelCommand() {
+        return defer(() -> goToLevelCommand(selectedLevel.increase()));
+    }
 
-        private MoveToHeightCommand(double goal) {
-            this.goal = goal;
+    public Command decreaseLevelCommand() {
+        return defer(() -> goToLevelCommand(selectedLevel.decrease()));
+    }
+
+    private final class MoveToLevelCommand extends Command {
+        private final Level level;
+
+        private MoveToLevelCommand(Level level) {
+            this.level = level;
             addRequirements(Elevator.this);
         }
 
         @Override
         public void initialize() {
+            selectedLevel = level;
             movementActive = true;
-            setHeightGoal(goal);
+            setHeightGoal(level.heightMeters);
         }
 
         @Override
         public boolean isFinished() {
-            return false;
+            double heightMeters = motor.getPosition().getValueAsDouble()
+                * ElevatorConstants.METERS_PER_DRUM_TURN;
+            double velocityMetersPerSecond = motor.getVelocity().getValueAsDouble()
+                * ElevatorConstants.METERS_PER_DRUM_TURN;
+            return Math.abs(heightMeters - level.heightMeters)
+                    < ElevatorConstants.POSITION_TOLERANCE_METERS
+                && Math.abs(velocityMetersPerSecond)
+                    < ElevatorConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
         }
 
         @Override
@@ -94,6 +137,8 @@ public final class Elevator extends SubsystemBase {
         double mechanismTurns = motor.getPosition().getValueAsDouble();
         telemetry.log("Actual_m", mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
         telemetry.log("MovementActive", movementActive);
+        telemetry.log("SelectedLevel", selectedLevel.name());
+        telemetry.log("SelectedHeight_m", selectedLevel.heightMeters);
         telemetry.log("Velocity_mps", motor.getVelocity().getValueAsDouble()
             * ElevatorConstants.METERS_PER_DRUM_TURN);
     }
