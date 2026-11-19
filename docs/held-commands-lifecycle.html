@@ -6,18 +6,20 @@
 <main class="wrap"><div class="intro"><h1>Command lifetime</h1></div><section><p>We will slow the movement, add cleanup inside the elevator, and then connect the buttons. Finish these edits before running the simulation.</p></section><section id="edit-1"><h2>1. Choose a slower movement</h2>
 <p>Open <code>src/main/java/first/robot/Constants.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="1" data-side="before"><code>        public static final double HIGH_METERS = 0.65;</code></pre>
-<p>Open Constants.java and find HIGH_METERS inside ElevatorConstants. Add these two constants below it. The motor controller already knows our gear ratio, so these limits describe drum turns. Multiplying by METERS_PER_DRUM_TURN gives about 0.094 meters per second and 0.236 meters per second squared. These limits apply to the Motion Magic profile; they are not hard physical speed limits.</p>
+<p>Open Constants.java and find HIGH_METERS inside ElevatorConstants. Add these two constants below it. Use elevator units: a cruise speed of 0.10 meters per second (10 cm/s) and an acceleration of 0.25 meters per second squared. These describe how fast the elevator travels and how quickly its speed changes. These limits apply to the Motion Magic profile; they are not hard physical speed limits.</p>
 <p class="code-caption">After — green marks the added code</p><pre data-edit="1" data-side="after"><code>        public static final double HIGH_METERS = 0.65;
 <span class="code-line code-added"></span>
-<span class="code-line code-added">        // Profile limits are drum rotations per second and per second squared.</span>
-<span class="code-line code-added">        public static final double CRUISE_ROTATIONS_PER_SECOND = 0.6;</span>
-<span class="code-line code-added">        public static final double ACCELERATION_ROTATIONS_PER_SECOND_SQUARED = 1.5;</span></code></pre></section><section id="edit-2"><h2>2. Use the limits</h2>
+<span class="code-line code-added">        // Motion profile limits in elevator units.</span>
+<span class="code-line code-added">        public static final double CRUISE_METERS_PER_SECOND = 0.10;</span>
+<span class="code-line code-added">        public static final double ACCELERATION_METERS_PER_SECOND_SQUARED = 0.25;</span></code></pre></section><section id="edit-2"><h2>2. Use the limits</h2>
 <p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="2" data-side="before"><code><span class="code-line code-removed">        config.MotionMagic.MotionMagicCruiseVelocity = 2.0;</span>
 <span class="code-line code-removed">        config.MotionMagic.MotionMagicAcceleration = 6.0;</span></code></pre>
-<p>Open Elevator.java. Replace the two profile settings with our named constants. The lower speed gives us time to release the button before the elevator reaches its destination.</p>
-<p class="code-caption">After — green marks the added code</p><pre data-edit="2" data-side="after"><code><span class="code-line code-added">        config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.CRUISE_ROTATIONS_PER_SECOND;</span>
-<span class="code-line code-added">        config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.ACCELERATION_ROTATIONS_PER_SECOND_SQUARED;</span></code></pre></section><section id="edit-3"><h2>3. Import the hold request</h2>
+<p>Open Elevator.java. Replace the two profile settings with these conversions. Divide meters per second by meters per drum turn to get drum turns per second. The same division converts acceleration to drum turns per second squared. SensorToMechanismRatio already accounts for the gears, so do not multiply by GEAR_RATIO again. Keeping our constants in elevator units makes the intended motion easier to understand. The lower speed gives us time to release the button before arrival.</p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="2" data-side="after"><code><span class="code-line code-added">        config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.CRUISE_METERS_PER_SECOND</span>
+<span class="code-line code-added">            / ElevatorConstants.METERS_PER_DRUM_TURN;</span>
+<span class="code-line code-added">        config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.ACCELERATION_METERS_PER_SECOND_SQUARED</span>
+<span class="code-line code-added">            / ElevatorConstants.METERS_PER_DRUM_TURN;</span></code></pre></section><section id="edit-3"><h2>3. Import the hold request</h2>
 <p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="3" data-side="before"><code>import com.ctre.phoenix6.controls.MotionMagicVoltage;</code></pre>
 <p>Add PositionVoltage alongside MotionMagicVoltage. Motion Magic creates a path toward a destination. PositionVoltage holds a position directly, without continuing that path.</p>

@@ -60,8 +60,10 @@ public final class Elevator extends SubsystemBase {
         config.Slot0.kV = 2.4;
         config.Slot0.kG = 0.28;
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-        config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.CRUISE_ROTATIONS_PER_SECOND;
-        config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.ACCELERATION_ROTATIONS_PER_SECOND_SQUARED;
+        config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.CRUISE_METERS_PER_SECOND
+            / ElevatorConstants.METERS_PER_DRUM_TURN;
+        config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.ACCELERATION_METERS_PER_SECOND_SQUARED
+            / ElevatorConstants.METERS_PER_DRUM_TURN;
 
         var status = motor.getConfigurator().apply(config);
         if (!status.isOK()) {

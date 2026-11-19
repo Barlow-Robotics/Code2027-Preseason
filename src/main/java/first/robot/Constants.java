@@ -16,9 +16,9 @@ public final class Constants {
         public static final double POSITION_TOLERANCE_METERS = 0.01;
         public static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.02;
 
-        // Profile limits are drum rotations per second and per second squared.
-        public static final double CRUISE_ROTATIONS_PER_SECOND = 0.6;
-        public static final double ACCELERATION_ROTATIONS_PER_SECOND_SQUARED = 1.5;
+        // Motion profile limits in elevator units.
+        public static final double CRUISE_METERS_PER_SECOND = 0.10;
+        public static final double ACCELERATION_METERS_PER_SECOND_SQUARED = 0.25;
 
         public static final double GEAR_RATIO = 12.0; // motor turns per drum turn
         public static final double MIN_METERS = 0.0;
