@@ -37,3 +37,22 @@ document.querySelectorAll('[data-copy-code]').forEach((button) => {
     }
   });
 });
+
+document.querySelectorAll('[data-copy-practice]').forEach((practice) => {
+  const input = practice.querySelector('textarea');
+  const status = practice.querySelector('[data-practice-status]');
+  const expected = practice.querySelector('[data-copy-code]').dataset.copyCode;
+  input.addEventListener('input', () => {
+    const pasted = input.value.replace(/\r\n?/g, '\n').replace(/\n$/, '');
+    if (!pasted) {
+      status.textContent = '';
+    } else if (pasted === expected) {
+      status.textContent = 'It worked! The code and indentation match.';
+    } else if (pasted.split('\n').map(line => line.trim()).join('\n')
+        === expected.split('\n').map(line => line.trim()).join('\n')) {
+      status.textContent = 'The words match, but the spacing is different. Clear the box and paste again without adding spaces.';
+    } else {
+      status.textContent = 'Copy the example above, then replace the contents of this box with it.';
+    }
+  });
+});

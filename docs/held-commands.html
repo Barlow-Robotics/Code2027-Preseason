@@ -30,7 +30,16 @@
 <button class="held-y" type="button" data-hold-y aria-label="Hold Y to raise the elevators; release to compare" aria-pressed="false">Y</button></div>
 <div><p>Hold <kbd>Y</kbd> on your keyboard,<br>or click and hold the yellow Y button.</p><button class="held-reset" type="button" data-preview-reset>Reset elevators</button></div></div>
 <p class="held-footnote">Behavior preview. In the simulator, expect a little settling after release.</p>
-<noscript><p>Enable JavaScript to try the preview. Before: movement continues after release. After: the elevator stops and holds.</p></noscript></section><section><h2>Copying code into VS Code</h2><p><strong>Copy added code</strong> copies just the green lines, including their indentation.</p><ol><li>Click the copy button below the code.</li><li>In VS Code, put your cursor at the <strong>very beginning of the destination line</strong>, before any spaces.</li><li>Press <kbd>Ctrl</kbd> + <kbd>V</kbd>. Do not add spaces first—the copied code already includes them.</li></ol><p>Replacing old code? Select those whole lines, including their leading spaces, before pasting.</p></section>
+<noscript><p>Enable JavaScript to try the preview. Before: movement continues after release. After: the elevator stops and holds.</p></noscript></section><section data-copy-practice><h2>New in this tutorial: copying code</h2><p><strong>Copy added code</strong> copies just the green lines, including their indentation. Try it here first.</p>
+<pre><code><span class="code-line code-added">    // Elevator target, in meters.</span>
+<span class="code-line code-added">    double targetMeters = 0.65;</span></code></pre>
+<div class="code-copy"><button type="button" data-copy-code="    // Elevator target, in meters.
+    double targetMeters = 0.65;" aria-label="Copy the practice code">Copy added code</button><span role="status" aria-live="polite"></span></div>
+<ol><li>Click <strong>Copy added code</strong>.</li><li>Click the empty box below. Start at the <strong>very beginning of the line</strong>—do not type spaces first.</li><li>Press <kbd>Ctrl</kbd> + <kbd>V</kbd> to paste.</li></ol>
+<label for="copy-practice-input"><strong>Paste here to try it</strong></label>
+<textarea id="copy-practice-input" class="copy-practice-input" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="copy-practice-status"></textarea>
+<p id="copy-practice-status" data-practice-status role="status" aria-live="polite"></p>
+<p>Use the same steps in VS Code. Replacing old code? Select those whole lines, including their leading spaces, before pasting.</p></section>
 <section><h2>Download the code and create your branch</h2>
 <details><summary>Coach: publish before class</summary><p>The starting tag is local only. Publish it and these pages before students begin.</p></details>
 <ol><li>Open GitHub Desktop. Select <strong>Code2027-Preseason</strong> under <strong>Current repository</strong>.</li>

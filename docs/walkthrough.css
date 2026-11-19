@@ -96,6 +96,8 @@ footer a { color:var(--muted); }
 .code-copy button:disabled { opacity:.6; cursor:wait; }
 .code-copy [role="status"] { font-size:.82rem; color:var(--ink); }
 .copy-manual { width:100%; min-height:8rem; padding:.6rem; color:var(--ink); background:var(--surface); border:1px solid var(--line); font: .85rem/1.5 Consolas,monospace; }
+.copy-practice-input { display:block; width:100%; max-width:65ch; margin-top:.4rem; padding:.75rem; resize:vertical; border:1px solid var(--muted); border-radius:5px; color:var(--ink); background:var(--surface); font:.9rem/1.6 Consolas,monospace; tab-size:4; }
+[data-practice-status] { min-height:1.65em; font-size:.85rem; }
 .held-comparison { display:grid; grid-template-columns:1fr 1fr; max-width:36rem; gap:1rem; margin-top:1rem; }
 .held-panel { text-align:center; }
 .held-panel h3 { margin:0; }
