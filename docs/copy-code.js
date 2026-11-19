@@ -41,18 +41,28 @@ document.querySelectorAll('[data-copy-code]').forEach((button) => {
 document.querySelectorAll('[data-copy-practice]').forEach((practice) => {
   const input = practice.querySelector('textarea');
   const status = practice.querySelector('[data-practice-status]');
-  const expected = practice.querySelector('[data-copy-code]').dataset.copyCode;
+  const expected = practice.dataset.expectedCode;
+  const original = input.defaultValue;
+  // Trailing spaces are harmless; leading spaces are the point of this exercise.
+  const normalize = text => text.replace(/\r\n?/g, '\n').replace(/[ \t]+$/gm, '').replace(/\n$/, '');
+  practice.querySelector('[data-practice-reset]').addEventListener('click', () => {
+    input.value = original;
+    status.textContent = '';
+    input.focus();
+    const position = original.indexOf('\n', original.indexOf('\n') + 1);
+    input.setSelectionRange(position, position);
+  });
   input.addEventListener('input', () => {
-    const pasted = input.value.replace(/\r\n?/g, '\n').replace(/\n$/, '');
-    if (!pasted) {
+    const pasted = normalize(input.value);
+    if (pasted === normalize(original)) {
       status.textContent = '';
     } else if (pasted === expected) {
-      status.textContent = 'It worked! The code and indentation match.';
+      status.textContent = 'It worked! The new lines fit, and the existing code and indentation are intact.';
     } else if (pasted.split('\n').map(line => line.trim()).join('\n')
         === expected.split('\n').map(line => line.trim()).join('\n')) {
-      status.textContent = 'The words match, but the spacing is different. Clear the box and paste again without adding spaces.';
+      status.textContent = 'The words match, but the spacing is different. Reset the practice code, then paste at the beginning of the blank line.';
     } else {
-      status.textContent = 'Copy the example above, then replace the contents of this box with it.';
+      status.textContent = 'Keep the existing code and add only the green lines on the blank line. Use Reset practice code to try again.';
     }
   });
 });
