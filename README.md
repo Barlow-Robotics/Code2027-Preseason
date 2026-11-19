@@ -5,6 +5,6 @@
 Choose a lesson from the walkthroughs page. Start with **Adding a subsystem**
 for step-by-step instructions on building an arm or elevator.
 
-The first walkthrough begins at the [`walkthrough-01-start`](https://github.com/Barlow-Robotics/Code2027-Preseason/tree/walkthrough-01-start) tag.
-Follow its Setup page to create your own branch from that saved starting point in GitHub Desktop.
+Start each lesson from its prepared branch: `walkthrough/1`, `walkthrough/2`, or `walkthrough/3`.
+These branches contain the lesson TODOs. Follow the Setup page to select the branch in GitHub Desktop and create your own working branch from it.
 `main` contains the completed arm and elevator and is the base for future walkthroughs.
