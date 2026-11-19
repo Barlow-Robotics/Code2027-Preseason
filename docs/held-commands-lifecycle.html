@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Command lifetime · Move while held</title><link rel="stylesheet" href="walkthrough.css"></head><body>
+<title>Command lifetime · Move while held</title><link rel="stylesheet" href="walkthrough.css"><script src="copy-code.js" defer></script></head><body>
 <header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Move while held</span><span>Draft for review</span></div></div></header>
 <nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="held-commands.html">1. Setup</a></li><li><a href="held-commands-lifecycle.html" aria-current="page">2. Command lifetime</a></li><li><a href="held-commands-simulator.html">3. Try it</a></li></ul></div></nav>
 <main class="wrap"><div class="intro"><h1>Command lifetime</h1></div><section><details><summary>What is a Command?</summary><p>A command is a task the robot can start, run, and stop. Ours is “move the elevator.”</p><ul><li><code>initialize()</code>: called once when the task starts.</li><li><code>isFinished()</code>: asks whether the task is done.</li><li><code>end(...)</code>: called when the task finishes or is canceled.</li></ul><p>WPILib’s <strong>scheduler</strong> manages these calls. We give it a command; it manages the task’s lifetime.</p><p>A command can also have <code>execute()</code>, called repeatedly. We do not need it here: the Talon keeps controlling the motor after receiving its target.</p><p><strong>A requirement reserves a subsystem:</strong> only one scheduled command can require the elevator at a time.</p></details></section><section id="edit-1"><h2>1. Choose a slower movement</h2>
@@ -12,6 +12,9 @@
 <span class="code-line code-added">        // Motion profile limits in elevator units.</span>
 <span class="code-line code-added">        public static final double CRUISE_METERS_PER_SECOND = 0.10;</span>
 <span class="code-line code-added">        public static final double ACCELERATION_METERS_PER_SECOND_SQUARED = 0.25;</span></code></pre>
+<div class="code-copy"><button type="button" data-copy-code="        // Motion profile limits in elevator units.
+        public static final double CRUISE_METERS_PER_SECOND = 0.10;
+        public static final double ACCELERATION_METERS_PER_SECOND_SQUARED = 0.25;" aria-label="Copy added code for Choose a slower movement">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>Speed: 0.10 m/s means 10 centimeters each second.</li><li>Acceleration: 0.25 m/s² controls how quickly the speed changes.</li></ul></section><section id="edit-2"><h2>2. Use the limits</h2>
 <p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="2" data-side="before"><code><span class="code-line code-removed">        config.MotionMagic.MotionMagicCruiseVelocity = 2.0;</span>
@@ -21,12 +24,17 @@
 <span class="code-line code-added">            / ElevatorConstants.METERS_PER_DRUM_TURN;</span>
 <span class="code-line code-added">        config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.ACCELERATION_METERS_PER_SECOND_SQUARED</span>
 <span class="code-line code-added">            / ElevatorConstants.METERS_PER_DRUM_TURN;</span></code></pre>
+<div class="code-copy"><button type="button" data-copy-code="        config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.CRUISE_METERS_PER_SECOND
+            / ElevatorConstants.METERS_PER_DRUM_TURN;
+        config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.ACCELERATION_METERS_PER_SECOND_SQUARED
+            / ElevatorConstants.METERS_PER_DRUM_TURN;" aria-label="Copy added code for Use the limits">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>Divide by meters per drum turn to convert our limits to drum turns.</li><li>The configured gear ratio already handles the gears. Do not apply it again.</li></ul></section><section id="edit-3"><h2>3. Import the hold request</h2>
 <p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="3" data-side="before"><code>import com.ctre.phoenix6.controls.MotionMagicVoltage;</code></pre>
 <p><strong>Add the PositionVoltage import.</strong></p>
 <p class="code-caption">After — green marks the added code</p><pre data-edit="3" data-side="after"><code>import com.ctre.phoenix6.controls.MotionMagicVoltage;
 <span class="code-line code-added">import com.ctre.phoenix6.controls.PositionVoltage;</span></code></pre>
+<div class="code-copy"><button type="button" data-copy-code="import com.ctre.phoenix6.controls.PositionVoltage;" aria-label="Copy added code for Import the hold request">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>MotionMagicVoltage plans the trip. PositionVoltage holds a position.</li></ul></section><section id="edit-4"><h2>4. Keep a hold request and activity flag</h2>
 <p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="4" data-side="before"><code>    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);</code></pre>
@@ -34,6 +42,8 @@
 <p class="code-caption">After — green marks the added code</p><pre data-edit="4" data-side="after"><code>    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
 <span class="code-line code-added">    private final PositionVoltage holdRequest = new PositionVoltage(0.0);</span>
 <span class="code-line code-added">    private boolean movementActive = false;</span></code></pre>
+<div class="code-copy"><button type="button" data-copy-code="    private final PositionVoltage holdRequest = new PositionVoltage(0.0);
+    private boolean movementActive = false;" aria-label="Copy added code for Keep a hold request and activity flag">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>holdRequest tells the motor where to hold.</li><li>movementActive records whether a movement command is running.</li></ul></section><section id="edit-5"><h2>5. Add the stop-and-hold helper</h2>
 <p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="5" data-side="before"><code>    private void setHeightGoal(double goal) {</code></pre>
@@ -45,6 +55,11 @@
 <span class="code-line code-added">    }</span>
 <span class="code-line code-added"></span>
     private void setHeightGoal(double goal) {</code></pre>
+<div class="code-copy"><button type="button" data-copy-code="    private void stopAndHold() {
+        double currentTurns = motor.getPosition().getValueAsDouble();
+        targetMeters = currentTurns * ElevatorConstants.METERS_PER_DRUM_TURN;
+        motor.setControl(holdRequest.withPosition(currentTurns));
+    }" aria-label="Copy added code for Add the stop-and-hold helper">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>Read the current position → make it the new target → hold there.</li><li>The motor still needs power to hold the elevator up. Expect a little settling.</li></ul></section><section id="edit-6"><h2>6. Add the private command class</h2>
 <p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="6" data-side="before"><code>    public Command setHeightGoalCommand(double goal) {
@@ -80,6 +95,31 @@
 <span class="code-line code-added">            movementActive = false;</span>
 <span class="code-line code-added">        }</span>
 <span class="code-line code-added">    }</span></code></pre>
+<div class="code-copy"><button type="button" data-copy-code="    private final class MoveToHeightCommand extends Command {
+        private final double goal;
+
+        private MoveToHeightCommand(double goal) {
+            this.goal = goal;
+            addRequirements(Elevator.this);
+        }
+
+        @Override
+        public void initialize() {
+            movementActive = true;
+            setHeightGoal(goal);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return false;
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            stopAndHold();
+            movementActive = false;
+        }
+    }" aria-label="Copy added code for Add the private command class">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>goal remembers the destination.</li><li>addRequirements(Elevator.this) gives this command control of the elevator.</li><li>initialize starts the trip; end stops and holds.</li><li>isFinished returns false: keep running until canceled.</li></ul></section><section id="edit-7"><h2>7. Use the new command in the factory</h2>
 <p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="7" data-side="before"><code>    public Command setHeightGoalCommand(double goal) {
@@ -89,6 +129,7 @@
 <p class="code-caption">After — green marks the added code</p><pre data-edit="7" data-side="after"><code>    public Command setHeightGoalCommand(double goal) {
 <span class="code-line code-added">        return new MoveToHeightCommand(goal);</span>
     }</code></pre>
+<div class="code-copy"><button type="button" data-copy-code="        return new MoveToHeightCommand(goal);" aria-label="Copy added code for Use the new command in the factory">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>A factory is a method that creates an object.</li><li>Creating the command does not start it. The button will do that.</li></ul></section><section id="edit-8"><h2>8. Log the command lifetime</h2>
 <p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="8" data-side="before"><code>        telemetry.log(&quot;Actual_m&quot;, mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);</code></pre>
@@ -97,6 +138,9 @@
 <span class="code-line code-added">        telemetry.log(&quot;MovementActive&quot;, movementActive);</span>
 <span class="code-line code-added">        telemetry.log(&quot;Velocity_mps&quot;, motor.getVelocity().getValueAsDouble()</span>
 <span class="code-line code-added">            * ElevatorConstants.METERS_PER_DRUM_TURN);</span></code></pre>
+<div class="code-copy"><button type="button" data-copy-code="        telemetry.log(&quot;MovementActive&quot;, movementActive);
+        telemetry.log(&quot;Velocity_mps&quot;, motor.getVelocity().getValueAsDouble()
+            * ElevatorConstants.METERS_PER_DRUM_TURN);" aria-label="Copy added code for Log the command lifetime">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>MovementActive: is the command running?</li><li>Velocity_mps: how fast is the elevator moving?</li><li>A command can be running while holding still at its destination.</li></ul></section><section id="edit-9"><h2>9. Move while the button is held</h2>
 <p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="9" data-side="before"><code><span class="code-line code-removed">        operator.a().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));</span>
@@ -104,5 +148,7 @@
 <p><strong>In configureElevatorBindings, change onTrue to whileTrue.</strong></p>
 <p class="code-caption">After — green marks the added code</p><pre data-edit="9" data-side="after"><code><span class="code-line code-added">        operator.a().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));</span>
 <span class="code-line code-added">        operator.y().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));</span></code></pre>
+<div class="code-copy"><button type="button" data-copy-code="        operator.a().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));
+        operator.y().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));" aria-label="Copy added code for Move while the button is held">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>Press → start. Release → cancel → run end.</li><li>Another elevator command can also interrupt this one.</li></ul></section>
 <div class="lesson-next"><a href="held-commands.html">Previous: 1. Setup</a><a href="held-commands-simulator.html">Next: 3. Try it</a></div></main></body></html>

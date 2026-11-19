@@ -90,6 +90,12 @@ footer a { color:var(--muted); }
 .code-line { display:inline-block; min-width:100%; }
 .code-removed { color:#862b32; background:#fce9eb; }
 .code-added { color:#155534; background:#e1f3e6; }
+.code-copy { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem .75rem; margin:-.3rem 0 1rem; }
+.code-copy button { font:inherit; font-size:.82rem; font-weight:600; color:var(--link); background:var(--paper); border:1px solid var(--link); border-radius:5px; padding:.45rem .7rem; cursor:pointer; }
+.code-copy button:hover { background:var(--accent); }
+.code-copy button:disabled { opacity:.6; cursor:wait; }
+.code-copy [role="status"] { font-size:.82rem; color:var(--ink); }
+.copy-manual { width:100%; min-height:8rem; padding:.6rem; color:var(--ink); background:var(--surface); border:1px solid var(--line); font: .85rem/1.5 Consolas,monospace; }
 
 /* Actual application screenshots; highlights mark the next control to use. */
 .lesson-shot { margin:1rem 0 2rem; }
