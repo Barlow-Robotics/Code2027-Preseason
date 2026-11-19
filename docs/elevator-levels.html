@@ -1,10 +1,34 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Setup · Choose elevator levels</title><link rel="stylesheet" href="walkthrough.css"><script src="copy-code.js" defer></script></head><body>
+<title>Setup · Choose elevator levels</title><link rel="stylesheet" href="walkthrough.css"><script src="copy-code.js" defer></script><script src="levels-preview.js" defer></script></head><body>
 <header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Choose elevator levels</span><span>Draft for review</span></div></div></header>
 <nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elevator-levels.html" aria-current="page">1. Setup</a></li><li><a href="elevator-levels-state.html">2. Levels</a></li><li><a href="elevator-levels-commands.html">3. Commands</a></li><li><a href="elevator-levels-simulator.html">4. Try it</a></li><li><a href="elevator-levels-repeat.html">5. Repeat presses</a></li></ul></div></nav>
-<main class="wrap"><div class="intro"><h1>Setup</h1></div><section><h2>What we will build</h2><p>Tap Y to select a higher level. Tap A to select a lower one.</p>
-<p>We will edit the <strong>elevator</strong>. Both mechanisms are already included.</p></section>
+<main class="wrap"><div class="intro"><h1>Setup</h1></div><section class="levels-preview" data-levels-preview><h2>What are we building?</h2>
+<p><strong>Tap Y to go up a level. Tap A to go down.</strong> The elevator keeps moving after you release.</p>
+<div class="levels-demo-layout"><div class="levels-drawing">
+<svg viewBox="45 15 230 150" role="img" aria-label="Elevator with three targets: BOTTOM at 0 meters, MID at 0.35 meters, TOP at 0.65 meters">
+<path d="M70 48V155M130 48V155M60 155H140" fill="none" stroke="#789086" stroke-width="2"/>
+<circle cx="95" cy="30" r="12.5" fill="#deebf5" stroke="#285f91" stroke-width="2"/>
+<path data-level-cable d="M82.5 30V135" stroke="#96501c" stroke-width="2" fill="none"/>
+<g data-level-marker="2" transform="translate(0 55)"><path d="M65 0H147"/><circle cx="153" r="3"/><text x="162" y="4">TOP · 0.65 m</text></g>
+<g data-level-marker="1" transform="translate(0 91.923)"><path d="M65 0H147"/><circle cx="153" r="3"/><text x="162" y="4">MID · 0.35 m</text></g>
+<g data-level-marker="0" transform="translate(0 135)"><path d="M65 0H147"/><circle cx="153" r="3"/><text x="162" y="4">BOTTOM · 0 m</text></g>
+<g data-level-carriage><rect x="70" y="135" width="60" height="15" fill="#deebf5" stroke="#285f91" stroke-width="2"/></g></svg>
+<p class="levels-readout" role="status" aria-live="polite" data-level-status>Target: BOTTOM · Holding</p></div>
+<div><div class="held-controller">
+<svg viewBox="0 0 260 150" aria-hidden="true">
+<path d="M67 30Q130 14 193 30Q214 38 224 70L240 121Q245 146 224 140L178 112H82L36 140Q15 146 20 121L36 70Q46 38 67 30Z" fill="#eef1ee" stroke="#52635e" stroke-width="3"/>
+<circle cx="72" cy="63" r="18" fill="#52635e"/><circle cx="72" cy="63" r="11" fill="#35473f"/>
+<circle cx="151" cy="103" r="17" fill="#52635e"/><circle cx="151" cy="103" r="10" fill="#35473f"/>
+<path d="M88 93H100V81H112V93H124V105H112V117H100V105H88Z" fill="#52635e"/>
+<circle cx="130" cy="47" r="10" fill="#52635e"/>
+<circle cx="212" cy="65" r="11" fill="#972e36"/><circle cx="168" cy="65" r="11" fill="#225d9c"/><circle cx="190" cy="87" r="11" fill="#24663b"/>
+<g fill="white" font-family="Segoe UI,sans-serif" font-size="13" font-weight="700" text-anchor="middle"><text x="212" y="70">B</text><text x="168" y="70">X</text><text x="190" y="92">A</text></g></svg>
+<button class="held-y" type="button" data-level-up aria-label="Select the next higher elevator level">Y</button><button class="level-a" type="button" data-level-down aria-label="Select the next lower elevator level">A</button></div>
+<p class="levels-controls-note">Tap <kbd>Y</kbd> / <kbd>A</kbd> on your keyboard,<br>or click the controller buttons.</p>
+<button class="held-reset" type="button" data-level-reset>Reset elevator</button></div></div>
+<p class="held-footnote">Preview of the finished lesson. Try another tap before the elevator arrives.</p>
+<noscript><p>Enable JavaScript to try selecting BOTTOM, MID, and TOP.</p></noscript></section>
 <section><h2>Download the code and create your branch</h2>
 <details><summary>Coach: publish before class</summary><p>The starting tag is local only. Publish it and these pages before students begin.</p></details>
 <ol><li>Open GitHub Desktop. Select <strong>Code2027-Preseason</strong> under <strong>Current repository</strong>.</li>

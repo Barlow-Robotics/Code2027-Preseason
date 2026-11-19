@@ -127,6 +127,19 @@ footer a { color:var(--muted); }
 .held-reset { font:inherit; font-size:.85rem; padding:.4rem .7rem; border:1px solid var(--link); border-radius:5px; background:var(--paper); color:var(--link); cursor:pointer; }
 .held-reset:hover { background:var(--accent); }
 .held-preview .held-footnote { font-size:.8rem; color:var(--muted); margin-top:.5rem; }
+.levels-demo-layout { display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; margin:1rem 0; }
+.levels-drawing { flex:1 1 19rem; max-width:24rem; }
+.levels-drawing svg { width:100%; display:block; }
+[data-level-marker] path { stroke:var(--muted); stroke-width:1; stroke-dasharray:3 3; }
+[data-level-marker] circle { fill:var(--paper); stroke:var(--muted); }
+[data-level-marker] text { fill:var(--ink); font:10px "Segoe UI",sans-serif; }
+[data-level-marker].is-target path { stroke:var(--link); stroke-width:2; stroke-dasharray:none; }
+[data-level-marker].is-target circle { fill:var(--link); stroke:var(--link); }
+[data-level-marker].is-target text { font-weight:700; }
+.level-a { position:absolute; left:170px; top:67px; width:40px; height:40px; padding:0; border:2px solid #164326; border-radius:50%; background:#24663b; color:white; font:bold 1rem "Segoe UI",sans-serif; cursor:pointer; touch-action:manipulation; }
+.level-a:hover { background:#164326; }
+.levels-readout { font-size:.9rem; font-weight:600; margin:.3rem 0; }
+.levels-controls-note,.levels-preview .held-footnote { font-size:.85rem; }
 @media(max-width:36rem) { .held-inputs { gap:.3rem; } .held-inputs > div:last-child { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; } }
 
 /* Actual application screenshots; highlights mark the next control to use. */
