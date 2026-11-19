@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Commands · Choose elevator levels</title><link rel="stylesheet" href="walkthrough.css"></head><body>
 <header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Choose elevator levels</span><span>Draft for review</span></div></div></header>
-<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elevator-levels.html">1. Setup</a></li><li><a href="elevator-levels-state.html">2. Levels</a></li><li><a href="elevator-levels-commands.html" aria-current="page">3. Commands</a></li><li><a href="elevator-levels-simulator.html">4. Try it</a></li></ul></div></nav>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elevator-levels.html">1. Setup</a></li><li><a href="elevator-levels-state.html">2. Levels</a></li><li><a href="elevator-levels-commands.html" aria-current="page">3. Commands</a></li><li><a href="elevator-levels-simulator.html">4. Try it</a></li><li><a href="elevator-levels-repeat.html">5. Repeat presses</a></li></ul></div></nav>
 <main class="wrap"><div class="intro"><h1>Commands</h1></div><section id="edit-4"><h2>4. Create commands from the selection</h2>
 <p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
 <p class="code-caption">Before — red marks the code being changed</p><pre data-edit="4" data-side="before"><code><span class="code-line code-removed">    public Command setHeightGoalCommand(double goal) {</span>
@@ -34,7 +34,7 @@
             movementActive = true;
 <span class="code-line code-removed">            setHeightGoal(goal);</span>
         }</code></pre>
-<p>Rename the private command and let it remember a Level instead of a raw height. initialize updates the selection and starts movement together. Replacing an elevator command runs its cleanup before starting the new one. In this draft, a repeated press of the same direction is ignored while that button’s command is still running. Wait for arrival before another same-direction press. The opposite button can interrupt the trip. Whether to allow repeated same-direction presses during travel is still under review.</p>
+<p>Rename the private command and let it remember a Level instead of a raw height. initialize updates the selection and starts movement together. Replacing an elevator command runs its cleanup before starting the new one. We will first bind these movement commands directly to the buttons, then try repeated presses in the simulator.</p>
 <p class="code-caption">After — green marks the added code</p><pre data-edit="5" data-side="after"><code><span class="code-line code-added">    private final class MoveToLevelCommand extends Command {</span>
 <span class="code-line code-added">        private final Level level;</span>
 

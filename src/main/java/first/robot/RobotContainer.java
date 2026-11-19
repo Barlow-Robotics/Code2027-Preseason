@@ -7,6 +7,7 @@ package first.robot;
 import static org.wpilib.units.Units.*;
 
 import org.wpilib.command2.Command;
+import org.wpilib.command2.Commands;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
@@ -112,8 +113,10 @@ public class RobotContainer {
     }
 
     private void configureElevatorBindings() {
-        operator.a().onTrue(elevator.decreaseLevelCommand());
-        operator.y().onTrue(elevator.increaseLevelCommand());
+        operator.a().onTrue(Commands.runOnce(() ->
+            CommandScheduler.getInstance().schedule(elevator.decreaseLevelCommand())));
+        operator.y().onTrue(Commands.runOnce(() ->
+            CommandScheduler.getInstance().schedule(elevator.increaseLevelCommand())));
     }
 
     private void configureArmBindings() {
