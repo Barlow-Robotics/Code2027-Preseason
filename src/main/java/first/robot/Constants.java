@@ -11,6 +11,7 @@ public final class Constants {
 
         // Goal presets used by the operator buttons.
         public static final double LOW_METERS = 0.0;
+        // TODO 1: Choose a slower movement.
         public static final double HIGH_METERS = 0.65;
 
         public static final double GEAR_RATIO = 12.0; // motor turns per drum turn

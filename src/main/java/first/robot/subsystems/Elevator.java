@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+// TODO 3: Import the hold request.
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import first.robot.generated.TunerConstants;
@@ -19,6 +20,7 @@ public final class Elevator extends SubsystemBase {
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
     private double targetMeters = ElevatorConstants.LOW_METERS;
+    // TODO 4: Keep a hold request and activity flag.
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
     private final TelemetryTable telemetry =
         Telemetry.getTable("Elevator");
@@ -30,6 +32,7 @@ public final class Elevator extends SubsystemBase {
         config.Slot0.kV = 2.4;
         config.Slot0.kG = 0.28;
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+        // TODO 2: Use the limits.
         config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
         config.MotionMagic.MotionMagicAcceleration = 6.0;
 
@@ -43,10 +46,13 @@ public final class Elevator extends SubsystemBase {
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
+    // TODO 6: Add the private command class.
+    // TODO 7: Use the new command in the factory.
     public Command setHeightGoalCommand(double goal) {
         return runOnce(() -> setHeightGoal(goal));
     }
 
+    // TODO 5: Add the stop-and-hold helper.
     private void setHeightGoal(double goal) {
         targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
         double goalTurns = targetMeters / ElevatorConstants.METERS_PER_DRUM_TURN;
@@ -57,6 +63,7 @@ public final class Elevator extends SubsystemBase {
     public void periodic() {
         telemetry.log("Target_m", targetMeters);
         double mechanismTurns = motor.getPosition().getValueAsDouble();
+        // TODO 8: Log the command lifetime.
         telemetry.log("Actual_m", mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
     }
 
