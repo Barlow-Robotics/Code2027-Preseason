@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Define the 3 levels · Choose elevator levels</title><link rel="stylesheet" href="walkthrough.css"><script src="copy-code.js" defer></script></head><body>
-<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Choose elevator levels</span><span>Draft for review</span></div></div></header>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Choose elevator levels</span></div></div></header>
 <nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elevator-levels.html">1. Setup</a></li><li><a href="elevator-levels-state.html" aria-current="page">2. Levels</a></li><li><a href="elevator-levels-commands.html">3. Commands</a></li><li><a href="elevator-levels-simulator.html">4. Try it</a></li><li><a href="elevator-levels-repeat.html">5. Repeat presses</a></li></ul></div></nav>
 <main class="wrap"><div class="intro"><h1>Define the 3 levels</h1></div><section><p>To define the levels, we’ll use an <strong>Enum</strong>.</p></section><aside class="concept-break" aria-labelledby="enum-concept"><h2 id="enum-concept">What is an Enum?</h2><p>An enum gives a value a <strong>fixed set of named choices</strong>: BOTTOM, MID, or TOP.</p><h3>Each choice can carry a value</h3><p>We use a <strong>valued enum</strong>: each level stores its height in meters.</p><pre><code>public enum Level {
     BOTTOM(ElevatorConstants.BOTTOM_METERS),
