@@ -10,6 +10,7 @@ public final class Constants {
         public static final int MOTOR_CAN_ID = 20;
 
         // Goal presets used by the operator buttons.
+        // TODO 1: Name three destinations.
         public static final double LOW_METERS = 0.0;
         public static final double HIGH_METERS = 0.65;
 

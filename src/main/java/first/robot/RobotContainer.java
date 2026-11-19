@@ -6,6 +6,7 @@ package first.robot;
 
 import static org.wpilib.units.Units.*;
 
+// TODO 10: Import the command builders.
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.button.CommandXboxController;
@@ -22,6 +23,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
 import first.robot.Constants.ArmConstants;
+// TODO 9: Remove the unused import.
 import first.robot.Constants.ElevatorConstants;
 import first.robot.generated.TunerConstants;
 import first.robot.subsystems.Arm;
@@ -113,6 +115,8 @@ public class RobotContainer {
     }
 
     private void configureElevatorBindings() {
+        // TODO 8: Advance one level per press.
+        // TODO 11: Start a fresh movement on each press.
         operator.a().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));
         operator.y().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));
     }

@@ -16,9 +16,11 @@ import first.robot.generated.TunerConstants;
 import first.robot.Constants.ElevatorConstants;
 
 /** Desktop elevator for the preseason controls lesson. */
+// TODO 2: Describe the levels with an enum.
 public final class Elevator extends SubsystemBase {
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+    // TODO 3: Remember the selection.
     private double targetMeters = ElevatorConstants.LOW_METERS;
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
     private final PositionVoltage holdRequest = new PositionVoltage(0.0);
@@ -48,10 +50,12 @@ public final class Elevator extends SubsystemBase {
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
+    // TODO 4: Create commands from the selection.
     public Command setHeightGoalCommand(double goal) {
         return new MoveToHeightCommand(goal);
     }
 
+    // TODO 5: Start a move to a level.
     private final class MoveToHeightCommand extends Command {
         private final double goal;
 
@@ -66,6 +70,7 @@ public final class Elevator extends SubsystemBase {
             setHeightGoal(goal);
         }
 
+        // TODO 6: Finish when we arrive.
         @Override
         public boolean isFinished() {
             return false;
@@ -95,6 +100,7 @@ public final class Elevator extends SubsystemBase {
         telemetry.log("Target_m", targetMeters);
         double mechanismTurns = motor.getPosition().getValueAsDouble();
         telemetry.log("Actual_m", mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
+        // TODO 7: Show selection separately from position.
         telemetry.log("MovementActive", movementActive);
         telemetry.log("Velocity_mps", motor.getVelocity().getValueAsDouble()
             * ElevatorConstants.METERS_PER_DRUM_TURN);
