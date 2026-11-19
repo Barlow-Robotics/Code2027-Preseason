@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setup · Move while held</title><link rel="stylesheet" href="walkthrough.css"><script src="copy-code.js" defer></script><script src="held-preview.js" defer></script></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Move while held</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="held-commands.html" aria-current="page">1. Setup</a></li><li><a href="held-commands-lifecycle.html">2. Command lifetime</a></li><li><a href="held-commands-simulator.html">3. Try it</a></li></ul></div></nav>
+<main class="wrap"><div class="intro"><h1>Setup</h1></div><section class="held-preview" data-held-preview><h2>What are we building?</h2>
+<p><strong>Hold Y for a moment, then let go.</strong> Watch what each elevator does.</p>
+<div class="held-comparison"><div class="held-panel" data-preview-panel="before"><h3>Before</h3><p>One press sends it to the top.</p>
+<svg viewBox="40 15 120 150" role="img" aria-label="Elevator: before">
+<path d="M70 48V155M130 48V155M60 155H140" fill="none" stroke="#789086" stroke-width="2"/>
+<circle cx="95" cy="30" r="12.5" fill="#deebf5" stroke="#285f91" stroke-width="2"/>
+<path data-cable d="M82.5 30V135" stroke="#96501c" stroke-width="2" fill="none"/>
+<g data-carriage><rect x="70" y="135" width="60" height="15" fill="#deebf5" stroke="#285f91" stroke-width="2"/></g></svg>
+<p class="held-status" role="status" aria-live="polite">Ready</p></div><div class="held-panel" data-preview-panel="after"><h3>After</h3><p>Release the button to stop and hold.</p>
+<svg viewBox="40 15 120 150" role="img" aria-label="Elevator: after">
+<path d="M70 48V155M130 48V155M60 155H140" fill="none" stroke="#789086" stroke-width="2"/>
+<circle cx="95" cy="30" r="12.5" fill="#deebf5" stroke="#285f91" stroke-width="2"/>
+<path data-cable d="M82.5 30V135" stroke="#96501c" stroke-width="2" fill="none"/>
+<g data-carriage><rect x="70" y="135" width="60" height="15" fill="#deebf5" stroke="#285f91" stroke-width="2"/></g></svg>
+<p class="held-status" role="status" aria-live="polite">Ready</p></div></div>
+<div class="held-inputs"><div class="held-controller">
+<svg viewBox="0 0 260 150" aria-hidden="true">
+<path d="M67 30Q130 14 193 30Q214 38 224 70L240 121Q245 146 224 140L178 112H82L36 140Q15 146 20 121L36 70Q46 38 67 30Z" fill="#eef1ee" stroke="#52635e" stroke-width="3"/>
+<circle cx="72" cy="63" r="18" fill="#52635e"/><circle cx="72" cy="63" r="11" fill="#35473f"/>
+<circle cx="151" cy="103" r="17" fill="#52635e"/><circle cx="151" cy="103" r="10" fill="#35473f"/>
+<path d="M88 93H100V81H112V93H124V105H112V117H100V105H88Z" fill="#52635e"/>
+<circle cx="130" cy="47" r="10" fill="#52635e"/>
+<circle cx="212" cy="65" r="11" fill="#972e36"/><circle cx="168" cy="65" r="11" fill="#225d9c"/><circle cx="190" cy="87" r="11" fill="#24663b"/>
+<g fill="white" font-family="Segoe UI,sans-serif" font-size="13" font-weight="700" text-anchor="middle"><text x="212" y="70">B</text><text x="168" y="70">X</text><text x="190" y="92">A</text></g></svg>
+<button class="held-y" type="button" data-hold-y aria-label="Hold Y to raise the elevators; release to compare" aria-pressed="false">Y</button></div>
+<div><p>Hold <kbd>Y</kbd> on your keyboard,<br>or click and hold the yellow Y button.</p><button class="held-reset" type="button" data-preview-reset>Reset elevators</button></div></div>
+<p class="held-footnote">Behavior preview. In the simulator, expect a little settling after release.</p>
+<noscript><p>Enable JavaScript to try the preview. Before: movement continues after release. After: the elevator stops and holds.</p></noscript></section><section data-copy-practice data-expected-code="public class Elevator {
+    // Elevator target, in meters.
+    double targetMeters = 0.65;
+    boolean movementActive = false;
+}"><h2>New in this tutorial: copying code</h2><p><strong>Copy added code</strong> copies just the green lines, including their indentation. Try adding them inside this example class.</p>
+<pre><code>public class Elevator {
+<span class="code-line code-added">    // Elevator target, in meters.</span>
+<span class="code-line code-added">    double targetMeters = 0.65;</span>
+    boolean movementActive = false;
+}</code></pre>
+<div class="code-copy"><button type="button" data-copy-code="    // Elevator target, in meters.
+    double targetMeters = 0.65;" aria-label="Copy the practice code">Copy added code</button><span role="status" aria-live="polite"></span></div>
+<ol><li>Click <strong>Copy added code</strong>.</li><li>Find the <strong>blank line just after the opening brace</strong>. It already has four spaces. Put your cursor at the very beginning, <strong>before those spaces</strong>.</li><li>Press <kbd>Ctrl</kbd> + <kbd>V</kbd>. Keep the existing code around it.</li></ol><p><strong>Hint:</strong> try double-clicking in the whitespace to select it. When you paste, it will replace the selection.</p>
+<label for="copy-practice-input"><strong>Add the new lines here</strong></label>
+<textarea id="copy-practice-input" class="copy-practice-input" rows="7" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="copy-practice-status">public class Elevator {
+    
+    boolean movementActive = false;
+}</textarea>
+<p id="copy-practice-status" data-practice-status role="status" aria-live="polite"></p>
+<button type="button" class="practice-reset-link" data-practice-reset hidden>Click here to reset the test box.</button>
+<p>Use the same steps in VS Code. Replacing old code? Select those whole lines, including their leading spaces, before pasting.</p></section>
+<section><h2>Download the code and create your branch</h2>
+<ol><li>Open GitHub Desktop. Select <strong>Code2027-Preseason</strong> under <strong>Current repository</strong>.</li>
+<li>Save and commit your current work before switching branches.</li>
+<li>Click <strong>Fetch origin</strong> to download the list of branches.</li>
+<li>Click <strong>Current branch</strong>. Search for <code>walkthrough/2</code> and select it.</li>
+<li>Check that <strong>Current branch</strong> says <code>walkthrough/2</code>. If you see <strong>Pull origin</strong>, click it.</li>
+<li>Open <strong>Current branch → New branch</strong>. Name your working branch <code>lab/your-name-held-commands</code>, using your own name.</li>
+<li>Under <strong>Create branch based on…</strong>, choose <code>walkthrough/2</code>. Click <strong>Create branch</strong>.</li>
+<li>Open the <strong>Code2027-Preseason</strong> project using WPILib 2027 VS Code. Remember to open the top-level folder.</li></ol>
+
+<p>The walkthrough branch contains the TODOs. Your working branch is where you save your edits.</p></section>
+<section><h2>Before editing</h2><ul><li><kbd>Alt</kbd> + <kbd>Tab</kbd>: switch between this page and VS Code.</li><li><kbd>Ctrl</kbd> + <kbd>S</kbd>: save your file.</li><li>Find the numbered TODO comment, then make the code match “After.” Remove that TODO as you finish; keep the later TODOs.</li></ul><p>Old code may show red underlines while we replace it. We will define new classes and methods before using them.</p></section>
+<div class="lesson-next"><a href="index.html">Previous: All walkthroughs</a><a href="held-commands-lifecycle.html">Next: 2. Command lifetime</a></div></main></body></html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Define the 3 levels · Choose elevator levels</title><link rel="stylesheet" href="walkthrough.css"><script src="copy-code.js" defer></script></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Choose elevator levels</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elevator-levels.html">1. Setup</a></li><li><a href="elevator-levels-state.html" aria-current="page">2. Levels</a></li><li><a href="elevator-levels-commands.html">3. Commands</a></li><li><a href="elevator-levels-simulator.html">4. Try it</a></li><li><a href="elevator-levels-repeat.html">5. Repeat presses</a></li></ul></div></nav>
+<main class="wrap"><div class="intro"><h1>Define the 3 levels</h1></div><section><p>To define the levels, we’ll use an <strong>Enum</strong>.</p></section><aside class="concept-break" aria-labelledby="enum-concept"><h2 id="enum-concept">What is an Enum?</h2><p>An enum gives a value a <strong>fixed set of named choices</strong>: BOTTOM, MID, or TOP.</p><h3>Each choice can carry a value</h3><p>We use a <strong>valued enum</strong>: each level stores its height in meters.</p><pre><code>public enum Level {
+    BOTTOM(ElevatorConstants.BOTTOM_METERS),
+    MID(ElevatorConstants.MID_METERS),
+    TOP(ElevatorConstants.TOP_METERS);
+
+    private final double heightMeters;
+
+    Level(double heightMeters) {
+        this.heightMeters = heightMeters;
+    }
+}</code></pre><ul><li><code>MID(...)</code> passes MID’s height to the enum’s <strong>constructor</strong>—the setup code for that choice.</li><li><code>this.heightMeters = heightMeters</code> saves that height inside the choice.</li><li><code>level.heightMeters</code> reads the height for the selected level.</li></ul><p>We choose a name like MID; the movement code uses its stored height. Selecting MID does not mean we have arrived.</p><p class="concept-caption">Read this example; you’ll add the full version, including increase and decrease, below.</p></aside><section id="edit-1"><h2>1. Name three destinations</h2>
+<p>Open <code>src/main/java/first/robot/Constants.java</code>. <strong>Find TODO 1:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="1" data-side="before"><code>        // Goal presets used by the operator buttons.
+<span class="code-line code-removed">        // TODO 1: Name three destinations.</span>
+<span class="code-line code-removed">        public static final double LOW_METERS = 0.0;</span>
+<span class="code-line code-removed">        public static final double HIGH_METERS = 0.65;</span>
+</code></pre>
+<p><strong>Replace the elevator presets. Leave ArmConstants alone.</strong></p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="1" data-side="after"><code>        // Goal presets used by the operator buttons.
+<span class="code-line code-added">        public static final double BOTTOM_METERS = 0.0;</span>
+<span class="code-line code-added">        public static final double MID_METERS = 0.35;</span>
+<span class="code-line code-added">        public static final double TOP_METERS = 0.65;</span>
+<span class="code-line code-added">        public static final double POSITION_TOLERANCE_METERS = 0.01;</span>
+<span class="code-line code-added">        public static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.02;</span>
+</code></pre>
+<div class="code-copy"><button type="button" data-copy-code="        public static final double BOTTOM_METERS = 0.0;
+        public static final double MID_METERS = 0.35;
+        public static final double TOP_METERS = 0.65;
+        public static final double POSITION_TOLERANCE_METERS = 0.01;
+        public static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.02;" aria-label="Copy added code for Name three destinations">Copy added code</button><span role="status" aria-live="polite"></span></div>
+<ul><li>BOTTOM = 0 m. MID = 0.35 m. TOP = 0.65 m.</li><li>Arrived means within 1 cm of the goal AND moving slower than 2 cm/s.</li></ul></section><section id="edit-2"><h2>2. Describe the levels with an enum</h2>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find TODO 2:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="2" data-side="before"><code>/** Desktop elevator for the preseason controls lesson. */
+<span class="code-line code-removed">// TODO 2: Describe the levels with an enum.</span>
+public final class Elevator extends SubsystemBase {
+    private final ElevatorSim sim = new ElevatorSim();</code></pre>
+<p><strong>Add Level just inside the Elevator class, above sim.</strong></p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="2" data-side="after"><code>/** Desktop elevator for the preseason controls lesson. */
+public final class Elevator extends SubsystemBase {
+<span class="code-line code-added">    public enum Level {</span>
+<span class="code-line code-added">        BOTTOM(ElevatorConstants.BOTTOM_METERS),</span>
+<span class="code-line code-added">        MID(ElevatorConstants.MID_METERS),</span>
+<span class="code-line code-added">        TOP(ElevatorConstants.TOP_METERS);</span>
+<span class="code-line code-added"></span>
+<span class="code-line code-added">        private final double heightMeters;</span>
+<span class="code-line code-added"></span>
+<span class="code-line code-added">        Level(double heightMeters) {</span>
+<span class="code-line code-added">            this.heightMeters = heightMeters;</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added"></span>
+<span class="code-line code-added">        public Level increase() {</span>
+<span class="code-line code-added">            return switch (this) {</span>
+<span class="code-line code-added">                case BOTTOM -&gt; MID;</span>
+<span class="code-line code-added">                case MID, TOP -&gt; TOP;</span>
+<span class="code-line code-added">            };</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added"></span>
+<span class="code-line code-added">        public Level decrease() {</span>
+<span class="code-line code-added">            return switch (this) {</span>
+<span class="code-line code-added">                case TOP -&gt; MID;</span>
+<span class="code-line code-added">                case MID, BOTTOM -&gt; BOTTOM;</span>
+<span class="code-line code-added">            };</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added">    }</span>
+<span class="code-line code-added"></span>
+    private final ElevatorSim sim = new ElevatorSim();</code></pre>
+<div class="code-copy"><button type="button" data-copy-code="    public enum Level {
+        BOTTOM(ElevatorConstants.BOTTOM_METERS),
+        MID(ElevatorConstants.MID_METERS),
+        TOP(ElevatorConstants.TOP_METERS);
+
+        private final double heightMeters;
+
+        Level(double heightMeters) {
+            this.heightMeters = heightMeters;
+        }
+
+        public Level increase() {
+            return switch (this) {
+                case BOTTOM -&gt; MID;
+                case MID, TOP -&gt; TOP;
+            };
+        }
+
+        public Level decrease() {
+            return switch (this) {
+                case TOP -&gt; MID;
+                case MID, BOTTOM -&gt; BOTTOM;
+            };
+        }
+    }" aria-label="Copy added code for Describe the levels with an enum">Copy added code</button><span role="status" aria-live="polite"></span></div>
+<ul><li>Each level stores its height.</li><li>increase() and decrease() return the neighboring level.</li><li>At TOP or BOTTOM, another step in that direction stays there.</li></ul></section><section id="edit-3"><h2>3. Remember the selection</h2>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find TODO 3:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="3" data-side="before"><code>    private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+<span class="code-line code-removed">    // TODO 3: Remember the selection.</span>
+<span class="code-line code-removed">    private double targetMeters = ElevatorConstants.LOW_METERS;</span>
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);</code></pre>
+<p><strong>Replace targetMeters with these two fields.</strong></p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="3" data-side="after"><code>    private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+<span class="code-line code-added">    private Level selectedLevel = Level.BOTTOM;</span>
+<span class="code-line code-added">    private double targetMeters = ElevatorConstants.BOTTOM_METERS;</span>
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);</code></pre>
+<div class="code-copy"><button type="button" data-copy-code="    private Level selectedLevel = Level.BOTTOM;
+    private double targetMeters = ElevatorConstants.BOTTOM_METERS;" aria-label="Copy added code for Remember the selection">Copy added code</button><span role="status" aria-live="polite"></span></div>
+<ul><li>selectedLevel: the destination we last requested.</li><li>targetMeters: the motor’s current target, including a hold position.</li><li>Neither tells us where the elevator actually is. Read Actual_m for that.</li></ul></section>
+<div class="lesson-next"><a href="elevator-levels.html">Previous: 1. Setup</a><a href="elevator-levels-commands.html">Next: 3. Commands</a></div></main></body></html>
