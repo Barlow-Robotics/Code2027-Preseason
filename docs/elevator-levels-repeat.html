@@ -4,21 +4,31 @@
 <header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Choose elevator levels</span><span>Draft for review</span></div></div></header>
 <nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elevator-levels.html">1. Setup</a></li><li><a href="elevator-levels-state.html">2. Levels</a></li><li><a href="elevator-levels-commands.html">3. Commands</a></li><li><a href="elevator-levels-simulator.html">4. Try it</a></li><li><a href="elevator-levels-repeat.html" aria-current="page">5. Repeat presses</a></li></ul></div></nav>
 <main class="wrap"><div class="intro"><h1>Repeat presses</h1></div><section><p>Keep the elevator code. Change the buttons to create a fresh movement on each press.</p></section><section id="edit-10"><h2>10. Import the command builders</h2>
-<p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find this code:</strong></p>
-<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="10" data-side="before"><code>import org.wpilib.command2.Command;</code></pre>
+<p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find TODO 10:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="10" data-side="before"><code>
+<span class="code-line code-removed">// TODO 10: Import the command builders.</span>
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;</code></pre>
 <p><strong>Add Commands beside the existing Command import.</strong></p>
-<p class="code-caption">After — green marks the added code</p><pre data-edit="10" data-side="after"><code>import org.wpilib.command2.Command;
-<span class="code-line code-added">import org.wpilib.command2.Commands;</span></code></pre>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="10" data-side="after"><code>
+import org.wpilib.command2.Command;
+<span class="code-line code-added">import org.wpilib.command2.Commands;</span>
+import org.wpilib.command2.CommandScheduler;</code></pre>
 <div class="code-copy"><button type="button" data-copy-code="import org.wpilib.command2.Commands;" aria-label="Copy added code for Import the command builders">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>Commands.runOnce builds a command that performs one action, then finishes.</li></ul></section><section id="edit-11"><h2>11. Start a fresh movement on each press</h2>
-<p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find this code:</strong></p>
-<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="11" data-side="before"><code><span class="code-line code-removed">        operator.a().onTrue(elevator.decreaseLevelCommand());</span>
-<span class="code-line code-removed">        operator.y().onTrue(elevator.increaseLevelCommand());</span></code></pre>
+<p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find TODO 11:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="11" data-side="before"><code>    private void configureElevatorBindings() {
+<span class="code-line code-removed">        // TODO 11: Start a fresh movement on each press.</span>
+<span class="code-line code-removed">        operator.a().onTrue(elevator.decreaseLevelCommand());</span>
+<span class="code-line code-removed">        operator.y().onTrue(elevator.increaseLevelCommand());</span>
+    }</code></pre>
 <p><strong>Replace the two elevator button bindings.</strong></p>
-<p class="code-caption">After — green marks the added code</p><pre data-edit="11" data-side="after"><code><span class="code-line code-added">        operator.a().onTrue(Commands.runOnce(() -&gt;</span>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="11" data-side="after"><code>    private void configureElevatorBindings() {
+<span class="code-line code-added">        operator.a().onTrue(Commands.runOnce(() -&gt;</span>
 <span class="code-line code-added">            CommandScheduler.getInstance().schedule(elevator.decreaseLevelCommand())));</span>
 <span class="code-line code-added">        operator.y().onTrue(Commands.runOnce(() -&gt;</span>
-<span class="code-line code-added">            CommandScheduler.getInstance().schedule(elevator.increaseLevelCommand())));</span></code></pre>
+<span class="code-line code-added">            CommandScheduler.getInstance().schedule(elevator.increaseLevelCommand())));</span>
+    }</code></pre>
 <div class="code-copy"><button type="button" data-copy-code="        operator.a().onTrue(Commands.runOnce(() -&gt;
             CommandScheduler.getInstance().schedule(elevator.decreaseLevelCommand())));
         operator.y().onTrue(Commands.runOnce(() -&gt;

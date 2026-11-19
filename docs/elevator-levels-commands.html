@@ -4,12 +4,15 @@
 <header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Choose elevator levels</span><span>Draft for review</span></div></div></header>
 <nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elevator-levels.html">1. Setup</a></li><li><a href="elevator-levels-state.html">2. Levels</a></li><li><a href="elevator-levels-commands.html" aria-current="page">3. Commands</a></li><li><a href="elevator-levels-simulator.html">4. Try it</a></li><li><a href="elevator-levels-repeat.html">5. Repeat presses</a></li></ul></div></nav>
 <main class="wrap"><div class="intro"><h1>Commands</h1></div><section id="edit-4"><h2>4. Create commands from the selection</h2>
-<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
-<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="4" data-side="before"><code><span class="code-line code-removed">    public Command setHeightGoalCommand(double goal) {</span>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find TODO 4:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="4" data-side="before"><code>
+<span class="code-line code-removed">    // TODO 4: Create commands from the selection.</span>
+<span class="code-line code-removed">    public Command setHeightGoalCommand(double goal) {</span>
 <span class="code-line code-removed">        return new MoveToHeightCommand(goal);</span>
     }</code></pre>
 <p><strong>Replace the old factory with these three methods.</strong></p>
-<p class="code-caption">After — green marks the added code</p><pre data-edit="4" data-side="after"><code><span class="code-line code-added">    public Command goToLevelCommand(Level level) {</span>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="4" data-side="after"><code>
+<span class="code-line code-added">    public Command goToLevelCommand(Level level) {</span>
 <span class="code-line code-added">        return new MoveToLevelCommand(level);</span>
     }
 <span class="code-line code-added"></span>
@@ -29,8 +32,10 @@
         return defer(() -&gt; goToLevelCommand(selectedLevel.decrease()));
     }" aria-label="Copy added code for Create commands from the selection, block 2">Copy block 2</button><span role="status" aria-live="polite"></span></div>
 <ul><li>goToLevelCommand creates a movement command.</li><li>The two helpers choose a neighboring level.</li><li>defer means “wait until this command starts.” The arrow supplies the code to run then.</li></ul></section><section id="edit-5"><h2>5. Start a move to a level</h2>
-<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
-<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="5" data-side="before"><code><span class="code-line code-removed">    private final class MoveToHeightCommand extends Command {</span>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find TODO 5:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="5" data-side="before"><code>
+<span class="code-line code-removed">    // TODO 5: Start a move to a level.</span>
+<span class="code-line code-removed">    private final class MoveToHeightCommand extends Command {</span>
 <span class="code-line code-removed">        private final double goal;</span>
 
 <span class="code-line code-removed">        private MoveToHeightCommand(double goal) {</span>
@@ -44,7 +49,8 @@
 <span class="code-line code-removed">            setHeightGoal(goal);</span>
         }</code></pre>
 <p><strong>Rename the private command and give it a Level instead of a height.</strong></p>
-<p class="code-caption">After — green marks the added code</p><pre data-edit="5" data-side="after"><code><span class="code-line code-added">    private final class MoveToLevelCommand extends Command {</span>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="5" data-side="after"><code>
+<span class="code-line code-added">    private final class MoveToLevelCommand extends Command {</span>
 <span class="code-line code-added">        private final Level level;</span>
 
 <span class="code-line code-added">        private MoveToLevelCommand(Level level) {</span>
@@ -62,13 +68,16 @@
         private final Level level;" aria-label="Copy added code for Start a move to a level, block 1">Copy block 1</button><button type="button" data-copy-code="        private MoveToLevelCommand(Level level) {
             this.level = level;" aria-label="Copy added code for Start a move to a level, block 2">Copy block 2</button><button type="button" data-copy-code="            selectedLevel = level;" aria-label="Copy added code for Start a move to a level, block 3">Copy block 3</button><button type="button" data-copy-code="            setHeightGoal(level.heightMeters);" aria-label="Copy added code for Start a move to a level, block 4">Copy block 4</button><span role="status" aria-live="polite"></span></div>
 <ul><li>initialize remembers the selected level and starts the trip.</li><li>When a new command replaces an old one, the old command runs end first.</li></ul></section><section id="edit-6"><h2>6. Finish when we arrive</h2>
-<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
-<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="6" data-side="before"><code>        @Override
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find TODO 6:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="6" data-side="before"><code>
+<span class="code-line code-removed">        // TODO 6: Finish when we arrive.</span>
+        @Override
         public boolean isFinished() {
 <span class="code-line code-removed">            return false;</span>
         }</code></pre>
 <p><strong>Replace isFinished. Keep end and stopAndHold unchanged.</strong></p>
-<p class="code-caption">After — green marks the added code</p><pre data-edit="6" data-side="after"><code>        @Override
+<p class="code-caption">After — green marks the added code</p><pre data-edit="6" data-side="after"><code>
+        @Override
         public boolean isFinished() {
 <span class="code-line code-added">            double heightMeters = motor.getPosition().getValueAsDouble()</span>
 <span class="code-line code-added">                * ElevatorConstants.METERS_PER_DRUM_TURN;</span>
@@ -88,28 +97,44 @@
                 &amp;&amp; Math.abs(velocityMetersPerSecond)
                     &lt; ElevatorConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;" aria-label="Copy added code for Finish when we arrive">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>Math.abs gives the size of the error, ignoring its sign.</li><li>&amp;&amp; means both checks must pass: close enough AND slow enough.</li><li>Finishing also calls end, so the elevator holds where it arrived.</li></ul></section><section id="edit-7"><h2>7. Show selection separately from position</h2>
-<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
-<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="7" data-side="before"><code>        telemetry.log(&quot;MovementActive&quot;, movementActive);</code></pre>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find TODO 7:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="7" data-side="before"><code>        telemetry.log(&quot;Actual_m&quot;, mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
+<span class="code-line code-removed">        // TODO 7: Show selection separately from position.</span>
+        telemetry.log(&quot;MovementActive&quot;, movementActive);
+        telemetry.log(&quot;Velocity_mps&quot;, motor.getVelocity().getValueAsDouble()</code></pre>
 <p><strong>Add these two log entries in periodic.</strong></p>
-<p class="code-caption">After — green marks the added code</p><pre data-edit="7" data-side="after"><code>        telemetry.log(&quot;MovementActive&quot;, movementActive);
+<p class="code-caption">After — green marks the added code</p><pre data-edit="7" data-side="after"><code>        telemetry.log(&quot;Actual_m&quot;, mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
+        telemetry.log(&quot;MovementActive&quot;, movementActive);
 <span class="code-line code-added">        telemetry.log(&quot;SelectedLevel&quot;, selectedLevel.name());</span>
-<span class="code-line code-added">        telemetry.log(&quot;SelectedHeight_m&quot;, selectedLevel.heightMeters);</span></code></pre>
+<span class="code-line code-added">        telemetry.log(&quot;SelectedHeight_m&quot;, selectedLevel.heightMeters);</span>
+        telemetry.log(&quot;Velocity_mps&quot;, motor.getVelocity().getValueAsDouble()</code></pre>
 <div class="code-copy"><button type="button" data-copy-code="        telemetry.log(&quot;SelectedLevel&quot;, selectedLevel.name());
         telemetry.log(&quot;SelectedHeight_m&quot;, selectedLevel.heightMeters);" aria-label="Copy added code for Show selection separately from position">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>SelectedLevel shows BOTTOM, MID, or TOP.</li><li>SelectedHeight_m lets us graph that destination.</li></ul></section><section id="edit-8"><h2>8. Advance one level per press</h2>
-<p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find this code:</strong></p>
-<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="8" data-side="before"><code><span class="code-line code-removed">        operator.a().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));</span>
-<span class="code-line code-removed">        operator.y().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));</span></code></pre>
+<p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find TODO 8:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="8" data-side="before"><code>    private void configureElevatorBindings() {
+<span class="code-line code-removed">        // TODO 8: Advance one level per press.</span>
+        // TODO 11: Start a fresh movement on each press.
+<span class="code-line code-removed">        operator.a().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));</span>
+<span class="code-line code-removed">        operator.y().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));</span>
+    }</code></pre>
 <p><strong>In configureElevatorBindings, use these onTrue bindings.</strong></p>
-<p class="code-caption">After — green marks the added code</p><pre data-edit="8" data-side="after"><code><span class="code-line code-added">        operator.a().onTrue(elevator.decreaseLevelCommand());</span>
-<span class="code-line code-added">        operator.y().onTrue(elevator.increaseLevelCommand());</span></code></pre>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="8" data-side="after"><code>    private void configureElevatorBindings() {
+        // TODO 11: Start a fresh movement on each press.
+<span class="code-line code-added">        operator.a().onTrue(elevator.decreaseLevelCommand());</span>
+<span class="code-line code-added">        operator.y().onTrue(elevator.increaseLevelCommand());</span>
+    }</code></pre>
 <div class="code-copy"><button type="button" data-copy-code="        operator.a().onTrue(elevator.decreaseLevelCommand());
         operator.y().onTrue(elevator.increaseLevelCommand());" aria-label="Copy added code for Advance one level per press">Copy added code</button><span role="status" aria-live="polite"></span></div>
 <ul><li>Tap Y to increase. Tap A to decrease.</li><li>Releasing the button leaves the movement command running until arrival.</li></ul></section><section id="edit-9"><h2>9. Remove the unused import</h2>
-<p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find this code:</strong></p>
-<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="9" data-side="before"><code><span class="code-line code-removed">import first.robot.Constants.ElevatorConstants;</span></code></pre>
+<p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find TODO 9:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="9" data-side="before"><code>import first.robot.Constants.ArmConstants;
+<span class="code-line code-removed">// TODO 9: Remove the unused import.</span>
+<span class="code-line code-removed">import first.robot.Constants.ElevatorConstants;</span>
+import first.robot.generated.TunerConstants;</code></pre>
 <p><strong>Delete this import. Keep the ArmConstants import.</strong></p>
-<p class="code-caption">After — green marks the added code</p><pre data-edit="9" data-side="after"><code></code></pre>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="9" data-side="after"><code>import first.robot.Constants.ArmConstants;
+import first.robot.generated.TunerConstants;</code></pre>
 
 <ul><li>RobotContainer no longer chooses elevator heights.</li></ul></section>
 <div class="lesson-next"><a href="elevator-levels-state.html">Previous: 2. Levels</a><a href="elevator-levels-simulator.html">Next: 4. Try it</a></div></main></body></html>
