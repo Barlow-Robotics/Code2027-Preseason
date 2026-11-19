@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setup · Choose elevator levels</title><link rel="stylesheet" href="walkthrough.css"></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Choose elevator levels</span><span>Draft for review</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elevator-levels.html" aria-current="page">1. Setup</a></li><li><a href="elevator-levels-state.html">2. Levels</a></li><li><a href="elevator-levels-commands.html">3. Commands</a></li><li><a href="elevator-levels-simulator.html">4. Try it</a></li></ul></div></nav>
+<main class="wrap"><div class="intro"><h1>Setup</h1></div><section><h2>What we will change</h2><p>We will replace the two held-button controls with three named destinations: BOTTOM, MID, and TOP. Each tap selects the next destination. A movement command stays running until arrival, and interruption still replaces the old target with a hold.</p>
+<p>This lesson uses the <strong>elevator</strong>. Both mechanisms are already present in the starting code. Leave the arm code unchanged.</p></section>
+<section><h2>Download the code and create your branch</h2>
+<p><strong>Coach preview:</strong> the starting tag below exists locally but has not been published. Publish the starting tags and lesson pages before students follow these download steps.</p>
+<ol><li>Open GitHub Desktop. Select <strong>Code2027-Preseason</strong> under <strong>Current repository</strong>.</li>
+<li>Save and commit any work you want to keep on your current branch before switching. Under <strong>Current branch</strong>, choose <strong>main</strong>.</li>
+<li>Click <strong>Fetch origin</strong>. If it changes to <strong>Pull origin</strong>, click that too.</li>
+<li>Open <strong>History</strong>. Find the commit named <strong>Teach held elevator commands with interruption cleanup</strong>, marked with tag <code>walkthrough-03-start</code>. Its short identifier is <code>55e5e5e</code>. This gives everyone the same starting code even after main changes.</li>
+<li>Right-click that commit and choose <strong>Create branch from commit</strong>. Name it <code>lab/your-name-elevator-levels</code>, replacing <code>your-name</code> with your name. Click <strong>Create branch</strong>.</li>
+<li>Open the <strong>Code2027-Preseason</strong> project using WPILib 2027 VS Code. Remember to open the top-level folder.</li></ol>
+<p><strong>Screenshot placeholder:</strong> GitHub Desktop with <code>walkthrough-03-start</code> selected and the Create branch from commit menu open. Capture after publication.</p></section>
+<section><h2>Before editing</h2><p>Keep this page in your browser and VS Code open beside it if your screen has room. Otherwise, use <kbd>Alt</kbd>+<kbd>Tab</kbd> to switch between them. Each change below shows the existing code first, then the edited code. Save each file with <kbd>Ctrl</kbd>+<kbd>S</kbd>.</p>
+<p>These lessons edit existing working code; there are no numbered TODO comments to fill in. If a “Before” snippet does not match, check your starting branch before continuing. Temporary red underlines are expected while related edits are incomplete.</p></section>
+<div class="lesson-next"><a href="index.html">Previous: All walkthroughs</a><a href="elevator-levels-state.html">Next: 2. Levels</a></div></main></body></html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Levels · Choose elevator levels</title><link rel="stylesheet" href="walkthrough.css"></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Choose elevator levels</span><span>Draft for review</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elevator-levels.html">1. Setup</a></li><li><a href="elevator-levels-state.html" aria-current="page">2. Levels</a></li><li><a href="elevator-levels-commands.html">3. Commands</a></li><li><a href="elevator-levels-simulator.html">4. Try it</a></li></ul></div></nav>
+<main class="wrap"><div class="intro"><h1>Levels</h1></div><section><p>Y will increase the selected level; A will decrease it. At either end, another press stays at that end. Selection describes where we asked to go, not where we are now.</p><p><strong>BOTTOM (0 m) → MID (0.35 m) → TOP (0.65 m)</strong></p></section><section id="edit-1"><h2>1. Name three destinations</h2>
+<p>Open <code>src/main/java/first/robot/Constants.java</code>. <strong>Find this code:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="1" data-side="before"><code><span class="code-line code-removed">        public static final double LOW_METERS = 0.0;</span>
+<span class="code-line code-removed">        public static final double HIGH_METERS = 0.65;</span></code></pre>
+<p>In Constants.java, replace the two elevator presets with three heights and two arrival tolerances. Leave ArmConstants alone. We will consider the elevator arrived when it is within 1 cm of the destination and moving slower than 2 cm per second. A position check alone could finish while the mechanism is passing through the destination.</p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="1" data-side="after"><code><span class="code-line code-added">        public static final double BOTTOM_METERS = 0.0;</span>
+<span class="code-line code-added">        public static final double MID_METERS = 0.35;</span>
+<span class="code-line code-added">        public static final double TOP_METERS = 0.65;</span>
+<span class="code-line code-added">        public static final double POSITION_TOLERANCE_METERS = 0.01;</span>
+<span class="code-line code-added">        public static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.02;</span></code></pre></section><section id="edit-2"><h2>2. Describe the levels with an enum</h2>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="2" data-side="before"><code>public final class Elevator extends SubsystemBase {
+    private final ElevatorSim sim = new ElevatorSim();</code></pre>
+<p>In Elevator.java, insert this enum immediately inside the class, above the sim field. An enum gives us a fixed set of named values. Each value carries its height. increase() and decrease() return a value; they do not change the elevator. The switch spells out each transition. Increasing TOP stays at TOP, and decreasing BOTTOM stays at BOTTOM.</p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="2" data-side="after"><code>public final class Elevator extends SubsystemBase {
+<span class="code-line code-added">    public enum Level {</span>
+<span class="code-line code-added">        BOTTOM(ElevatorConstants.BOTTOM_METERS),</span>
+<span class="code-line code-added">        MID(ElevatorConstants.MID_METERS),</span>
+<span class="code-line code-added">        TOP(ElevatorConstants.TOP_METERS);</span>
+<span class="code-line code-added"></span>
+<span class="code-line code-added">        private final double heightMeters;</span>
+<span class="code-line code-added"></span>
+<span class="code-line code-added">        Level(double heightMeters) {</span>
+<span class="code-line code-added">            this.heightMeters = heightMeters;</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added"></span>
+<span class="code-line code-added">        public Level increase() {</span>
+<span class="code-line code-added">            return switch (this) {</span>
+<span class="code-line code-added">                case BOTTOM -&gt; MID;</span>
+<span class="code-line code-added">                case MID, TOP -&gt; TOP;</span>
+<span class="code-line code-added">            };</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added"></span>
+<span class="code-line code-added">        public Level decrease() {</span>
+<span class="code-line code-added">            return switch (this) {</span>
+<span class="code-line code-added">                case TOP -&gt; MID;</span>
+<span class="code-line code-added">                case MID, BOTTOM -&gt; BOTTOM;</span>
+<span class="code-line code-added">            };</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added">    }</span>
+<span class="code-line code-added"></span>
+    private final ElevatorSim sim = new ElevatorSim();</code></pre></section><section id="edit-3"><h2>3. Remember the selection</h2>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="3" data-side="before"><code><span class="code-line code-removed">    private double targetMeters = ElevatorConstants.LOW_METERS;</span></code></pre>
+<p>Replace the target field with these two fields. selectedLevel starts at BOTTOM because our simulation starts there. It records the last level requested by a running movement command, not the measured position. targetMeters is the current controller target, including a hold position after interruption. Neither field is proof that we have arrived.</p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="3" data-side="after"><code><span class="code-line code-added">    private Level selectedLevel = Level.BOTTOM;</span>
+<span class="code-line code-added">    private double targetMeters = ElevatorConstants.BOTTOM_METERS;</span></code></pre></section>
+<div class="lesson-next"><a href="elevator-levels.html">Previous: 1. Setup</a><a href="elevator-levels-commands.html">Next: 3. Commands</a></div></main></body></html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commands · Choose elevator levels</title><link rel="stylesheet" href="walkthrough.css"></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Choose elevator levels</span><span>Draft for review</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elevator-levels.html">1. Setup</a></li><li><a href="elevator-levels-state.html">2. Levels</a></li><li><a href="elevator-levels-commands.html" aria-current="page">3. Commands</a></li><li><a href="elevator-levels-simulator.html">4. Try it</a></li></ul></div></nav>
+<main class="wrap"><div class="intro"><h1>Commands</h1></div><section id="edit-4"><h2>4. Create commands from the selection</h2>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="4" data-side="before"><code><span class="code-line code-removed">    public Command setHeightGoalCommand(double goal) {</span>
+<span class="code-line code-removed">        return new MoveToHeightCommand(goal);</span>
+    }</code></pre>
+<p>Replace the old factory with these three methods. There is still only one movement command implementation. goToLevelCommand constructs it; the other two methods are convenience factories. defer waits until the command is scheduled before evaluating selectedLevel. The arrow means “run this expression later.” Without that delay, constructing the button binding would choose its destination once at robot startup. The subsystem defer helper also declares the elevator requirement. These factories do not themselves change the selection or move the motor.</p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="4" data-side="after"><code><span class="code-line code-added">    public Command goToLevelCommand(Level level) {</span>
+<span class="code-line code-added">        return new MoveToLevelCommand(level);</span>
+    }
+<span class="code-line code-added"></span>
+<span class="code-line code-added">    public Command increaseLevelCommand() {</span>
+<span class="code-line code-added">        return defer(() -&gt; goToLevelCommand(selectedLevel.increase()));</span>
+<span class="code-line code-added">    }</span>
+<span class="code-line code-added"></span>
+<span class="code-line code-added">    public Command decreaseLevelCommand() {</span>
+<span class="code-line code-added">        return defer(() -&gt; goToLevelCommand(selectedLevel.decrease()));</span>
+<span class="code-line code-added">    }</span></code></pre></section><section id="edit-5"><h2>5. Start a move to a level</h2>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="5" data-side="before"><code><span class="code-line code-removed">    private final class MoveToHeightCommand extends Command {</span>
+<span class="code-line code-removed">        private final double goal;</span>
+
+<span class="code-line code-removed">        private MoveToHeightCommand(double goal) {</span>
+<span class="code-line code-removed">            this.goal = goal;</span>
+            addRequirements(Elevator.this);
+        }
+
+        @Override
+        public void initialize() {
+            movementActive = true;
+<span class="code-line code-removed">            setHeightGoal(goal);</span>
+        }</code></pre>
+<p>Rename the private command and let it remember a Level instead of a raw height. initialize updates the selection and starts movement together. Replacing an elevator command runs its cleanup before starting the new one. In this draft, a repeated press of the same direction is ignored while that button’s command is still running. Wait for arrival before another same-direction press. The opposite button can interrupt the trip. Whether to allow repeated same-direction presses during travel is still under review.</p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="5" data-side="after"><code><span class="code-line code-added">    private final class MoveToLevelCommand extends Command {</span>
+<span class="code-line code-added">        private final Level level;</span>
+
+<span class="code-line code-added">        private MoveToLevelCommand(Level level) {</span>
+<span class="code-line code-added">            this.level = level;</span>
+            addRequirements(Elevator.this);
+        }
+
+        @Override
+        public void initialize() {
+<span class="code-line code-added">            selectedLevel = level;</span>
+            movementActive = true;
+<span class="code-line code-added">            setHeightGoal(level.heightMeters);</span>
+        }</code></pre></section><section id="edit-6"><h2>6. Finish when we arrive</h2>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="6" data-side="before"><code>        @Override
+        public boolean isFinished() {
+<span class="code-line code-removed">            return false;</span>
+        }</code></pre>
+<p>Replace isFinished inside MoveToLevelCommand. Math.abs measures the size of the error regardless of its direction; &amp;&amp; requires both tests to pass. Keep end and stopAndHold exactly as they are. Cleanup now runs after normal completion too. It changes Target_m to the measured hold position, which can differ slightly from the selected level height. A canceled move does not silently resume later.</p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="6" data-side="after"><code>        @Override
+        public boolean isFinished() {
+<span class="code-line code-added">            double heightMeters = motor.getPosition().getValueAsDouble()</span>
+<span class="code-line code-added">                * ElevatorConstants.METERS_PER_DRUM_TURN;</span>
+<span class="code-line code-added">            double velocityMetersPerSecond = motor.getVelocity().getValueAsDouble()</span>
+<span class="code-line code-added">                * ElevatorConstants.METERS_PER_DRUM_TURN;</span>
+<span class="code-line code-added">            return Math.abs(heightMeters - level.heightMeters)</span>
+<span class="code-line code-added">                    &lt; ElevatorConstants.POSITION_TOLERANCE_METERS</span>
+<span class="code-line code-added">                &amp;&amp; Math.abs(velocityMetersPerSecond)</span>
+<span class="code-line code-added">                    &lt; ElevatorConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;</span>
+        }</code></pre></section><section id="edit-7"><h2>7. Show selection separately from position</h2>
+<p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. <strong>Find this code:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="7" data-side="before"><code>        telemetry.log(&quot;MovementActive&quot;, movementActive);</code></pre>
+<p>Add these lines in periodic. SelectedLevel is the name BOTTOM, MID, or TOP; SelectedHeight_m is its destination height. Target_m is the motor target, and Actual_m is measured height. After interruption, SelectedLevel still records the requested destination while Target_m records the hold position. MovementActive tells us whether a movement command is running.</p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="7" data-side="after"><code>        telemetry.log(&quot;MovementActive&quot;, movementActive);
+<span class="code-line code-added">        telemetry.log(&quot;SelectedLevel&quot;, selectedLevel.name());</span>
+<span class="code-line code-added">        telemetry.log(&quot;SelectedHeight_m&quot;, selectedLevel.heightMeters);</span></code></pre></section><section id="edit-8"><h2>8. Advance one level per press</h2>
+<p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find this code:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="8" data-side="before"><code><span class="code-line code-removed">        operator.a().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));</span>
+<span class="code-line code-removed">        operator.y().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));</span></code></pre>
+<p>In configureElevatorBindings, replace the held-button bindings with these onTrue bindings. Tap Y to increase or A to decrease. Releasing the button now leaves the movement command running; reaching the destination ends it. This differs from our first walkthrough: a command owns the elevator for the entire trip. Pressing the other button replaces it and runs cleanup. Hold a button down to confirm that it advances only once.</p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="8" data-side="after"><code><span class="code-line code-added">        operator.a().onTrue(elevator.decreaseLevelCommand());</span>
+<span class="code-line code-added">        operator.y().onTrue(elevator.increaseLevelCommand());</span></code></pre></section><section id="edit-9"><h2>9. Remove the unused import</h2>
+<p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. <strong>Find this code:</strong></p>
+<p class="code-caption">Before — red marks the code being changed</p><pre data-edit="9" data-side="before"><code><span class="code-line code-removed">import first.robot.Constants.ElevatorConstants;</span></code></pre>
+<p>RobotContainer no longer chooses elevator heights. Find and delete this import at the top of the file. Keep the ArmConstants import: the arm bindings still use it.</p>
+<p class="code-caption">After — green marks the added code</p><pre data-edit="9" data-side="after"><code></code></pre></section>
+<div class="lesson-next"><a href="elevator-levels-state.html">Previous: 2. Levels</a><a href="elevator-levels-simulator.html">Next: 4. Try it</a></div></main></body></html>

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setup · Move while held</title><link rel="stylesheet" href="walkthrough.css"></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Move while held</span><span>Draft for review</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="held-commands.html" aria-current="page">1. Setup</a></li><li><a href="held-commands-lifecycle.html">2. Command lifetime</a></li><li><a href="held-commands-simulator.html">3. Try it</a></li></ul></div></nav>
+<main class="wrap"><div class="intro"><h1>Setup</h1></div><section><h2>What we will change</h2><p>Today a button sends a motor target and the command ends immediately. The motor keeps moving. We will give the movement a command that stays running, and make releasing the button stop and hold the elevator.</p>
+<p>This lesson uses the <strong>elevator</strong>. Both mechanisms are already present in the starting code. Leave the arm code unchanged.</p></section>
+<section><h2>Download the code and create your branch</h2>
+<p><strong>Coach preview:</strong> the starting tag below exists locally but has not been published. Publish the starting tags and lesson pages before students follow these download steps.</p>
+<ol><li>Open GitHub Desktop. Select <strong>Code2027-Preseason</strong> under <strong>Current repository</strong>.</li>
+<li>Save and commit any work you want to keep on your current branch before switching. Under <strong>Current branch</strong>, choose <strong>main</strong>.</li>
+<li>Click <strong>Fetch origin</strong>. If it changes to <strong>Pull origin</strong>, click that too.</li>
+<li>Open <strong>History</strong>. Find the commit named <strong>Show creating a student branch from the tagged commit</strong>, marked with tag <code>walkthrough-02-start</code>. Its short identifier is <code>76205fb</code>. This gives everyone the same starting code even after main changes.</li>
+<li>Right-click that commit and choose <strong>Create branch from commit</strong>. Name it <code>lab/your-name-held-commands</code>, replacing <code>your-name</code> with your name. Click <strong>Create branch</strong>.</li>
+<li>Open the <strong>Code2027-Preseason</strong> project using WPILib 2027 VS Code. Remember to open the top-level folder.</li></ol>
+<p><strong>Screenshot placeholder:</strong> GitHub Desktop with <code>walkthrough-02-start</code> selected and the Create branch from commit menu open. Capture after publication.</p></section>
+<section><h2>Before editing</h2><p>Keep this page in your browser and VS Code open beside it if your screen has room. Otherwise, use <kbd>Alt</kbd>+<kbd>Tab</kbd> to switch between them. Each change below shows the existing code first, then the edited code. Save each file with <kbd>Ctrl</kbd>+<kbd>S</kbd>.</p>
+<p>These lessons edit existing working code; there are no numbered TODO comments to fill in. If a “Before” snippet does not match, check your starting branch before continuing. Temporary red underlines are expected while related edits are incomplete.</p></section>
+<div class="lesson-next"><a href="index.html">Previous: All walkthroughs</a><a href="held-commands-lifecycle.html">Next: 2. Command lifetime</a></div></main></body></html>
