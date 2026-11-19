@@ -96,6 +96,23 @@ footer a { color:var(--muted); }
 .code-copy button:disabled { opacity:.6; cursor:wait; }
 .code-copy [role="status"] { font-size:.82rem; color:var(--ink); }
 .copy-manual { width:100%; min-height:8rem; padding:.6rem; color:var(--ink); background:var(--surface); border:1px solid var(--line); font: .85rem/1.5 Consolas,monospace; }
+.held-comparison { display:grid; grid-template-columns:1fr 1fr; max-width:36rem; gap:1rem; margin-top:1rem; }
+.held-panel { text-align:center; }
+.held-panel h3 { margin:0; }
+.held-panel > p { font-size:.88rem; margin:.3rem 0; }
+.held-panel svg { display:block; height:160px; width:100%; margin:auto; }
+.held-panel .held-status { font-weight:600; min-height:2.7em; }
+.held-inputs { display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap; }
+.held-inputs p { font-size:.85rem; }
+.held-controller { width:260px; height:150px; position:relative; flex:none; }
+.held-controller svg { width:100%; height:100%; }
+.held-y { position:absolute; left:170px; top:23px; width:40px; height:40px; padding:0; border:2px solid #805d00; border-radius:50%; background:#ffdc58; color:#342600; font:bold 1rem "Segoe UI",sans-serif; cursor:pointer; touch-action:none; user-select:none; }
+.held-y:hover { background:#ffe889; }
+.held-y.is-held { background:#805d00; color:white; }
+.held-reset { font:inherit; font-size:.85rem; padding:.4rem .7rem; border:1px solid var(--link); border-radius:5px; background:var(--paper); color:var(--link); cursor:pointer; }
+.held-reset:hover { background:var(--accent); }
+.held-preview .held-footnote { font-size:.8rem; color:var(--muted); margin-top:.5rem; }
+@media(max-width:36rem) { .held-inputs { gap:.3rem; } .held-inputs > div:last-child { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; } }
 
 /* Actual application screenshots; highlights mark the next control to use. */
 .lesson-shot { margin:1rem 0 2rem; }
