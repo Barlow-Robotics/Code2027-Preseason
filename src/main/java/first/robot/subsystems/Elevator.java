@@ -50,12 +50,12 @@ public final class Elevator extends SubsystemBase {
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
-    // TODO 4: Create commands from the selection.
+    // TODO 6: Create commands from the selection.
     public Command setHeightGoalCommand(double goal) {
         return new MoveToHeightCommand(goal);
     }
 
-    // TODO 5: Start a move to a level.
+    // TODO 4: Start a move to a level.
     private final class MoveToHeightCommand extends Command {
         private final double goal;
 
@@ -70,7 +70,7 @@ public final class Elevator extends SubsystemBase {
             setHeightGoal(goal);
         }
 
-        // TODO 6: Finish when we arrive.
+        // TODO 5: Finish when we arrive.
         @Override
         public boolean isFinished() {
             return false;
