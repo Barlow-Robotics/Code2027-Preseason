@@ -60,9 +60,9 @@ document.querySelectorAll('[data-copy-practice]').forEach((practice) => {
       status.textContent = 'It worked! The new lines fit, and the existing code and indentation are intact.';
     } else if (pasted.split('\n').map(line => line.trim()).join('\n')
         === expected.split('\n').map(line => line.trim()).join('\n')) {
-      status.textContent = 'The words match, but the spacing is different. Reset the practice code, then paste at the beginning of the blank line.';
+      status.textContent = 'The words match, but the spacing is different. Click Reset practice code and try again.';
     } else {
-      status.textContent = 'Keep the existing code and add only the green lines on the blank line. Use Reset practice code to try again.';
+      status.textContent = 'Keep the existing code and add only the green lines on the blank line. Pasted in the wrong spot? Click Reset practice code and try again.';
     }
   });
 });
