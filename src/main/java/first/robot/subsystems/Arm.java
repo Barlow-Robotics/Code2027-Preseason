@@ -2,7 +2,9 @@ package first.robot.subsystems;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
-// TODO 6a: Add the telemetry imports.
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -16,13 +18,19 @@ public final class Arm extends SubsystemBase {
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
     private double targetDegrees = ArmConstants . LOW_DEGREES;
-    // TODO 7b: Add a Motion Magic request field.
-    // TODO 6b: Add a telemetry table field.
+    private final TelemetryTable telemetry =
+    Telemetry.getTable("Arm");
 
     public Arm() {
-        // TODO 6c: Configure the sensor ratio here.
+         var config = new TalonFXConfiguration();
+        config.Feedback.SensorToMechanismRatio = ArmConstants.GEAR_RATIO;
         // TODO 7c: Add gains and Motion Magic settings here.
 
+         var status = motor.getConfigurator().apply(config);
+        if (!status.isOK()) {
+        throw new IllegalStateException("Arm Talon FX configuration failed: " + status);
+    }
+    
         // Setup Simulation
         // Sets the simulated motor model. This setup is prepared for you; leave it in place.
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
@@ -39,7 +47,9 @@ public final class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // TODO 6d: Publish target and actual position in degrees.
+        telemetry.log("Target_deg", targetDegrees);
+        double mechanismTurns = motor.getPosition().getValueAsDouble();
+        telemetry.log("Actual_deg", mechanismTurns * 360.0);
     }
 
     @Override
