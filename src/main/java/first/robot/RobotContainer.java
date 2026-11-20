@@ -116,7 +116,8 @@ public class RobotContainer {
     }
 
     private void configureArmBindings() {
-        // TODO 5: Bind X and B on the operator controller to the low and high arm goals.
+        operator.x().onTrue(arm.setAngleGoalCommand(ArmConstants.LOW_DEGREES));
+    operator.b().onTrue(arm.setAngleGoalCommand(ArmConstants.HIGH_DEGREES));
     }
 
     public Command getAutonomousCommand() {

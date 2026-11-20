@@ -29,9 +29,7 @@ public final class Arm extends SubsystemBase {
     }
 
     public Command setAngleGoalCommand(double goal) {
-        return runOnce(() -> {
-            // TODO 3c: Call the private function that saves the goal.
-        });
+        return runOnce(() -> {setAngleGoal(goal));
     }
 
     private void setAngleGoal(double goal) {
