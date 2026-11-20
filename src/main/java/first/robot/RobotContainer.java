@@ -113,9 +113,8 @@ public class RobotContainer {
     }
 
     private void configureElevatorBindings() {
-        // TODO 9: Move while the button is held.
-        operator.a().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));
-        operator.y().onTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));
+        operator.a().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.LOW_METERS));
+        operator.y().whileTrue(elevator.setHeightGoalCommand(ElevatorConstants.HIGH_METERS));
     }
 
     private void configureArmBindings() {

@@ -8,7 +8,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-// TODO 3: Import the hold request.
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import first.robot.generated.TunerConstants;
@@ -20,7 +20,8 @@ public final class Elevator extends SubsystemBase {
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
     private double targetMeters = ElevatorConstants.LOW_METERS;
-    // TODO 4: Keep a hold request and activity flag.
+        private final PositionVoltage holdRequest = new PositionVoltage(0.0);
+    private boolean movementActive = false;
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
     private final TelemetryTable telemetry =
         Telemetry.getTable("Elevator");
@@ -32,9 +33,10 @@ public final class Elevator extends SubsystemBase {
         config.Slot0.kV = 2.4;
         config.Slot0.kG = 0.28;
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-        // TODO 2: Use the limits.
-        config.MotionMagic.MotionMagicCruiseVelocity = 2.0;
-        config.MotionMagic.MotionMagicAcceleration = 6.0;
+        config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.CRUISE_METERS_PER_SECOND
+            / ElevatorConstants.METERS_PER_DRUM_TURN;
+        config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.ACCELERATION_METERS_PER_SECOND_SQUARED
+            / ElevatorConstants.METERS_PER_DRUM_TURN;
 
         var status = motor.getConfigurator().apply(config);
         if (!status.isOK()) {
@@ -45,14 +47,42 @@ public final class Elevator extends SubsystemBase {
         // Sets the simulated motor model. This setup is prepared for you; leave it in place.
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
+    private final class MoveToHeightCommand extends Command {
+        private final double goal;
 
-    // TODO 6: Add the private command class.
-    // TODO 7: Use the new command in the factory.
-    public Command setHeightGoalCommand(double goal) {
-        return runOnce(() -> setHeightGoal(goal));
+        private MoveToHeightCommand(double goal) {
+            this.goal = goal;
+            addRequirements(Elevator.this);
+        }
+
+        @Override
+        public void initialize() {
+            movementActive = true;
+            setHeightGoal(goal);
+        }
+
+        @Override
+        public boolean isFinished() {
+            return false;
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            stopAndHold();
+            movementActive = false;
+        }
     }
 
-    // TODO 5: Add the stop-and-hold helper.
+    public Command setHeightGoalCommand(double goal) {
+        return new MoveToHeightCommand(goal);
+
+    }
+
+    private void stopAndHold() {
+        double currentTurns = motor.getPosition().getValueAsDouble();
+        targetMeters = currentTurns * ElevatorConstants.METERS_PER_DRUM_TURN;
+        motor.setControl(holdRequest.withPosition(currentTurns));
+    }
     private void setHeightGoal(double goal) {
         targetMeters = Math.clamp(goal, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
         double goalTurns = targetMeters / ElevatorConstants.METERS_PER_DRUM_TURN;
@@ -63,7 +93,9 @@ public final class Elevator extends SubsystemBase {
     public void periodic() {
         telemetry.log("Target_m", targetMeters);
         double mechanismTurns = motor.getPosition().getValueAsDouble();
-        // TODO 8: Log the command lifetime.
+        telemetry.log("MovementActive", movementActive);
+        telemetry.log("Velocity_mps", motor.getVelocity().getValueAsDouble()
+            * ElevatorConstants.METERS_PER_DRUM_TURN);
         telemetry.log("Actual_m", mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
     }
 
