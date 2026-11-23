@@ -5,6 +5,7 @@ import org.wpilib.command2.SubsystemBase;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.tunable.TunableDouble;
+// TODO 5.E1: Import the gain tools.
 import org.wpilib.tunable.Tunables;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
@@ -55,6 +56,7 @@ public final class Elevator extends SubsystemBase {
         Tunables.addDouble("Elevator/Targets/Top_m", ElevatorConstants.TOP_METERS);
     private Level selectedLevel = Level.BOTTOM;
     private double targetMeters = ElevatorConstants.BOTTOM_METERS;
+    // TODO 5.E2: Publish the gain controls.
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
     private final PositionVoltage holdRequest = new PositionVoltage(0.0);
     private boolean movementActive = false;
@@ -68,6 +70,7 @@ public final class Elevator extends SubsystemBase {
         config.Slot0.kV = 2.4;
         config.Slot0.kG = 0.28;
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+        // TODO 5.E3: Remember the current gain configuration.
         config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.CRUISE_METERS_PER_SECOND
             / ElevatorConstants.METERS_PER_DRUM_TURN;
         config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.ACCELERATION_METERS_PER_SECOND_SQUARED
@@ -155,9 +158,12 @@ public final class Elevator extends SubsystemBase {
         motor.setControl(positionRequest.withPosition(goalTurns));
     }
 
+    // TODO 5.E4: Apply only the gains.
     @Override
     public void periodic() {
+        // TODO 5.E5: Check for an Apply request.
         telemetry.log("Target_m", targetMeters);
+        // TODO 5.E6: Log what the controller is doing.
         double mechanismTurns = motor.getPosition().getValueAsDouble();
         telemetry.log("Actual_m", mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
         telemetry.log("MovementActive", movementActive);

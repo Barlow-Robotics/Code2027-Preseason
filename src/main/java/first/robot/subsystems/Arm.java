@@ -5,6 +5,7 @@ import org.wpilib.command2.SubsystemBase;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.tunable.TunableDouble;
+// TODO 5.A1: Import the gain tools.
 import org.wpilib.tunable.Tunables;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
@@ -27,6 +28,7 @@ public final class Arm extends SubsystemBase {
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
     private double targetDegrees = ArmConstants.LOW_DEGREES;
+    // TODO 5.A2: Publish the gain controls.
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
     private final TelemetryTable telemetry =
         Telemetry.getTable("Arm");
@@ -38,6 +40,7 @@ public final class Arm extends SubsystemBase {
         config.Slot0.kV = 15.0;
         config.Slot0.kG = 0.23;
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+        // TODO 5.A3: Remember the current gain configuration.
         config.MotionMagic.MotionMagicCruiseVelocity = 0.45;
         config.MotionMagic.MotionMagicAcceleration = 1.5;
 
@@ -69,9 +72,12 @@ public final class Arm extends SubsystemBase {
         motor.setControl(positionRequest.withPosition(goalTurns));
     }
 
+    // TODO 5.A4: Apply only the gains.
     @Override
     public void periodic() {
+        // TODO 5.A5: Check for an Apply request.
         telemetry.log("Target_deg", targetDegrees);
+        // TODO 5.A6: Log what the controller is doing.
         double mechanismTurns = motor.getPosition().getValueAsDouble();
         telemetry.log("Actual_deg", mechanismTurns * 360.0);
     }
