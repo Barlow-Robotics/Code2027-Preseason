@@ -9,6 +9,8 @@
     {name:'Help it follow', concept:'kV adds voltage for the profile’s planned speed. kA adds voltage for its planned acceleration—how quickly speed changes. These feedforward terms predict the effort needed; P corrects the remaining position error.', text:'Return to kP = 8. Set kV to 4 and kA to 0.31, then Reset and Run. Keep Error axis at ±1° and compare the settling with experiment 3’s higher P. Does the red line stay closer to zero?', show:['p','g','v','a','maxV','maxA'], config:{p:8,d:0,g:1.2,v:0,a:0,profile:true}},
     {name:'Add damping when needed', concept:'kD is the derivative gain. It adds voltage based on the difference between target velocity and actual velocity. At a fixed target it resists motion, helping the arm settle instead of swinging past the target.', text:'This experiment starts with strong P. Compare kD = 0 and 4, using Reset each time. Watch for overshoot. Then try the profile checkbox.', show:['p','d','g','v','a','maxV','maxA'], config:{p:80,d:0,g:1.2,v:0,a:0,profile:false}}
   ];
+  const duration = 3;
+  let manuallyPaused = false;
   let stage = 0, running = false, samples = [model.sample()], previous = null, accumulator = 0, lastRender = 0, peakError = 0;
   const canvas = root.querySelector('canvas'), ctx = canvas.getContext('2d');
   const errorPanel = root.querySelector('#tracking-detail');
@@ -18,7 +20,7 @@
   function playbackState() {
     const button=root.querySelector('#lab-play');
     button.textContent=running?'Pause':'Run';
-    button.disabled=!keepScrolling.checked && model.time>=5-1e-9;
+    button.disabled=!keepScrolling.checked && model.time>=duration-1e-9;
     button.title=button.disabled?'Reset to start another run, or enable Keep scrolling.':'';
   }
   function sync() {
@@ -43,20 +45,20 @@
     errorPanel.hidden = stage !== 2 && stage !== 3;
     root.querySelector('#error-legend').hidden = errorPanel.hidden;
     root.querySelector('#error-scale-control').hidden = errorPanel.hidden;
-    sync(); running = false; root.querySelector('#lab-play').textContent='Run'; reset();
+    sync(); manuallyPaused = false; running = false; root.querySelector('#lab-play').textContent='Run'; reset();
   }
   controls.forEach(input => input.addEventListener('input', () => {
     model.config[input.dataset.gain]=Number(input.value); sync(); render();
   }));
   profile.addEventListener('change', () => {model.config.profile=profile.checked; reset();});
   root.querySelector('#lab-play').addEventListener('click', () => {
-    running=!running; previous=null; playbackState();
+    running=!running; manuallyPaused=!running; previous=null; playbackState();
   });
   keepScrolling.addEventListener('change',()=>{
-    if(!keepScrolling.checked && model.time>=5-1e-9){running=false;previous=null;accumulator=0;}
+    if(!keepScrolling.checked && model.time>=duration-1e-9){running=false;previous=null;accumulator=0;}
     playbackState();
   });
-  root.querySelector('#lab-restart').addEventListener('click', reset);
+  root.querySelector('#lab-restart').addEventListener('click', () => {running=!manuallyPaused; reset();});
   root.querySelector('#stage-back').addEventListener('click', () => setStage(stage-1));
   root.querySelector('#stage-next').addEventListener('click', () => setStage(stage+1));
   root.querySelector('#lab-defaults').addEventListener('click', () => {
@@ -74,13 +76,13 @@
     ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,width,height);
     const showError=!errorPanel.hidden;
     const left=37,right=showError?43:12,top=23,w=width-left-right,h=height-top-25;
-    const start=Math.max(0,model.time-5), end=start+5;
+    const start=Math.max(0,model.time-duration), end=start+duration;
     // Keep ordinary trials comparable; expand only to avoid hiding an excursion.
     let low=0, high=80;
     for(const s of samples) for(const key of ['target','reference','actual']) {
       low=Math.min(low,Math.floor(s[key]/20)*20); high=Math.max(high,Math.ceil(s[key]/20)*20);
     }
-    const x=t=>left+(t-start)/5*w,y=a=>top+(high-a)/(high-low)*h;
+    const x=t=>left+(t-start)/duration*w,y=a=>top+(high-a)/(high-low)*h;
     ctx.font='11px Segoe UI';ctx.lineWidth=1;ctx.setLineDash([]);
     for(let a=low;a<=high;a+=20){ctx.strokeStyle='#dce4df';ctx.beginPath();ctx.moveTo(left,y(a));ctx.lineTo(left+w,y(a));ctx.stroke();ctx.fillStyle='#52635e';ctx.fillText(`${a}°`,2,y(a)+4);}
     for(let t=Math.ceil(start);t<=end;t+=1){ctx.fillStyle='#52635e';ctx.fillText(`${t}s`,x(t)-6,height-3);}
@@ -124,14 +126,14 @@
   function frame(now){
     if(running && !document.hidden){
       if(previous!==null)accumulator+=Math.min((now-previous)/1000,.05);
-      while(accumulator>=.002 && (keepScrolling.checked || model.time<5-1e-9)){
-        const sample=model.step(keepScrolling.checked?.002:Math.min(.002,5-model.time));
+      while(accumulator>=.002 && (keepScrolling.checked || model.time<duration-1e-9)){
+        const sample=model.step(keepScrolling.checked ? .002 : Math.min(.002,duration-model.time));
         peakError=Math.max(peakError,Math.abs(sample.reference-sample.actual));accumulator-=.002;
         if(Math.round(model.time/.002)%10===0)samples.push(sample);
       }
-      if(!keepScrolling.checked && model.time>=5-1e-9){running=false;accumulator=0;playbackState();render();}
+      if(!keepScrolling.checked && model.time>=duration-1e-9){running=false;accumulator=0;playbackState();render();}
       // Retain one point before the visible window so the trace reaches its left edge.
-      while(samples.length>2 && samples[1].time<model.time-5)samples.shift();
+      while(samples.length>2 && samples[1].time<model.time-duration)samples.shift();
       if(now-lastRender>30){render();lastRender=now;}
     }
     previous=now;requestAnimationFrame(frame);
