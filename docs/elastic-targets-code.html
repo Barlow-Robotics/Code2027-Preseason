@@ -60,14 +60,16 @@ import org.wpilib.tunable.Tunables;" aria-label="Copy added code for Elevator st
 <span class="code-line code-added">        private double goalMeters;</span></code></pre><div class="code-copy"><button type="button" data-copy-code="        private double goalMeters;" aria-label="Copy added code for Elevator step 4">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-5"><h2>5. Choose the destination at the start</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 4.E5</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-5" data-side="before"><code>        public void initialize() {
             selectedLevel = level;
 <span class="code-line code-removed">            // TODO 4.E5: Choose the destination at the start.</span>
-            movementActive = true;
+<span class="code-line code-removed">            movementActive = true;</span>
 <span class="code-line code-removed">            setHeightGoal(level.heightMeters);</span>
         }</code></pre><p>Changing a dashboard field alone does not move the elevator. The next button press uses its new value. An active movement keeps its original destination.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-5" data-side="after"><code>        public void initialize() {
             selectedLevel = level;
 <span class="code-line code-added">            goalMeters = getHeightMeters(level);</span>
-            movementActive = true;
+<span class="code-line code-added">            movementActive = true;</span>
 <span class="code-line code-added">            setHeightGoal(goalMeters);</span>
-        }</code></pre><div class="code-copy"><button type="button" data-copy-code="            goalMeters = getHeightMeters(level);" aria-label="Copy green block 1 for Elevator step 5">Copy green block 1</button><span role="status" aria-live="polite"></span></div><div class="code-copy"><button type="button" data-copy-code="            setHeightGoal(goalMeters);" aria-label="Copy green block 2 for Elevator step 5">Copy green block 2</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-6"><h2>6. Check arrival at that same destination</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 4.E6</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-6" data-side="before"><code>                * ElevatorConstants.METERS_PER_DRUM_TURN;
+        }</code></pre><div class="code-copy"><button type="button" data-copy-code="            goalMeters = getHeightMeters(level);
+            movementActive = true;
+            setHeightGoal(goalMeters);" aria-label="Copy added code for Elevator step 5">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-6"><h2>6. Check arrival at that same destination</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 4.E6</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-6" data-side="before"><code>                * ElevatorConstants.METERS_PER_DRUM_TURN;
 <span class="code-line code-removed">            // TODO 4.E6: Check arrival at that same destination.</span>
 <span class="code-line code-removed">            return Math.abs(heightMeters - level.heightMeters)</span>
                     &lt; ElevatorConstants.POSITION_TOLERANCE_METERS</code></pre><p>The arrival test must use the saved goal too. Otherwise a dashboard edit could change when the command ends.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-6" data-side="after"><code>                * ElevatorConstants.METERS_PER_DRUM_TURN;
