@@ -63,16 +63,16 @@
     ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,width,height);
     const showError=!errorPanel.hidden;
     const left=37,right=showError?43:12,top=23,w=width-left-right,h=height-top-25;
-    const start=Math.max(0,model.time-10), end=start+10;
+    const start=Math.max(0,model.time-5), end=start+5;
     // Keep ordinary trials comparable; expand only to avoid hiding an excursion.
     let low=0, high=80;
     for(const s of samples) for(const key of ['target','reference','actual']) {
       low=Math.min(low,Math.floor(s[key]/20)*20); high=Math.max(high,Math.ceil(s[key]/20)*20);
     }
-    const x=t=>left+(t-start)/10*w,y=a=>top+(high-a)/(high-low)*h;
+    const x=t=>left+(t-start)/5*w,y=a=>top+(high-a)/(high-low)*h;
     ctx.font='11px Segoe UI';ctx.lineWidth=1;ctx.setLineDash([]);
     for(let a=low;a<=high;a+=20){ctx.strokeStyle='#dce4df';ctx.beginPath();ctx.moveTo(left,y(a));ctx.lineTo(left+w,y(a));ctx.stroke();ctx.fillStyle='#52635e';ctx.fillText(`${a}°`,2,y(a)+4);}
-    for(let t=Math.ceil(start/2)*2;t<=end;t+=2){ctx.fillStyle='#52635e';ctx.fillText(`${t}s`,x(t)-6,height-3);}
+    for(let t=Math.ceil(start);t<=end;t+=1){ctx.fillStyle='#52635e';ctx.fillText(`${t}s`,x(t)-6,height-3);}
     ctx.fillStyle='#52635e';ctx.fillText('Angle °',0,11);
     const errorRange=Number(root.querySelector('#error-scale').value);
     const errorY=e=>top+(errorRange-e)/(2*errorRange)*h;
@@ -115,7 +115,7 @@
       if(previous!==null)accumulator+=Math.min((now-previous)/1000,.05);
       while(accumulator>=.002){const sample=model.step(.002);peakError=Math.max(peakError,Math.abs(sample.reference-sample.actual));accumulator-=.002;if(Math.round(model.time/.002)%10===0)samples.push(sample);}
       // Retain one point before the visible window so the trace reaches its left edge.
-      while(samples.length>2 && samples[1].time<model.time-10)samples.shift();
+      while(samples.length>2 && samples[1].time<model.time-5)samples.shift();
       if(now-lastRender>30){render();lastRender=now;}
     }
     previous=now;requestAnimationFrame(frame);
