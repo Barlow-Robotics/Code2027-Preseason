@@ -1,0 +1,144 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Make the target positions editable · Change targets with Elastic</title><link rel="stylesheet" href="walkthrough.css"><link rel="stylesheet" href="tuning.css"><script src="copy-code.js" defer></script><script src="tuning-selector.js" defer></script></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Change targets with Elastic</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="elastic-targets.html">1. Setup</a></li><li><a href="elastic-targets-code.html" aria-current="page">2. Add targets</a></li><li><a href="elastic-targets-try.html">3. Try Elastic</a></li></ul></div></nav>
+<main class="wrap"><div class="intro"><h1>Make the target positions editable</h1></div><p><strong>Copy added code</strong> copies only the green lines. Select the red lines being replaced, starting at the beginning of the first line. Keep the surrounding code.</p><fieldset class="tuning-picker"><legend>Choose your mechanism</legend><label><input type="radio" name="tuning-mechanism" value="Elevator" checked>Elevator</label><label><input type="radio" name="tuning-mechanism" value="Arm">Arm</label></fieldset><noscript><p>JavaScript is off: both mechanisms’ instructions are shown.</p></noscript><div data-mechanism="Elevator"><section id="edit-elevator-1"><h2>1. Import the tunable types</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 4.E1</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-1" data-side="before"><code>import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
+<span class="code-line code-removed">// TODO 4.E1: Import the tunable types.</span>
+import com.ctre.phoenix6.configs.TalonFXConfiguration;</code></pre><p>TunableDouble stores an editable number. Tunables publishes it so Elastic can change it.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-1" data-side="after"><code>import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
+<span class="code-line code-added">import org.wpilib.tunable.TunableDouble;</span>
+<span class="code-line code-added">import org.wpilib.tunable.Tunables;</span>
+import com.ctre.phoenix6.configs.TalonFXConfiguration;</code></pre><div class="code-copy"><button type="button" data-copy-code="import org.wpilib.tunable.TunableDouble;
+import org.wpilib.tunable.Tunables;" aria-label="Copy added code for Elevator step 1">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-2"><h2>2. Publish the three heights</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 4.E2</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-2" data-side="before"><code>    private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+<span class="code-line code-removed">    // TODO 4.E2: Publish the three heights.</span>
+    private Level selectedLevel = Level.BOTTOM;
+    private double targetMeters = ElevatorConstants.BOTTOM_METERS;</code></pre><p>These constants supply the starting values. Elastic edits the tunables, not Constants.java. Keep the physical MIN_METERS and MAX_METERS unchanged.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-2" data-side="after"><code>    private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+<span class="code-line code-added">    private final TunableDouble bottomMeters =</span>
+<span class="code-line code-added">        Tunables.addDouble(&quot;Elevator/Targets/Bottom_m&quot;, ElevatorConstants.BOTTOM_METERS);</span>
+<span class="code-line code-added">    private final TunableDouble midMeters =</span>
+<span class="code-line code-added">        Tunables.addDouble(&quot;Elevator/Targets/Mid_m&quot;, ElevatorConstants.MID_METERS);</span>
+<span class="code-line code-added">    private final TunableDouble topMeters =</span>
+<span class="code-line code-added">        Tunables.addDouble(&quot;Elevator/Targets/Top_m&quot;, ElevatorConstants.TOP_METERS);</span>
+    private Level selectedLevel = Level.BOTTOM;
+    private double targetMeters = ElevatorConstants.BOTTOM_METERS;</code></pre><div class="code-copy"><button type="button" data-copy-code="    private final TunableDouble bottomMeters =
+        Tunables.addDouble(&quot;Elevator/Targets/Bottom_m&quot;, ElevatorConstants.BOTTOM_METERS);
+    private final TunableDouble midMeters =
+        Tunables.addDouble(&quot;Elevator/Targets/Mid_m&quot;, ElevatorConstants.MID_METERS);
+    private final TunableDouble topMeters =
+        Tunables.addDouble(&quot;Elevator/Targets/Top_m&quot;, ElevatorConstants.TOP_METERS);" aria-label="Copy added code for Elevator step 2">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-3"><h2>3. Read the selected height</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 4.E3</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-3" data-side="before"><code>
+<span class="code-line code-removed">    // TODO 4.E3: Read the selected height.</span>
+    public Command goToLevelCommand(Level level) {
+        return new MoveToLevelCommand(level);</code></pre><p>get() reads the latest dashboard value. The switch chooses the number for this level. Reject non-numbers and clamp to the mechanism’s physical limits.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-3" data-side="after"><code>
+<span class="code-line code-added">    private double getHeightMeters(Level level) {</span>
+<span class="code-line code-added">        double requested = switch (level) {</span>
+<span class="code-line code-added">            case BOTTOM -&gt; bottomMeters.get();</span>
+<span class="code-line code-added">            case MID -&gt; midMeters.get();</span>
+<span class="code-line code-added">            case TOP -&gt; topMeters.get();</span>
+<span class="code-line code-added">        };</span>
+<span class="code-line code-added">        if (!Double.isFinite(requested)) {</span>
+<span class="code-line code-added">            requested = level.heightMeters;</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added">        return Math.clamp(requested, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);</span>
+<span class="code-line code-added">    }</span>
+<span class="code-line code-added"></span>
+    public Command goToLevelCommand(Level level) {
+        return new MoveToLevelCommand(level);</code></pre><div class="code-copy"><button type="button" data-copy-code="    private double getHeightMeters(Level level) {
+        double requested = switch (level) {
+            case BOTTOM -&gt; bottomMeters.get();
+            case MID -&gt; midMeters.get();
+            case TOP -&gt; topMeters.get();
+        };
+        if (!Double.isFinite(requested)) {
+            requested = level.heightMeters;
+        }
+        return Math.clamp(requested, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
+    }
+" aria-label="Copy added code for Elevator step 3">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-4"><h2>4. Give each movement its own destination</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 4.E4</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-4" data-side="before"><code>    private final class MoveToLevelCommand extends Command {
+        private final Level level;
+<span class="code-line code-removed">        // TODO 4.E4: Give each movement its own destination.</span></code></pre><p>This field belongs to the command. We will read the dashboard once when that command starts.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-4" data-side="after"><code>    private final class MoveToLevelCommand extends Command {
+        private final Level level;
+<span class="code-line code-added">        private double goalMeters;</span></code></pre><div class="code-copy"><button type="button" data-copy-code="        private double goalMeters;" aria-label="Copy added code for Elevator step 4">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-5"><h2>5. Choose the destination at the start</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 4.E5</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-5" data-side="before"><code>        public void initialize() {
+            selectedLevel = level;
+<span class="code-line code-removed">            // TODO 4.E5: Choose the destination at the start.</span>
+<span class="code-line code-removed">            movementActive = true;</span>
+<span class="code-line code-removed">            setHeightGoal(level.heightMeters);</span>
+        }</code></pre><p>Changing a dashboard field alone does not move the elevator. The next button press uses its new value. An active movement keeps its original destination.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-5" data-side="after"><code>        public void initialize() {
+            selectedLevel = level;
+<span class="code-line code-added">            goalMeters = getHeightMeters(level);</span>
+<span class="code-line code-added">            movementActive = true;</span>
+<span class="code-line code-added">            setHeightGoal(goalMeters);</span>
+        }</code></pre><div class="code-copy"><button type="button" data-copy-code="            goalMeters = getHeightMeters(level);
+            movementActive = true;
+            setHeightGoal(goalMeters);" aria-label="Copy added code for Elevator step 5">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-6"><h2>6. Check arrival at that same destination</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 4.E6</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-6" data-side="before"><code>                * ElevatorConstants.METERS_PER_DRUM_TURN;
+<span class="code-line code-removed">            // TODO 4.E6: Check arrival at that same destination.</span>
+<span class="code-line code-removed">            return Math.abs(heightMeters - level.heightMeters)</span>
+                    &lt; ElevatorConstants.POSITION_TOLERANCE_METERS</code></pre><p>The arrival test must use the saved goal too. Otherwise a dashboard edit could change when the command ends.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-6" data-side="after"><code>                * ElevatorConstants.METERS_PER_DRUM_TURN;
+<span class="code-line code-added">            return Math.abs(heightMeters - goalMeters)</span>
+                    &lt; ElevatorConstants.POSITION_TOLERANCE_METERS</code></pre><div class="code-copy"><button type="button" data-copy-code="            return Math.abs(heightMeters - goalMeters)" aria-label="Copy added code for Elevator step 6">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-7"><h2>7. Log the editable preset</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 4.E7</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-7" data-side="before"><code>        telemetry.log(&quot;SelectedLevel&quot;, selectedLevel.name());
+<span class="code-line code-removed">        // TODO 4.E7: Log the editable preset.</span>
+<span class="code-line code-removed">        telemetry.log(&quot;SelectedHeight_m&quot;, selectedLevel.heightMeters);</span>
+        telemetry.log(&quot;Velocity_mps&quot;, motor.getVelocity().getValueAsDouble()</code></pre><p>SelectedHeight_m shows the current preset. Target_m shows the destination actually sent to the motor. They can differ when you edit a preset during movement.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-7" data-side="after"><code>        telemetry.log(&quot;SelectedLevel&quot;, selectedLevel.name());
+<span class="code-line code-added">        telemetry.log(&quot;SelectedHeight_m&quot;, getHeightMeters(selectedLevel));</span>
+        telemetry.log(&quot;Velocity_mps&quot;, motor.getVelocity().getValueAsDouble()</code></pre><div class="code-copy"><button type="button" data-copy-code="        telemetry.log(&quot;SelectedHeight_m&quot;, getHeightMeters(selectedLevel));" aria-label="Copy added code for Elevator step 7">Copy added code</button><span role="status" aria-live="polite"></span></div></section></div><div data-mechanism="Arm"><section id="edit-arm-1"><h2>1. Import the tunable types</h2><p>Open <code>src/main/java/first/robot/subsystems/Arm.java</code>. Find <strong>TODO 4.A1</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-1" data-side="before"><code>import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
+<span class="code-line code-removed">// TODO 4.A1: Import the tunable types.</span>
+import com.ctre.phoenix6.configs.TalonFXConfiguration;</code></pre><p>TunableDouble stores an editable number. Tunables publishes it so Elastic can change it.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-1" data-side="after"><code>import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
+<span class="code-line code-added">import org.wpilib.tunable.TunableDouble;</span>
+<span class="code-line code-added">import org.wpilib.tunable.Tunables;</span>
+import com.ctre.phoenix6.configs.TalonFXConfiguration;</code></pre><div class="code-copy"><button type="button" data-copy-code="import org.wpilib.tunable.TunableDouble;
+import org.wpilib.tunable.Tunables;" aria-label="Copy added code for Arm step 1">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-arm-2"><h2>2. Publish the two angles</h2><p>Open <code>src/main/java/first/robot/subsystems/Arm.java</code>. Find <strong>TODO 4.A2</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-2" data-side="before"><code>/** Desktop arm for the preseason controls lesson. */
+public final class Arm extends SubsystemBase {
+<span class="code-line code-removed">    // TODO 4.A2: Publish the two angles.</span>
+    private final ArmSim sim = new ArmSim();</code></pre><p>LOW and HIGH name the two choices. The constants supply their starting angles. These are targets, not the physical MIN_DEGREES and MAX_DEGREES limits.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-2" data-side="after"><code>/** Desktop arm for the preseason controls lesson. */
+public final class Arm extends SubsystemBase {
+<span class="code-line code-added">    public enum Preset { LOW, HIGH }</span>
+<span class="code-line code-added"></span>
+<span class="code-line code-added">    private final TunableDouble lowDegrees =</span>
+<span class="code-line code-added">        Tunables.addDouble(&quot;Arm/Targets/Low_deg&quot;, ArmConstants.LOW_DEGREES);</span>
+<span class="code-line code-added">    private final TunableDouble highDegrees =</span>
+<span class="code-line code-added">        Tunables.addDouble(&quot;Arm/Targets/High_deg&quot;, ArmConstants.HIGH_DEGREES);</span>
+    private final ArmSim sim = new ArmSim();</code></pre><div class="code-copy"><button type="button" data-copy-code="    public enum Preset { LOW, HIGH }
+
+    private final TunableDouble lowDegrees =
+        Tunables.addDouble(&quot;Arm/Targets/Low_deg&quot;, ArmConstants.LOW_DEGREES);
+    private final TunableDouble highDegrees =
+        Tunables.addDouble(&quot;Arm/Targets/High_deg&quot;, ArmConstants.HIGH_DEGREES);" aria-label="Copy added code for Arm step 2">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-arm-3"><h2>3. Read an angle</h2><p>Open <code>src/main/java/first/robot/subsystems/Arm.java</code>. Find <strong>TODO 4.A3</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-3" data-side="before"><code>
+<span class="code-line code-removed">    // TODO 4.A3: Read an angle.</span>
+    // TODO 4.A4: Read the preset when the button is pressed.
+    public Command setAngleGoalCommand(double goal) {
+        return runOnce(() -&gt; setAngleGoal(goal));</code></pre><p>get() reads the latest value. The question-mark expression chooses LOW’s number or HIGH’s number. Clamp keeps the request inside the arm’s physical limits.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-3" data-side="after"><code>
+<span class="code-line code-added">    private double getAngleDegrees(Preset preset) {</span>
+<span class="code-line code-added">        double requested = preset == Preset.LOW ? lowDegrees.get() : highDegrees.get();</span>
+<span class="code-line code-added">        if (!Double.isFinite(requested)) {</span>
+<span class="code-line code-added">            requested = preset == Preset.LOW ? ArmConstants.LOW_DEGREES : ArmConstants.HIGH_DEGREES;</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added">        return Math.clamp(requested, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);</span>
+<span class="code-line code-added">    }</span>
+<span class="code-line code-added"></span>
+    // TODO 4.A4: Read the preset when the button is pressed.
+    public Command setAngleGoalCommand(double goal) {
+        return runOnce(() -&gt; setAngleGoal(goal));</code></pre><div class="code-copy"><button type="button" data-copy-code="    private double getAngleDegrees(Preset preset) {
+        double requested = preset == Preset.LOW ? lowDegrees.get() : highDegrees.get();
+        if (!Double.isFinite(requested)) {
+            requested = preset == Preset.LOW ? ArmConstants.LOW_DEGREES : ArmConstants.HIGH_DEGREES;
+        }
+        return Math.clamp(requested, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
+    }
+" aria-label="Copy added code for Arm step 3">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-arm-4"><h2>4. Read the preset when the button is pressed</h2><p>Open <code>src/main/java/first/robot/subsystems/Arm.java</code>. Find <strong>TODO 4.A4</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-4" data-side="before"><code>
+<span class="code-line code-removed">    // TODO 4.A4: Read the preset when the button is pressed.</span>
+<span class="code-line code-removed">    public Command setAngleGoalCommand(double goal) {</span>
+<span class="code-line code-removed">        return runOnce(() -&gt; setAngleGoal(goal));</span>
+    }</code></pre><p>The code inside runOnce runs when the command starts. Editing Elastic alone does not move the arm or change a movement already in progress.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-4" data-side="after"><code>
+<span class="code-line code-added">    public Command setAngleGoalCommand(Preset preset) {</span>
+<span class="code-line code-added">        return runOnce(() -&gt; setAngleGoal(getAngleDegrees(preset)));</span>
+    }</code></pre><div class="code-copy"><button type="button" data-copy-code="    public Command setAngleGoalCommand(Preset preset) {
+        return runOnce(() -&gt; setAngleGoal(getAngleDegrees(preset)));" aria-label="Copy added code for Arm step 4">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-arm-5"><h2>5. Bind buttons to names</h2><p>Open <code>src/main/java/first/robot/RobotContainer.java</code>. Find <strong>TODO 4.A5</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-5" data-side="before"><code>    private void configureArmBindings() {
+<span class="code-line code-removed">        // TODO 4.A5: Bind buttons to names.</span>
+<span class="code-line code-removed">        operator.x().onTrue(arm.setAngleGoalCommand(ArmConstants.LOW_DEGREES));</span>
+<span class="code-line code-removed">        operator.b().onTrue(arm.setAngleGoalCommand(ArmConstants.HIGH_DEGREES));</span>
+    }</code></pre><p>X selects LOW; B selects HIGH. The subsystem now looks up each angle at button-press time instead of capturing a fixed number during robot startup.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-5" data-side="after"><code>    private void configureArmBindings() {
+<span class="code-line code-added">        operator.x().onTrue(arm.setAngleGoalCommand(Arm.Preset.LOW));</span>
+<span class="code-line code-added">        operator.b().onTrue(arm.setAngleGoalCommand(Arm.Preset.HIGH));</span>
+    }</code></pre><div class="code-copy"><button type="button" data-copy-code="        operator.x().onTrue(arm.setAngleGoalCommand(Arm.Preset.LOW));
+        operator.b().onTrue(arm.setAngleGoalCommand(Arm.Preset.HIGH));" aria-label="Copy added code for Arm step 5">Copy added code</button><span role="status" aria-live="polite"></span></div></section></div><div class="lesson-next"><a href="elastic-targets.html">Previous: Setup</a><a href="elastic-targets-try.html">Next: Try Elastic</a></div></main></body></html>
