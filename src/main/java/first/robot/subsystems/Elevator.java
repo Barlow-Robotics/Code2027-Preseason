@@ -5,6 +5,8 @@ import org.wpilib.command2.SubsystemBase;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.tunable.TunableDouble;
+import org.wpilib.tunable.TunableBoolean;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import org.wpilib.tunable.Tunables;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
@@ -55,6 +57,15 @@ public final class Elevator extends SubsystemBase {
         Tunables.addDouble("Elevator/Targets/Top_m", ElevatorConstants.TOP_METERS);
     private Level selectedLevel = Level.BOTTOM;
     private double targetMeters = ElevatorConstants.BOTTOM_METERS;
+    private final TunableDouble kP = Tunables.addDouble("Elevator/Gains/kP", 5.0);
+    private final TunableDouble kD = Tunables.addDouble("Elevator/Gains/kD", 0.0);
+    private final TunableDouble kG = Tunables.addDouble("Elevator/Gains/kG", 0.28);
+    private final TunableDouble kV = Tunables.addDouble("Elevator/Gains/kV", 2.4);
+    private final TunableDouble kA = Tunables.addDouble("Elevator/Gains/kA", 0.0);
+    private final TunableBoolean applyGains =
+        Tunables.addBoolean("Elevator/Gains/Apply", false);
+    private String gainStatus = "Using code defaults";
+    private Slot0Configs appliedGains;
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
     private final PositionVoltage holdRequest = new PositionVoltage(0.0);
     private boolean movementActive = false;
@@ -68,6 +79,7 @@ public final class Elevator extends SubsystemBase {
         config.Slot0.kV = 2.4;
         config.Slot0.kG = 0.28;
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+        appliedGains = config.Slot0;
         config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.CRUISE_METERS_PER_SECOND
             / ElevatorConstants.METERS_PER_DRUM_TURN;
         config.MotionMagic.MotionMagicAcceleration = ElevatorConstants.ACCELERATION_METERS_PER_SECOND_SQUARED
@@ -155,9 +167,46 @@ public final class Elevator extends SubsystemBase {
         motor.setControl(positionRequest.withPosition(goalTurns));
     }
 
+    private void updateGains() {
+        if (!applyGains.get()) {
+            return;
+        }
+        applyGains.set(false);
+        double[] values = {kP.get(), kD.get(), kG.get(), kV.get(), kA.get()};
+        for (double value : values) {
+            if (!Double.isFinite(value) || value < 0.0 || value > 1000.0) {
+                gainStatus = "Not applied: use numbers from 0 to 1000";
+                return;
+            }
+        }
+        var next = new Slot0Configs();
+        next.GravityType = appliedGains.GravityType;
+        next.kP = values[0];
+        next.kD = values[1];
+        next.kG = values[2];
+        next.kV = values[3];
+        next.kA = values[4];
+        var status = motor.getConfigurator().apply(next, 0.020);
+        if (status.isOK()) {
+            appliedGains = next;
+            gainStatus = "Applied";
+        } else {
+            gainStatus = "Not applied: " + status + "; switch Apply on to retry";
+        }
+    }
+
     @Override
     public void periodic() {
+        updateGains();
         telemetry.log("Target_m", targetMeters);
+        telemetry.log("ProfileTarget_m", motor.getClosedLoopReference().getValueAsDouble() * ElevatorConstants.METERS_PER_DRUM_TURN);
+        telemetry.log("MotorVoltage_V", motor.getMotorVoltage().getValueAsDouble());
+        telemetry.log("GainStatus", gainStatus);
+        telemetry.log("Applied_kP", appliedGains.kP);
+        telemetry.log("Applied_kD", appliedGains.kD);
+        telemetry.log("Applied_kG", appliedGains.kG);
+        telemetry.log("Applied_kV", appliedGains.kV);
+        telemetry.log("Applied_kA", appliedGains.kA);
         double mechanismTurns = motor.getPosition().getValueAsDouble();
         telemetry.log("Actual_m", mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
         telemetry.log("MovementActive", movementActive);
