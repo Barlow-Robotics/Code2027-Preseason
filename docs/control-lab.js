@@ -3,11 +3,11 @@
   const root = document.querySelector('[data-control-lab]'); if (!root) return;
   const model = new ControlLab.ArmModel();
   const stages = [
-    {name:'Correct the error', text:'Set kP to 8, then try 40. Press Reset each time. Does the arm stop exactly at 65°? P needs some error to keep pushing against gravity.', show:['p'], config:{p:8,d:0,g:0,v:0,a:0,profile:false}},
-    {name:'Support the weight', text:'Raise kG toward 1.2 V. The arm can now hold near the target without needing a large position error. Try a different target angle: gravity compensation changes with the arm’s angle.', show:['p','g'], config:{p:8,d:0,g:0,v:0,a:0,profile:false}},
-    {name:'Plan the movement', text:'The orange reference now travels toward the destination instead of jumping there. Change the speed and acceleration limits. The motor still needs output to follow that reference.', show:['p','g','maxV','maxA'], config:{p:8,d:0,g:1.2,v:0,a:0,profile:true}},
-    {name:'Help it follow', text:'Raise kV toward 4, then kA toward 0.31. Compare green Actual with orange Profile target. Feedforward supplies the expected effort; kP corrects the remaining position error.', show:['p','g','v','a','maxV','maxA'], config:{p:8,d:0,g:1.2,v:0,a:0,profile:true}},
-    {name:'Add damping when needed', text:'This experiment starts with strong P and an immediate target. Try kD = 0, then 4. D opposes velocity error. It can reduce overshoot; too much can make the response sluggish. Then try the profile checkbox.', show:['p','d','g','v','a','maxV','maxA'], config:{p:80,d:0,g:1.2,v:0,a:0,profile:false}}
+    {name:'Correct the error', concept:'kP is the proportional gain. It applies voltage based on position error: how far the arm is from its target. A larger error or a larger kP means more voltage toward the target.', text:'Set kP = 8, then 40. Press Reset and Run if paused. Does the arm stop exactly at 65°? P needs some error to keep pushing against gravity.', show:['p'], config:{p:8,d:0,g:0,v:0,a:0,profile:false}},
+    {name:'Support the weight', concept:'kG adds voltage to counter gravity. For an arm, that voltage changes with its angle. This is feedforward: predicting the effort needed instead of waiting for an error.', text:'Raise kG toward 1.2 V. Does the arm hold closer to the target? Then change the destination angle and try again.', show:['p','g'], config:{p:8,d:0,g:0,v:0,a:0,profile:false}},
+    {name:'Plan the movement', concept:'A trajectory is a plan for position over time. A motion profile moves the target gradually, limiting speed and acceleration. The controller follows that moving target instead of aiming straight at the final angle.', text:'Press Run. Watch the orange Profile target move toward the destination. Change the speed and acceleration limits, then Reset to compare.', show:['p','g','maxV','maxA'], config:{p:8,d:0,g:1.2,v:0,a:0,profile:true}},
+    {name:'Help it follow', concept:'kV adds voltage for the profile’s planned speed. kA adds voltage for its planned acceleration—how quickly speed changes. These feedforward terms predict the effort needed; P corrects the remaining position error.', text:'Raise kV toward 4, then kA toward 0.31. Press Reset to repeat the move. Does green Actual follow orange Profile target more closely?', show:['p','g','v','a','maxV','maxA'], config:{p:8,d:0,g:1.2,v:0,a:0,profile:true}},
+    {name:'Add damping when needed', concept:'kD is the derivative gain. It adds voltage based on the difference between target velocity and actual velocity. At a fixed target it resists motion, helping the arm settle instead of swinging past the target.', text:'This experiment starts with strong P. Compare kD = 0 and 4, using Reset each time. Watch for overshoot. Then try the profile checkbox.', show:['p','d','g','v','a','maxV','maxA'], config:{p:80,d:0,g:1.2,v:0,a:0,profile:false}}
   ];
   let stage = 0, running = false, samples = [model.sample()], previous = null, accumulator = 0, lastRender = 0;
   const canvas = root.querySelector('canvas'), ctx = canvas.getContext('2d');
@@ -25,6 +25,7 @@
     stage = Math.max(0, Math.min(stages.length-1,n));
     Object.assign(model.config, stages[stage].config, {target:65,maxV:.18,maxA:.35});
     root.querySelector('#experiment-title').textContent = `${stage+1}. ${stages[stage].name}`;
+    root.querySelector('#experiment-concept').textContent = stages[stage].concept;
     root.querySelector('#experiment-task').textContent = stages[stage].text;
     root.querySelector('#stage-back').disabled = stage===0;
     root.querySelector('#stage-next').disabled = stage===stages.length-1;
@@ -40,7 +41,7 @@
   root.querySelector('#lab-play').addEventListener('click', () => {
     running=!running; previous=null; root.querySelector('#lab-play').textContent=running?'Pause':'Run';
   });
-  root.querySelector('#lab-restart').addEventListener('click', () => {reset();running=true;root.querySelector('#lab-play').textContent='Pause';});
+  root.querySelector('#lab-restart').addEventListener('click', reset);
   root.querySelector('#stage-back').addEventListener('click', () => setStage(stage-1));
   root.querySelector('#stage-next').addEventListener('click', () => setStage(stage+1));
   root.querySelector('#lab-defaults').addEventListener('click', () => {
@@ -92,3 +93,4 @@
   new ResizeObserver(render).observe(canvas);
   setStage(0);requestAnimationFrame(frame);
 })();
+
