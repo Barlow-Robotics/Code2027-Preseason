@@ -4,6 +4,8 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.TunableDouble;
+import org.wpilib.tunable.Tunables;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -45,6 +47,12 @@ public final class Elevator extends SubsystemBase {
 
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+    private final TunableDouble bottomMeters =
+        Tunables.addDouble("Elevator/Targets/Bottom_m", ElevatorConstants.BOTTOM_METERS);
+    private final TunableDouble midMeters =
+        Tunables.addDouble("Elevator/Targets/Mid_m", ElevatorConstants.MID_METERS);
+    private final TunableDouble topMeters =
+        Tunables.addDouble("Elevator/Targets/Top_m", ElevatorConstants.TOP_METERS);
     private Level selectedLevel = Level.BOTTOM;
     private double targetMeters = ElevatorConstants.BOTTOM_METERS;
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
@@ -75,6 +83,18 @@ public final class Elevator extends SubsystemBase {
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
+    private double getHeightMeters(Level level) {
+        double requested = switch (level) {
+            case BOTTOM -> bottomMeters.get();
+            case MID -> midMeters.get();
+            case TOP -> topMeters.get();
+        };
+        if (!Double.isFinite(requested)) {
+            requested = level.heightMeters;
+        }
+        return Math.clamp(requested, ElevatorConstants.MIN_METERS, ElevatorConstants.MAX_METERS);
+    }
+
     public Command goToLevelCommand(Level level) {
         return new MoveToLevelCommand(level);
     }
@@ -89,6 +109,7 @@ public final class Elevator extends SubsystemBase {
 
     private final class MoveToLevelCommand extends Command {
         private final Level level;
+        private double goalMeters;
 
         private MoveToLevelCommand(Level level) {
             this.level = level;
@@ -98,8 +119,9 @@ public final class Elevator extends SubsystemBase {
         @Override
         public void initialize() {
             selectedLevel = level;
+            goalMeters = getHeightMeters(level);
             movementActive = true;
-            setHeightGoal(level.heightMeters);
+            setHeightGoal(goalMeters);
         }
 
         @Override
@@ -108,7 +130,7 @@ public final class Elevator extends SubsystemBase {
                 * ElevatorConstants.METERS_PER_DRUM_TURN;
             double velocityMetersPerSecond = motor.getVelocity().getValueAsDouble()
                 * ElevatorConstants.METERS_PER_DRUM_TURN;
-            return Math.abs(heightMeters - level.heightMeters)
+            return Math.abs(heightMeters - goalMeters)
                     < ElevatorConstants.POSITION_TOLERANCE_METERS
                 && Math.abs(velocityMetersPerSecond)
                     < ElevatorConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
@@ -140,7 +162,7 @@ public final class Elevator extends SubsystemBase {
         telemetry.log("Actual_m", mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
         telemetry.log("MovementActive", movementActive);
         telemetry.log("SelectedLevel", selectedLevel.name());
-        telemetry.log("SelectedHeight_m", selectedLevel.heightMeters);
+        telemetry.log("SelectedHeight_m", getHeightMeters(selectedLevel));
         telemetry.log("Velocity_mps", motor.getVelocity().getValueAsDouble()
             * ElevatorConstants.METERS_PER_DRUM_TURN);
     }

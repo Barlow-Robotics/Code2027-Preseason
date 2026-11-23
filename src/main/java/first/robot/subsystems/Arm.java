@@ -4,6 +4,8 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.TunableDouble;
+import org.wpilib.tunable.Tunables;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -16,6 +18,12 @@ import first.robot.Constants.ArmConstants;
 
 /** Desktop arm for the preseason controls lesson. */
 public final class Arm extends SubsystemBase {
+    public enum Preset { LOW, HIGH }
+
+    private final TunableDouble lowDegrees =
+        Tunables.addDouble("Arm/Targets/Low_deg", ArmConstants.LOW_DEGREES);
+    private final TunableDouble highDegrees =
+        Tunables.addDouble("Arm/Targets/High_deg", ArmConstants.HIGH_DEGREES);
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
     private double targetDegrees = ArmConstants.LOW_DEGREES;
@@ -43,8 +51,16 @@ public final class Arm extends SubsystemBase {
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
-    public Command setAngleGoalCommand(double goal) {
-        return runOnce(() -> setAngleGoal(goal));
+    private double getAngleDegrees(Preset preset) {
+        double requested = preset == Preset.LOW ? lowDegrees.get() : highDegrees.get();
+        if (!Double.isFinite(requested)) {
+            requested = preset == Preset.LOW ? ArmConstants.LOW_DEGREES : ArmConstants.HIGH_DEGREES;
+        }
+        return Math.clamp(requested, ArmConstants.MIN_DEGREES, ArmConstants.MAX_DEGREES);
+    }
+
+    public Command setAngleGoalCommand(Preset preset) {
+        return runOnce(() -> setAngleGoal(getAngleDegrees(preset)));
     }
 
     private void setAngleGoal(double goal) {

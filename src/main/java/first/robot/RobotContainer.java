@@ -120,8 +120,8 @@ public class RobotContainer {
     }
 
     private void configureArmBindings() {
-        operator.x().onTrue(arm.setAngleGoalCommand(ArmConstants.LOW_DEGREES));
-        operator.b().onTrue(arm.setAngleGoalCommand(ArmConstants.HIGH_DEGREES));
+        operator.x().onTrue(arm.setAngleGoalCommand(Arm.Preset.LOW));
+        operator.b().onTrue(arm.setAngleGoalCommand(Arm.Preset.HIGH));
     }
 
     public Command getAutonomousCommand() {
