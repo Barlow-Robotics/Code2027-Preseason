@@ -120,6 +120,7 @@ public class RobotContainer {
     }
 
     private void configureArmBindings() {
+        // TODO 4.A5: Bind buttons to names.
         operator.x().onTrue(arm.setAngleGoalCommand(ArmConstants.LOW_DEGREES));
         operator.b().onTrue(arm.setAngleGoalCommand(ArmConstants.HIGH_DEGREES));
     }

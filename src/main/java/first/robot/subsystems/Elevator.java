@@ -4,6 +4,7 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
+// TODO 4.E1: Import the tunable types.
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -45,6 +46,7 @@ public final class Elevator extends SubsystemBase {
 
     private final ElevatorSim sim = new ElevatorSim();
     private final TalonFX motor = new TalonFX(ElevatorConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
+    // TODO 4.E2: Publish the three heights.
     private Level selectedLevel = Level.BOTTOM;
     private double targetMeters = ElevatorConstants.BOTTOM_METERS;
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
@@ -75,6 +77,7 @@ public final class Elevator extends SubsystemBase {
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
+    // TODO 4.E3: Read the selected height.
     public Command goToLevelCommand(Level level) {
         return new MoveToLevelCommand(level);
     }
@@ -89,6 +92,7 @@ public final class Elevator extends SubsystemBase {
 
     private final class MoveToLevelCommand extends Command {
         private final Level level;
+        // TODO 4.E4: Give each movement its own destination.
 
         private MoveToLevelCommand(Level level) {
             this.level = level;
@@ -98,6 +102,7 @@ public final class Elevator extends SubsystemBase {
         @Override
         public void initialize() {
             selectedLevel = level;
+            // TODO 4.E5: Choose the destination at the start.
             movementActive = true;
             setHeightGoal(level.heightMeters);
         }
@@ -108,6 +113,7 @@ public final class Elevator extends SubsystemBase {
                 * ElevatorConstants.METERS_PER_DRUM_TURN;
             double velocityMetersPerSecond = motor.getVelocity().getValueAsDouble()
                 * ElevatorConstants.METERS_PER_DRUM_TURN;
+            // TODO 4.E6: Check arrival at that same destination.
             return Math.abs(heightMeters - level.heightMeters)
                     < ElevatorConstants.POSITION_TOLERANCE_METERS
                 && Math.abs(velocityMetersPerSecond)
@@ -140,6 +146,7 @@ public final class Elevator extends SubsystemBase {
         telemetry.log("Actual_m", mechanismTurns * ElevatorConstants.METERS_PER_DRUM_TURN);
         telemetry.log("MovementActive", movementActive);
         telemetry.log("SelectedLevel", selectedLevel.name());
+        // TODO 4.E7: Log the editable preset.
         telemetry.log("SelectedHeight_m", selectedLevel.heightMeters);
         telemetry.log("Velocity_mps", motor.getVelocity().getValueAsDouble()
             * ElevatorConstants.METERS_PER_DRUM_TURN);

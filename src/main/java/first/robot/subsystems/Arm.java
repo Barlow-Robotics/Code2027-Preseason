@@ -4,6 +4,7 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryTable;
+// TODO 4.A1: Import the tunable types.
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -16,6 +17,7 @@ import first.robot.Constants.ArmConstants;
 
 /** Desktop arm for the preseason controls lesson. */
 public final class Arm extends SubsystemBase {
+    // TODO 4.A2: Publish the two angles.
     private final ArmSim sim = new ArmSim();
     private final TalonFX motor = new TalonFX(ArmConstants.MOTOR_CAN_ID, TunerConstants.kCANBus);
     private double targetDegrees = ArmConstants.LOW_DEGREES;
@@ -43,6 +45,8 @@ public final class Arm extends SubsystemBase {
         motor.getSimState().setMotorType(TalonFXSimState.MotorType.KrakenX60);
     }
 
+    // TODO 4.A3: Read an angle.
+    // TODO 4.A4: Read the preset when the button is pressed.
     public Command setAngleGoalCommand(double goal) {
         return runOnce(() -> setAngleGoal(goal));
     }

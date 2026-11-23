@@ -1,0 +1,252 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Make the gains editable · Control and tune the motion</title><link rel="stylesheet" href="walkthrough.css"><link rel="stylesheet" href="tuning.css"><script src="copy-code.js" defer></script><script src="tuning-selector.js" defer></script></head><body>
+<header><div class="mast"><div class="wrap"><a href="index.html">Walkthroughs</a><span aria-hidden="true">/</span><span class="lesson-name">Control and tune the motion</span></div></div></header>
+<nav aria-label="Walkthrough sections"><div class="wrap"><ul><li><a href="control-lab.html">1. Explore control</a></li><li><a href="control-setup.html">2. Setup</a></li><li><a href="control-gains.html" aria-current="page">3. Add gains</a></li><li><a href="control-try.html">4. Tune the sim</a></li></ul></div></nav>
+<main class="wrap"><div class="intro"><h1>Make the gains editable</h1></div><p><strong>Copy added code</strong> copies only the green lines. Select the red lines being replaced, starting at the beginning of the first line. Keep the surrounding code.</p><fieldset class="tuning-picker"><legend>Choose your mechanism</legend><label><input type="radio" name="tuning-mechanism" value="Elevator" checked>Elevator</label><label><input type="radio" name="tuning-mechanism" value="Arm">Arm</label></fieldset><noscript><p>JavaScript is off: both mechanisms’ instructions are shown.</p></noscript><div data-mechanism="Elevator"><section id="edit-elevator-1"><h2>1. Import the gain tools</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 5.E1</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-1" data-side="before"><code>import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.TunableDouble;
+<span class="code-line code-removed">// TODO 5.E1: Import the gain tools.</span>
+import org.wpilib.tunable.Tunables;</code></pre><p>Slot0Configs contains the controller’s gains. TunableBoolean gives us an Apply switch in Elastic.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-1" data-side="after"><code>import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.TunableDouble;
+<span class="code-line code-added">import org.wpilib.tunable.TunableBoolean;</span>
+<span class="code-line code-added">import com.ctre.phoenix6.configs.Slot0Configs;</span>
+import org.wpilib.tunable.Tunables;</code></pre><div class="code-copy"><button type="button" data-copy-code="import org.wpilib.tunable.TunableBoolean;
+import com.ctre.phoenix6.configs.Slot0Configs;" aria-label="Copy added code for Elevator step 1">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-2"><h2>2. Publish the gain controls</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 5.E2</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-2" data-side="before"><code>    private double targetMeters = ElevatorConstants.BOTTOM_METERS;
+<span class="code-line code-removed">    // TODO 5.E2: Publish the gain controls.</span>
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
+    private final PositionVoltage holdRequest = new PositionVoltage(0.0);</code></pre><p>Start with our working gains. kI remains zero. Edit one number, then switch Apply on to send the gains to the Talon together. This works without restarting the simulator.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-2" data-side="after"><code>    private double targetMeters = ElevatorConstants.BOTTOM_METERS;
+<span class="code-line code-added">    private final TunableDouble kP = Tunables.addDouble(&quot;Elevator/Gains/kP&quot;, 5.0);</span>
+<span class="code-line code-added">    private final TunableDouble kD = Tunables.addDouble(&quot;Elevator/Gains/kD&quot;, 0.0);</span>
+<span class="code-line code-added">    private final TunableDouble kG = Tunables.addDouble(&quot;Elevator/Gains/kG&quot;, 0.28);</span>
+<span class="code-line code-added">    private final TunableDouble kV = Tunables.addDouble(&quot;Elevator/Gains/kV&quot;, 2.4);</span>
+<span class="code-line code-added">    private final TunableDouble kA = Tunables.addDouble(&quot;Elevator/Gains/kA&quot;, 0.0);</span>
+<span class="code-line code-added">    private final TunableBoolean applyGains =</span>
+<span class="code-line code-added">        Tunables.addBoolean(&quot;Elevator/Gains/Apply&quot;, false);</span>
+<span class="code-line code-added">    private String gainStatus = &quot;Using code defaults&quot;;</span>
+<span class="code-line code-added">    private Slot0Configs appliedGains;</span>
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
+    private final PositionVoltage holdRequest = new PositionVoltage(0.0);</code></pre><div class="code-copy"><button type="button" data-copy-code="    private final TunableDouble kP = Tunables.addDouble(&quot;Elevator/Gains/kP&quot;, 5.0);
+    private final TunableDouble kD = Tunables.addDouble(&quot;Elevator/Gains/kD&quot;, 0.0);
+    private final TunableDouble kG = Tunables.addDouble(&quot;Elevator/Gains/kG&quot;, 0.28);
+    private final TunableDouble kV = Tunables.addDouble(&quot;Elevator/Gains/kV&quot;, 2.4);
+    private final TunableDouble kA = Tunables.addDouble(&quot;Elevator/Gains/kA&quot;, 0.0);
+    private final TunableBoolean applyGains =
+        Tunables.addBoolean(&quot;Elevator/Gains/Apply&quot;, false);
+    private String gainStatus = &quot;Using code defaults&quot;;
+    private Slot0Configs appliedGains;" aria-label="Copy added code for Elevator step 2">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-3"><h2>3. Remember the current gain configuration</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 5.E3</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-3" data-side="before"><code>        config.Slot0.kG = 0.28;
+        config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+<span class="code-line code-removed">        // TODO 5.E3: Remember the current gain configuration.</span>
+        config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.CRUISE_METERS_PER_SECOND</code></pre><p>Keep this object so we can preserve the gravity mode and report which gains were accepted. The ratio and motion limits belong to other configuration groups.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-3" data-side="after"><code>        config.Slot0.kG = 0.28;
+        config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+<span class="code-line code-added">        appliedGains = config.Slot0;</span>
+        config.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.CRUISE_METERS_PER_SECOND</code></pre><div class="code-copy"><button type="button" data-copy-code="        appliedGains = config.Slot0;" aria-label="Copy added code for Elevator step 3">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-4"><h2>4. Apply only the gains</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 5.E4</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-4" data-side="before"><code>
+<span class="code-line code-removed">    // TODO 5.E4: Apply only the gains.</span>
+    @Override
+    public void periodic() {
+        // TODO 5.E5: Check for an Apply request.</code></pre><p>Apply resets to off after each attempt. We reject invalid numbers and send only Slot0Configs: the sensor ratio and Motion Magic limits stay intact. A failed attempt is reported instead of retried every loop. The 0–1000 range is an input check, not a promise that every value will tune well.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-4" data-side="after"><code>
+<span class="code-line code-added">    private void updateGains() {</span>
+<span class="code-line code-added">        if (!applyGains.get()) {</span>
+<span class="code-line code-added">            return;</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added">        applyGains.set(false);</span>
+<span class="code-line code-added">        double[] values = {kP.get(), kD.get(), kG.get(), kV.get(), kA.get()};</span>
+<span class="code-line code-added">        for (double value : values) {</span>
+<span class="code-line code-added">            if (!Double.isFinite(value) || value &lt; 0.0 || value &gt; 1000.0) {</span>
+<span class="code-line code-added">                gainStatus = &quot;Not applied: use numbers from 0 to 1000&quot;;</span>
+<span class="code-line code-added">                return;</span>
+<span class="code-line code-added">            }</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added">        var next = new Slot0Configs();</span>
+<span class="code-line code-added">        next.GravityType = appliedGains.GravityType;</span>
+<span class="code-line code-added">        next.kP = values[0];</span>
+<span class="code-line code-added">        next.kD = values[1];</span>
+<span class="code-line code-added">        next.kG = values[2];</span>
+<span class="code-line code-added">        next.kV = values[3];</span>
+<span class="code-line code-added">        next.kA = values[4];</span>
+<span class="code-line code-added">        var status = motor.getConfigurator().apply(next, 0.020);</span>
+<span class="code-line code-added">        if (status.isOK()) {</span>
+<span class="code-line code-added">            appliedGains = next;</span>
+<span class="code-line code-added">            gainStatus = &quot;Applied&quot;;</span>
+<span class="code-line code-added">        } else {</span>
+<span class="code-line code-added">            gainStatus = &quot;Not applied: &quot; + status + &quot;; switch Apply on to retry&quot;;</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added">    }</span>
+<span class="code-line code-added"></span>
+    @Override
+    public void periodic() {
+        // TODO 5.E5: Check for an Apply request.</code></pre><div class="code-copy"><button type="button" data-copy-code="    private void updateGains() {
+        if (!applyGains.get()) {
+            return;
+        }
+        applyGains.set(false);
+        double[] values = {kP.get(), kD.get(), kG.get(), kV.get(), kA.get()};
+        for (double value : values) {
+            if (!Double.isFinite(value) || value &lt; 0.0 || value &gt; 1000.0) {
+                gainStatus = &quot;Not applied: use numbers from 0 to 1000&quot;;
+                return;
+            }
+        }
+        var next = new Slot0Configs();
+        next.GravityType = appliedGains.GravityType;
+        next.kP = values[0];
+        next.kD = values[1];
+        next.kG = values[2];
+        next.kV = values[3];
+        next.kA = values[4];
+        var status = motor.getConfigurator().apply(next, 0.020);
+        if (status.isOK()) {
+            appliedGains = next;
+            gainStatus = &quot;Applied&quot;;
+        } else {
+            gainStatus = &quot;Not applied: &quot; + status + &quot;; switch Apply on to retry&quot;;
+        }
+    }
+" aria-label="Copy added code for Elevator step 4">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-5"><h2>5. Check for an Apply request</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 5.E5</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-5" data-side="before"><code>    @Override
+    public void periodic() {
+<span class="code-line code-removed">        // TODO 5.E5: Check for an Apply request.</span>
+        telemetry.log(&quot;Target_m&quot;, targetMeters);</code></pre><p>periodic runs each robot loop. updateGains returns immediately unless Apply is on; it does not repeatedly configure the controller.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-5" data-side="after"><code>    @Override
+    public void periodic() {
+<span class="code-line code-added">        updateGains();</span>
+        telemetry.log(&quot;Target_m&quot;, targetMeters);</code></pre><div class="code-copy"><button type="button" data-copy-code="        updateGains();" aria-label="Copy added code for Elevator step 5">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-elevator-6"><h2>6. Log what the controller is doing</h2><p>Open <code>src/main/java/first/robot/subsystems/Elevator.java</code>. Find <strong>TODO 5.E6</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Elevator-6" data-side="before"><code>        updateGains();
+        telemetry.log(&quot;Target_m&quot;, targetMeters);
+<span class="code-line code-removed">        // TODO 5.E6: Log what the controller is doing.</span>
+        double mechanismTurns = motor.getPosition().getValueAsDouble();</code></pre><p>ProfileTarget is the Talon’s moving reference. Target is the destination sent by our code. Actual is the measured position. Applied_kP and the other Applied values report the last successful configuration, not an unsubmitted dashboard edit.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Elevator-6" data-side="after"><code>        updateGains();
+        telemetry.log(&quot;Target_m&quot;, targetMeters);
+<span class="code-line code-added">        telemetry.log(&quot;ProfileTarget_m&quot;, motor.getClosedLoopReference().getValueAsDouble() * ElevatorConstants.METERS_PER_DRUM_TURN);</span>
+<span class="code-line code-added">        telemetry.log(&quot;MotorVoltage_V&quot;, motor.getMotorVoltage().getValueAsDouble());</span>
+<span class="code-line code-added">        telemetry.log(&quot;GainStatus&quot;, gainStatus);</span>
+<span class="code-line code-added">        telemetry.log(&quot;Applied_kP&quot;, appliedGains.kP);</span>
+<span class="code-line code-added">        telemetry.log(&quot;Applied_kD&quot;, appliedGains.kD);</span>
+<span class="code-line code-added">        telemetry.log(&quot;Applied_kG&quot;, appliedGains.kG);</span>
+<span class="code-line code-added">        telemetry.log(&quot;Applied_kV&quot;, appliedGains.kV);</span>
+<span class="code-line code-added">        telemetry.log(&quot;Applied_kA&quot;, appliedGains.kA);</span>
+        double mechanismTurns = motor.getPosition().getValueAsDouble();</code></pre><div class="code-copy"><button type="button" data-copy-code="        telemetry.log(&quot;ProfileTarget_m&quot;, motor.getClosedLoopReference().getValueAsDouble() * ElevatorConstants.METERS_PER_DRUM_TURN);
+        telemetry.log(&quot;MotorVoltage_V&quot;, motor.getMotorVoltage().getValueAsDouble());
+        telemetry.log(&quot;GainStatus&quot;, gainStatus);
+        telemetry.log(&quot;Applied_kP&quot;, appliedGains.kP);
+        telemetry.log(&quot;Applied_kD&quot;, appliedGains.kD);
+        telemetry.log(&quot;Applied_kG&quot;, appliedGains.kG);
+        telemetry.log(&quot;Applied_kV&quot;, appliedGains.kV);
+        telemetry.log(&quot;Applied_kA&quot;, appliedGains.kA);" aria-label="Copy added code for Elevator step 6">Copy added code</button><span role="status" aria-live="polite"></span></div></section></div><div data-mechanism="Arm"><section id="edit-arm-1"><h2>1. Import the gain tools</h2><p>Open <code>src/main/java/first/robot/subsystems/Arm.java</code>. Find <strong>TODO 5.A1</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-1" data-side="before"><code>import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.TunableDouble;
+<span class="code-line code-removed">// TODO 5.A1: Import the gain tools.</span>
+import org.wpilib.tunable.Tunables;</code></pre><p>Slot0Configs contains the controller’s gains. TunableBoolean gives us an Apply switch in Elastic.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-1" data-side="after"><code>import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.TunableDouble;
+<span class="code-line code-added">import org.wpilib.tunable.TunableBoolean;</span>
+<span class="code-line code-added">import com.ctre.phoenix6.configs.Slot0Configs;</span>
+import org.wpilib.tunable.Tunables;</code></pre><div class="code-copy"><button type="button" data-copy-code="import org.wpilib.tunable.TunableBoolean;
+import com.ctre.phoenix6.configs.Slot0Configs;" aria-label="Copy added code for Arm step 1">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-arm-2"><h2>2. Publish the gain controls</h2><p>Open <code>src/main/java/first/robot/subsystems/Arm.java</code>. Find <strong>TODO 5.A2</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-2" data-side="before"><code>    private double targetDegrees = ArmConstants.LOW_DEGREES;
+<span class="code-line code-removed">    // TODO 5.A2: Publish the gain controls.</span>
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
+    private final TelemetryTable telemetry =</code></pre><p>Start with our working gains. kI remains zero. Edit one number, then switch Apply on to send the gains to the Talon together. This works without restarting the simulator.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-2" data-side="after"><code>    private double targetDegrees = ArmConstants.LOW_DEGREES;
+<span class="code-line code-added">    private final TunableDouble kP = Tunables.addDouble(&quot;Arm/Gains/kP&quot;, 45.0);</span>
+<span class="code-line code-added">    private final TunableDouble kD = Tunables.addDouble(&quot;Arm/Gains/kD&quot;, 0.0);</span>
+<span class="code-line code-added">    private final TunableDouble kG = Tunables.addDouble(&quot;Arm/Gains/kG&quot;, 0.23);</span>
+<span class="code-line code-added">    private final TunableDouble kV = Tunables.addDouble(&quot;Arm/Gains/kV&quot;, 15.0);</span>
+<span class="code-line code-added">    private final TunableDouble kA = Tunables.addDouble(&quot;Arm/Gains/kA&quot;, 0.0);</span>
+<span class="code-line code-added">    private final TunableBoolean applyGains =</span>
+<span class="code-line code-added">        Tunables.addBoolean(&quot;Arm/Gains/Apply&quot;, false);</span>
+<span class="code-line code-added">    private String gainStatus = &quot;Using code defaults&quot;;</span>
+<span class="code-line code-added">    private Slot0Configs appliedGains;</span>
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0.0);
+    private final TelemetryTable telemetry =</code></pre><div class="code-copy"><button type="button" data-copy-code="    private final TunableDouble kP = Tunables.addDouble(&quot;Arm/Gains/kP&quot;, 45.0);
+    private final TunableDouble kD = Tunables.addDouble(&quot;Arm/Gains/kD&quot;, 0.0);
+    private final TunableDouble kG = Tunables.addDouble(&quot;Arm/Gains/kG&quot;, 0.23);
+    private final TunableDouble kV = Tunables.addDouble(&quot;Arm/Gains/kV&quot;, 15.0);
+    private final TunableDouble kA = Tunables.addDouble(&quot;Arm/Gains/kA&quot;, 0.0);
+    private final TunableBoolean applyGains =
+        Tunables.addBoolean(&quot;Arm/Gains/Apply&quot;, false);
+    private String gainStatus = &quot;Using code defaults&quot;;
+    private Slot0Configs appliedGains;" aria-label="Copy added code for Arm step 2">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-arm-3"><h2>3. Remember the current gain configuration</h2><p>Open <code>src/main/java/first/robot/subsystems/Arm.java</code>. Find <strong>TODO 5.A3</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-3" data-side="before"><code>        config.Slot0.kG = 0.23;
+        config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+<span class="code-line code-removed">        // TODO 5.A3: Remember the current gain configuration.</span>
+        config.MotionMagic.MotionMagicCruiseVelocity = 0.45;</code></pre><p>Keep this object so we can preserve the gravity mode and report which gains were accepted. The ratio and motion limits belong to other configuration groups.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-3" data-side="after"><code>        config.Slot0.kG = 0.23;
+        config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+<span class="code-line code-added">        appliedGains = config.Slot0;</span>
+        config.MotionMagic.MotionMagicCruiseVelocity = 0.45;</code></pre><div class="code-copy"><button type="button" data-copy-code="        appliedGains = config.Slot0;" aria-label="Copy added code for Arm step 3">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-arm-4"><h2>4. Apply only the gains</h2><p>Open <code>src/main/java/first/robot/subsystems/Arm.java</code>. Find <strong>TODO 5.A4</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-4" data-side="before"><code>
+<span class="code-line code-removed">    // TODO 5.A4: Apply only the gains.</span>
+    @Override
+    public void periodic() {
+        // TODO 5.A5: Check for an Apply request.</code></pre><p>Apply resets to off after each attempt. We reject invalid numbers and send only Slot0Configs: the sensor ratio and Motion Magic limits stay intact. A failed attempt is reported instead of retried every loop. The 0–1000 range is an input check, not a promise that every value will tune well.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-4" data-side="after"><code>
+<span class="code-line code-added">    private void updateGains() {</span>
+<span class="code-line code-added">        if (!applyGains.get()) {</span>
+<span class="code-line code-added">            return;</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added">        applyGains.set(false);</span>
+<span class="code-line code-added">        double[] values = {kP.get(), kD.get(), kG.get(), kV.get(), kA.get()};</span>
+<span class="code-line code-added">        for (double value : values) {</span>
+<span class="code-line code-added">            if (!Double.isFinite(value) || value &lt; 0.0 || value &gt; 1000.0) {</span>
+<span class="code-line code-added">                gainStatus = &quot;Not applied: use numbers from 0 to 1000&quot;;</span>
+<span class="code-line code-added">                return;</span>
+<span class="code-line code-added">            }</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added">        var next = new Slot0Configs();</span>
+<span class="code-line code-added">        next.GravityType = appliedGains.GravityType;</span>
+<span class="code-line code-added">        next.kP = values[0];</span>
+<span class="code-line code-added">        next.kD = values[1];</span>
+<span class="code-line code-added">        next.kG = values[2];</span>
+<span class="code-line code-added">        next.kV = values[3];</span>
+<span class="code-line code-added">        next.kA = values[4];</span>
+<span class="code-line code-added">        var status = motor.getConfigurator().apply(next, 0.020);</span>
+<span class="code-line code-added">        if (status.isOK()) {</span>
+<span class="code-line code-added">            appliedGains = next;</span>
+<span class="code-line code-added">            gainStatus = &quot;Applied&quot;;</span>
+<span class="code-line code-added">        } else {</span>
+<span class="code-line code-added">            gainStatus = &quot;Not applied: &quot; + status + &quot;; switch Apply on to retry&quot;;</span>
+<span class="code-line code-added">        }</span>
+<span class="code-line code-added">    }</span>
+<span class="code-line code-added"></span>
+    @Override
+    public void periodic() {
+        // TODO 5.A5: Check for an Apply request.</code></pre><div class="code-copy"><button type="button" data-copy-code="    private void updateGains() {
+        if (!applyGains.get()) {
+            return;
+        }
+        applyGains.set(false);
+        double[] values = {kP.get(), kD.get(), kG.get(), kV.get(), kA.get()};
+        for (double value : values) {
+            if (!Double.isFinite(value) || value &lt; 0.0 || value &gt; 1000.0) {
+                gainStatus = &quot;Not applied: use numbers from 0 to 1000&quot;;
+                return;
+            }
+        }
+        var next = new Slot0Configs();
+        next.GravityType = appliedGains.GravityType;
+        next.kP = values[0];
+        next.kD = values[1];
+        next.kG = values[2];
+        next.kV = values[3];
+        next.kA = values[4];
+        var status = motor.getConfigurator().apply(next, 0.020);
+        if (status.isOK()) {
+            appliedGains = next;
+            gainStatus = &quot;Applied&quot;;
+        } else {
+            gainStatus = &quot;Not applied: &quot; + status + &quot;; switch Apply on to retry&quot;;
+        }
+    }
+" aria-label="Copy added code for Arm step 4">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-arm-5"><h2>5. Check for an Apply request</h2><p>Open <code>src/main/java/first/robot/subsystems/Arm.java</code>. Find <strong>TODO 5.A5</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-5" data-side="before"><code>    @Override
+    public void periodic() {
+<span class="code-line code-removed">        // TODO 5.A5: Check for an Apply request.</span>
+        telemetry.log(&quot;Target_deg&quot;, targetDegrees);</code></pre><p>periodic runs each robot loop. updateGains returns immediately unless Apply is on; it does not repeatedly configure the controller.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-5" data-side="after"><code>    @Override
+    public void periodic() {
+<span class="code-line code-added">        updateGains();</span>
+        telemetry.log(&quot;Target_deg&quot;, targetDegrees);</code></pre><div class="code-copy"><button type="button" data-copy-code="        updateGains();" aria-label="Copy added code for Arm step 5">Copy added code</button><span role="status" aria-live="polite"></span></div></section><section id="edit-arm-6"><h2>6. Log what the controller is doing</h2><p>Open <code>src/main/java/first/robot/subsystems/Arm.java</code>. Find <strong>TODO 5.A6</strong>.</p><p class="code-caption">Find this code — red marks what changes</p><pre data-edit="Arm-6" data-side="before"><code>        updateGains();
+        telemetry.log(&quot;Target_deg&quot;, targetDegrees);
+<span class="code-line code-removed">        // TODO 5.A6: Log what the controller is doing.</span>
+        double mechanismTurns = motor.getPosition().getValueAsDouble();</code></pre><p>ProfileTarget is the Talon’s moving reference. Target is the destination sent by our code. Actual is the measured position. Applied_kP and the other Applied values report the last successful configuration, not an unsubmitted dashboard edit.</p><p class="code-caption">Make it match — green marks the new code</p><pre data-edit="Arm-6" data-side="after"><code>        updateGains();
+        telemetry.log(&quot;Target_deg&quot;, targetDegrees);
+<span class="code-line code-added">        telemetry.log(&quot;ProfileTarget_deg&quot;, motor.getClosedLoopReference().getValueAsDouble() * 360.0);</span>
+<span class="code-line code-added">        telemetry.log(&quot;MotorVoltage_V&quot;, motor.getMotorVoltage().getValueAsDouble());</span>
+<span class="code-line code-added">        telemetry.log(&quot;GainStatus&quot;, gainStatus);</span>
+<span class="code-line code-added">        telemetry.log(&quot;Applied_kP&quot;, appliedGains.kP);</span>
+<span class="code-line code-added">        telemetry.log(&quot;Applied_kD&quot;, appliedGains.kD);</span>
+<span class="code-line code-added">        telemetry.log(&quot;Applied_kG&quot;, appliedGains.kG);</span>
+<span class="code-line code-added">        telemetry.log(&quot;Applied_kV&quot;, appliedGains.kV);</span>
+<span class="code-line code-added">        telemetry.log(&quot;Applied_kA&quot;, appliedGains.kA);</span>
+        double mechanismTurns = motor.getPosition().getValueAsDouble();</code></pre><div class="code-copy"><button type="button" data-copy-code="        telemetry.log(&quot;ProfileTarget_deg&quot;, motor.getClosedLoopReference().getValueAsDouble() * 360.0);
+        telemetry.log(&quot;MotorVoltage_V&quot;, motor.getMotorVoltage().getValueAsDouble());
+        telemetry.log(&quot;GainStatus&quot;, gainStatus);
+        telemetry.log(&quot;Applied_kP&quot;, appliedGains.kP);
+        telemetry.log(&quot;Applied_kD&quot;, appliedGains.kD);
+        telemetry.log(&quot;Applied_kG&quot;, appliedGains.kG);
+        telemetry.log(&quot;Applied_kV&quot;, appliedGains.kV);
+        telemetry.log(&quot;Applied_kA&quot;, appliedGains.kA);" aria-label="Copy added code for Arm step 6">Copy added code</button><span role="status" aria-live="polite"></span></div></section></div><div class="lesson-next"><a href="control-setup.html">Previous: Setup</a><a href="control-try.html">Next: Tune the sim</a></div></main></body></html>
