@@ -14,6 +14,13 @@
   const errorPanel = root.querySelector('#tracking-detail');
   const controls = [...root.querySelectorAll('[data-gain]')];
   const profile = root.querySelector('#profile-mode');
+  const keepScrolling = root.querySelector('#keep-scrolling');
+  function playbackState() {
+    const button=root.querySelector('#lab-play');
+    button.textContent=running?'Pause':'Run';
+    button.disabled=!keepScrolling.checked && model.time>=5-1e-9;
+    button.title=button.disabled?'Reset to start another run, or enable Keep scrolling.':'';
+  }
   function sync() {
     controls.forEach(input => {
       input.value = model.config[input.dataset.gain];
@@ -21,7 +28,7 @@
     });
     profile.checked = model.config.profile;
   }
-  function reset() { model.reset(); samples = [model.sample()]; previous = null; accumulator = 0; peakError = 0; render(); }
+  function reset() { model.reset(); samples = [model.sample()]; previous = null; accumulator = 0; peakError = 0; playbackState(); render(); }
   function setStage(n) {
     stage = Math.max(0, Math.min(stages.length-1,n));
     Object.assign(model.config, stages[stage].config, {target:65,maxV:.18,maxA:.35});
@@ -43,7 +50,11 @@
   }));
   profile.addEventListener('change', () => {model.config.profile=profile.checked; reset();});
   root.querySelector('#lab-play').addEventListener('click', () => {
-    running=!running; previous=null; root.querySelector('#lab-play').textContent=running?'Pause':'Run';
+    running=!running; previous=null; playbackState();
+  });
+  keepScrolling.addEventListener('change',()=>{
+    if(!keepScrolling.checked && model.time>=5-1e-9){running=false;previous=null;accumulator=0;}
+    playbackState();
   });
   root.querySelector('#lab-restart').addEventListener('click', reset);
   root.querySelector('#stage-back').addEventListener('click', () => setStage(stage-1));
@@ -113,7 +124,12 @@
   function frame(now){
     if(running && !document.hidden){
       if(previous!==null)accumulator+=Math.min((now-previous)/1000,.05);
-      while(accumulator>=.002){const sample=model.step(.002);peakError=Math.max(peakError,Math.abs(sample.reference-sample.actual));accumulator-=.002;if(Math.round(model.time/.002)%10===0)samples.push(sample);}
+      while(accumulator>=.002 && (keepScrolling.checked || model.time<5-1e-9)){
+        const sample=model.step(keepScrolling.checked?.002:Math.min(.002,5-model.time));
+        peakError=Math.max(peakError,Math.abs(sample.reference-sample.actual));accumulator-=.002;
+        if(Math.round(model.time/.002)%10===0)samples.push(sample);
+      }
+      if(!keepScrolling.checked && model.time>=5-1e-9){running=false;accumulator=0;playbackState();render();}
       // Retain one point before the visible window so the trace reaches its left edge.
       while(samples.length>2 && samples[1].time<model.time-5)samples.shift();
       if(now-lastRender>30){render();lastRender=now;}
